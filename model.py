@@ -76,7 +76,8 @@ class DiffImage(db.Model):
                     im_1_id={self.im_1_id},
                     im_2_id={self.im_2_id},
                     diff_upload_date={self.diff_upload_date},
-                    diff_size={self.diff_size},
+                    diff_size_x={self.diff_size_x},
+                    diff_size_y={self.diff_size_y},
                     diff_format={self.diff_format},
                     diff_mode={self.diff_mode},
                     diff_s3_url={self.diff_s3_url}""")
