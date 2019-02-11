@@ -1,0 +1,80 @@
+"""Models and database functions for image and user management"""
+
+from flask_sqlalchemy import flask_sqlalchemy
+
+db = SQLAlchemy
+
+class Users(db.model):
+    """User model."""
+
+    __tablename__ = "users"
+
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+    fname = db.Column(db.String(50), nullable=False)
+    lname = db.Column(db.String(50), nullable=False)
+    sign_up_date = db.Column(db.Date, nullable=False)
+
+
+    def __repr__(self):
+        """Formatted output when class obj is returned. Does not return password."""
+        return(f"""<User user_id={self.user_id}, username={self.user_id}), sign_up_date={self.sign_up_date}""")
+
+
+class InputImage(db.model):
+    """Input image model."""
+
+    __tablename__ = "input_images"
+
+    im_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    im_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    im_upload_date = db.Column(db.DateTime, timezone=True, nullable=False)
+    im_size = db.Column(db.Array, as_tuple=True, nullable=False)
+    im_format = db.Column(db.String(10), nullable=False)
+    im_mode = db.Column(db.String(10), nullable=False)
+    im_s3_url = db.Column(db.String(500), nullable=False)
+
+
+    def __repr__(self):
+        """Formatted output when class obj is returned. Does not return password."""
+        return (f"""<User:
+                    im_id={self.im_id}, 
+                    im_user_id={self.im_user_id}), 
+                    im_upload_date={self.im_upload_date},
+                    im_size={self.im_size},
+                    im_format={self.im_format},
+                    im_mode={self.im_mode},
+                    im_s3_url={self.im_s3_url}""")
+
+
+class DiffImage(db.model):
+    """Input image model."""
+
+    __tablename__ = "diff_images"
+
+    diff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    diff_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    im_1_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
+    im_2_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
+    diff_upload_date = db.Column(db.DateTime, timezone=True, nullable=False)
+    diff_size = db.Column(db.Array, as_tuple=True, nullable=False)
+    diff_format = db.Column(db.String(10), nullable=False)
+    diff_mode = db.Column(db.String(10), nullable=False)
+    diff_s3_url = db.Column(db.String(500), nullable=False)
+
+
+    def __repr__(self):
+        """Formatted output when class obj is returned. Does not return password."""
+        return (f"""<User:
+                    diff_id={self.diff_id}, 
+                    diff_user_id={self.diff_user_id}),
+                    im_1_id={self.im_1_id},
+                    im_2_id={self.im_2_id},
+                    diff_upload_date={self.diff_upload_date},
+                    diff_size={self.diff_size},
+                    diff_format={self.diff_format},
+                    diff_mode={self.diff_mode},
+                    diff_s3_url={self.diff_s3_url}""")
+
+
