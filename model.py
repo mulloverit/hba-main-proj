@@ -11,6 +11,7 @@ class Users(db.model):
 
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     fname = db.Column(db.String(50), nullable=False)
     lname = db.Column(db.String(50), nullable=False)
@@ -18,7 +19,7 @@ class Users(db.model):
 
 
     def __repr__(self):
-        """Formatted output when class obj is returned. Does not return password."""
+        """Formatted output when class obj is returned. Does not return email or password."""
         return(f"""<User user_id={self.user_id}, username={self.user_id}), sign_up_date={self.sign_up_date}""")
 
 
