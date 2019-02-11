@@ -1,10 +1,10 @@
 """Models and database functions for image and user management"""
 
-from flask_sqlalchemy import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy 
 
-db = SQLAlchemy
+db = SQLAlchemy()
 
-class Users(db.model):
+class User(db.Model):
     """User model."""
 
     __tablename__ = "users"
@@ -23,15 +23,16 @@ class Users(db.model):
         return(f"""<User user_id={self.user_id}, username={self.user_id}), sign_up_date={self.sign_up_date}""")
 
 
-class InputImage(db.model):
+class InputImage(db.Model):
     """Input image model."""
 
     __tablename__ = "input_images"
 
     im_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     im_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    im_upload_date = db.Column(db.DateTime, timezone=True, nullable=False)
-    im_size = db.Column(db.Array, as_tuple=True, nullable=False)
+    im_upload_date = db.Column(db.DateTime, nullable=False)
+    im_size_x = db.Column(db.Integer, nullable=False)
+    im_size_y = db.Column(db.Integer, nullable=False)
     im_format = db.Column(db.String(10), nullable=False)
     im_mode = db.Column(db.String(10), nullable=False)
     im_s3_url = db.Column(db.String(500), nullable=False)
@@ -43,13 +44,14 @@ class InputImage(db.model):
                     im_id={self.im_id}, 
                     im_user_id={self.im_user_id}), 
                     im_upload_date={self.im_upload_date},
-                    im_size={self.im_size},
+                    im_size_x={self.im_size_x},
+                    im_size_y={self.im_size_y},
                     im_format={self.im_format},
                     im_mode={self.im_mode},
                     im_s3_url={self.im_s3_url}""")
 
 
-class DiffImage(db.model):
+class DiffImage(db.Model):
     """Input image model."""
 
     __tablename__ = "diff_images"
@@ -58,8 +60,9 @@ class DiffImage(db.model):
     diff_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     im_1_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
     im_2_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
-    diff_upload_date = db.Column(db.DateTime, timezone=True, nullable=False)
-    diff_size = db.Column(db.Array, as_tuple=True, nullable=False)
+    diff_upload_date = db.Column(db.DateTime, nullable=False)
+    diff_size_x = db.Column(db.Integer, nullable=False)
+    diff_size_y = db.Column(db.Integer, nullable=False)
     diff_format = db.Column(db.String(10), nullable=False)
     diff_mode = db.Column(db.String(10), nullable=False)
     diff_s3_url = db.Column(db.String(500), nullable=False)
