@@ -1,0 +1,4 @@
+cmahon | cmahon@fakemail.com | !password! | camilla | mahon
+amahon | amahon@fakemail.com | @password@ | andrew | mahon
+mcbrush | mcbrush@fakemail.com | #password# | marie clare | brush
+breinhart | breinhart@fakemail.com | $password$ | ben | reinhart

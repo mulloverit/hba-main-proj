@@ -1,0 +1,14 @@
+cmahon | 4567 | 4567 | JPEG | RGB | s3://fake-data/cmahon/0000001/test.jpg
+cmahon | 4567 | 4567 | JPEG | RGB | s3://fake-data/cmahon/0000002/test.jpg
+cmahon | 9876 | 4566 | JPEG | RGB | s3://fake-data/cmahon/0000003/test.jpg
+cmahon | 9876 | 4566 | JPEG | RGB | s3://fake-data/cmahon/0000004/test.jpg
+cmahon | 3902 | 4000 | JPEG | RGB | s3://fake-data/cmahon/0000005/test.jpg
+amahon | 3902 | 4000 | JPEG | RGB | s3://fake-data/amahon/0000001/test.jpg
+amahon | 3902 | 4000 | JPEG | RGB | s3://fake-data/amahon/0000002/test.jpg
+amahon | 3902 | 4000 | JPEG | RGB | s3://fake-data/amahon/0000003/test.jpg
+amahon | 3902 | 4000 | JPEG | RGB | s3://fake-data/amahon/0000004/test.jpg
+mcbrush | 3902 | 4000 | JPEG | RGB | s3://fake-data/mcbrush/0000001/test.jpg
+mcbrush | 3902 | 4000 | JPEG | RGB | s3://fake-data/mcbrush/0000002/test.jpg
+mcbrush | 3902 | 4000 | JPEG | RGB | s3://fake-data/mcbrush/0000003/test.jpg
+breinhart | 3902 | 4000 | JPEG | RGB | s3://fake-data/breinhart/0000001/test.jpg
+breinhart | 3902 | 4000 | JPEG | RGB | s3://fake-data/breinhart/0000002/test.jpg
