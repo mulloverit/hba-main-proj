@@ -29,3 +29,13 @@ def load_users():
         db.session.add(user)
 
     db.session.commit()
+
+
+if __name__ == "__main__":
+
+    # creates tables, in case they haven't been created yet
+    db.create_all()
+
+    load_users()
+    # load_input_imgs()
+    # load_diff_imgs()
