@@ -2,10 +2,11 @@
 
 from flask import Flask, request, jsonify, render_template
 from model import User, InputImage, DiffImage
+from config import *
 
 
 app = Flask(__name__)
-app.secret_key = "faking_it_for_now"
+app.secret_key = SECRET_KEY
 
 @app.route("/")
 def show_index():
