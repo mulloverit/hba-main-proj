@@ -6,6 +6,7 @@ from datetime import datetime
 
 from model import connect_to_db, db
 from server import app
+import os
 
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 
@@ -63,10 +64,9 @@ def load_diff_imgs():
     # clean out any existing records from table
     DiffImage.query.delete()
 
-    for row in open("test-fixtures/input-images.txt"):
+    for row in open("test-fixtures/diff-images.txt"):
         row = row.rstrip()
-        (diff_user_id, im_1_id, im_2_id, diff_size_x, diff_size_y, 
-            diff_format, diff_mode, diff_s3_url = row.split("|")) 
+        diff_user_id, im_1_id, im_2_id, diff_size_x, diff_size_y, diff_format, diff_mode, diff_s3_url = row.split("|")
 
         diff_img = DiffImage(diff_user_id=diff_user_id,
                              im_1_id=im_1_id,
@@ -81,9 +81,11 @@ def load_diff_imgs():
 if __name__ == "__main__":
 
     # creates tables, in case they haven't been created yet
+    os.system("dropdb imgdiffs")
+    os.system("createdb imgdiffs")
     connect_to_db(app)
     db.create_all()
 
     load_users()
-    # load_input_imgs()
-    # load_diff_imgs()
+    load_input_imgs()
+    load_diff_imgs()
