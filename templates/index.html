@@ -14,6 +14,7 @@
             <br>
             <p>Upload the two images you'd like to diff.</p>
             <br>
+            <!-- multipart/form-data required by flask to upload files -->
             <form action="/" method="POST" enctype="multipart/form-data">
                 <input type="file" name="img-1"">
                 <input type="file" name="img-2">
