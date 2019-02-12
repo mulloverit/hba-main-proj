@@ -10,6 +10,20 @@
     <div class="row">
         <div class="diff-my-imgs">
             <h2>Just diff my images</h2>
+            <hr>
+            <br>
+            <p>Upload the two images you'd like to diff.</p>
+            <br>
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <input type="file" name="img-1"">
+                <input type="file" name="img-2">
+                <input type="submit" name="upload-input-imgs" value="Upload">
+            </form>
+            <br>
+            <br>
+            <br>
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <input type="submit" name="diff-input-imgs" value="Diff!">
         </div>
     </div>
 </div>
