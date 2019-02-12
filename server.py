@@ -1,11 +1,30 @@
 """Flask server for image differencing application"""
 
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, flash, redirect
 from model import User, InputImage, DiffImage
 from config import *
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+@app.route("/", methods=['POST'])
+def diff_imgs_no_login():
+    """Diff images without forcing user to sign in"""
+
+    # retrieve images from page
+    try:
+        img_1 = request.files['img-1']
+        img_2 = request.files['img-2']
+        flash("Upload success!")
+    
+    except:
+        flash("Please provide two valid files for upload.")
+    
+    return redirect("/")
+
+    # recognize action when user clicks "diff" button
+    # send two images to image diffing function
+    # display diff'd image
 
 @app.route("/")
 def show_index():
