@@ -22,7 +22,10 @@ class User(db.Model):
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return email or password."""
-        return(f"""<User user_id={self.user_id}, username={self.user_id}), sign_up_date={self.sign_up_date}""")
+        return(f"""<User:
+                        user_id={self.user_id},
+                        username={self.username}),
+                        sign_up_date={self.sign_up_date}""")
 
 
 class InputImage(db.Model):

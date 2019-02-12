@@ -5,6 +5,7 @@ from model import User, InputImage, DiffImage
 
 
 app = Flask(__name__)
+app.secret_key = "faking_it_for_now"
 
 @app.route("/")
 def show_index():
