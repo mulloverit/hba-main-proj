@@ -1,10 +1,9 @@
 """Utility file to seed image_diffs database for testing"""
-
-from sqlalchemy import func
-from model import User, InputImage, DiffImage
 from datetime import datetime
+from sqlalchemy import func
 
-from model import connect_to_db, db
+
+from model import User, InputImage, DiffImage, connect_to_db, db
 from server import app
 import os
 
