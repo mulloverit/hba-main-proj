@@ -30,52 +30,73 @@ class InputImage:
                   Mode: {im_mode},
                   Format: {im_format}""")
 
+def check_inputs_and_open():
+    """Manage incoming images"""
 
-#################### Make cheap pixel image difference: 
+    try:
+        img_1_path, img_2_path = [sys.argv[1], sys.argv[2]]
+        
+    except:
 
-try:
-    img_1_path, img_2_path = [sys.argv[1], sys.argv[2]]
-    
-except:
+        print("Please provide image inputs.\n")
+        img_1_path = input("Image 1: ") # 'test-fixtures/imgs/inputs/img1.jpg'
+        img_2_path = input("Image 2: ") # 'test-fixtures/imgs/inputs/img2.jpg'
 
-    print("Please provide image inputs.\n")
-    img_1_path = input("Image 1: ") # 'test-fixtures/imgs/inputs/img1.jpg'
-    img_2_path = input("Image 2: ") # 'test-fixtures/imgs/inputs/img2.jpg'
+    # Establish image classes and open files for differencing
+    img_1, img_2 = InputImage(img_1_path), InputImage(img_2_path)
+    diff_input_1, diff_input_2 = Image.open(img_1.filepath), Image.open(img_2.filepath)
 
-# Establish image classes and open files for differencing
-img_1, img_2 = InputImage(img_1_path), InputImage(img_2_path)
-diff_input_1, diff_input_2 = Image.open(img_1.filepath), Image.open(img_2.filepath)
+    return [img_1, img_2, diff_input_1, diff_input_2]
 
-# Perform image differencing, save the diff
-diff_img = ImageChops.difference(diff_input_1, diff_input_2)
-diff_img.save('test-fixtures/imgs/diffs/diff_{}_{}.jpg'.format(img_1.filename, img_2.filename))
+
+
+def create_cheap_diff(img_1, img_2, diff_input_1, diff_input_2):
+    """Create a direct pixel value subtraction diff and save it"""
+
+    diff_img = ImageChops.difference(diff_input_1, diff_input_2)
+    diff_img.save('test-fixtures/imgs/diffs/diff_{}_{}.jpg'.format(img_1.filename, img_2.filename))
+
+    return diff_img
 
 #################### Make boolean difference:
 
-# Convert input images to single channel, 8-bit, black and white images
-im1l, im2l = diff_input_1.convert("L"), diff_input_2.convert("L")
-bw_diff = ImageChops.difference(im1l, im2l) # compute their diff at every pixel
-bw_stat = ImageStat.Stat(bw_diff) # create an image statistics object
-bw_median = bw_stat.median # grab the diff's median value
+def create_boolean_diff(diff_input_1, diff_input_2):
+    """Convert input images to single channel images, output new bool diff"""
 
-# Create a new image that will be populated by boolean image
-# Open a list for storing boolean values
-bool_img = Image.new("L", bw_diff.size)
-bool_vals = []
+    # Convert input images to single channel, 8-bit, black and white images
+    im1l, im2l = diff_input_1.convert("L"), diff_input_2.convert("L") 
+    diff_input_1.close(), diff_input_2.close()
 
-# Change all values to either 0 or 255, split based on median val of diff
-for pixel in bw_diff.getdata():
-    if pixel > bw_median[0]:
-        bool_vals.append(255) # 255 instead of 1 cuz 8 bits
-    else:
-        bool_vals.append(0)
+    # Compute diff at each pixel, find median value of diff 
+    bw_diff = ImageChops.difference(im1l, im2l)
+    bw_stat = ImageStat.Stat(bw_diff)
+    bw_median = bw_stat.median
 
-# Add new vals to new image and save boolean image next to initial diff
-bool_img.putdata(bool_vals)
-bool_img.save('test-fixtures/imgs/diffs/diff_{}_{}_bool.jpg'.format(img_1.filename, img_2.filename))
+    # Est new image to populate later, est empty list for boolean vals
+    bool_img = Image.new("L", bw_diff.size)
+    bool_vals = []
 
-# For debugging:
-diff_img.show(), bool_img.show()
+    # Change all values to either 0 or 255, split based on median val of diff
+    for pixel in bw_diff.getdata():
 
-# Close up shop
-diff_input_1.close(), diff_input_2.close(), diff_img.close(), bool_img.close()
+        if pixel > bw_median[0]:
+            bool_vals.append(255)
+    
+        else:
+            bool_vals.append(0)
+
+    # Populate bool_img object with new vals and save 
+    bool_img.putdata(bool_vals)
+    bool_img.save('test-fixtures/imgs/diffs/diff_{}_{}_bool.jpg'.format(img_1.filename, img_2.filename))
+
+    return bool_img
+
+
+if __name__ == "__main__":
+
+    img_1, img_2, diff_in_1, diff_in_2 = check_inputs_and_open()
+    diff_img = create_cheap_diff(img_1, img_2, diff_in_1, diff_in_2)
+    bool_img = create_boolean_diff(diff_in_1, diff_in_2)
+
+    diff_img.show(), bool_img.show()
+    diff_img.close(), bool_img.close()
