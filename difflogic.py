@@ -3,9 +3,7 @@ import sys, os
 
 from testseed import load_users, load_input_imgs, load_diff_imgs
 
-# useful Image attributes:  .format, .size, .mode, .bits, .pallette
-# useful Image methods:     .getbbox(), .histogram(), .putalpha(), .resize(), 
-#                           .rotate(), .crop(), .save(), .copy(), .open()
+#################### Class definitions: 
 
 class InputImage:
 
@@ -33,7 +31,7 @@ class InputImage:
                   Format: {im_format}""")
 
 
-##########################################################
+#################### Work: 
 
 try:
     img_1_path, img_2_path = [sys.argv[1], sys.argv[2]]
