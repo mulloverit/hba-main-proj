@@ -1,11 +1,13 @@
 from PIL import Image, ImageChops, ImageStat # imagechops -> "image channel operations"
 import sys, os
+import boto3, botocore
+from config import S3_KEY, S3_SECRET, S3_BUCKET
 
 from testseed import load_users, load_input_imgs, load_diff_imgs
 
 ### Class establishments ###
 
-class InputImage:
+class DiffInputImage:
 
     def __init__(self, filepath):
         """Instantiate an Image class object"""
@@ -45,7 +47,7 @@ def check_inputs_and_open():
         img_2_path = input("Image 2: ") # 'test-fixtures/imgs/inputs/img2.jpg'
 
     # Establish image classes and open files for differencing
-    img_1, img_2 = InputImage(img_1_path), InputImage(img_2_path)
+    img_1, img_2 = DiffInputImage(img_1_path), DiffInputImage(img_2_path)
     diff_input_1, diff_input_2 = Image.open(img_1.filepath), Image.open(img_2.filepath)
 
     return [img_1, img_2, diff_input_1, diff_input_2]
@@ -92,6 +94,28 @@ def create_boolean_diff(diff_input_1, diff_input_2):
 
     return bool_img
 
+##### FUNCTIONS FOR UPLOAD LOGIC HERE TOO?? OR SEPARATE FILE?
+
+def upload_file_to_s3(file, bucket_name, username, acl="private"):
+    """Upload a file to S3 location specific to a user"""
+    try:
+        
+        bucket_loc = bucket_name + "/" + username
+
+        s3.upload_fileobj(
+            file,
+            bucket_loc,
+            file.filename, # what is .filename ?
+            ExtraArgs={
+                "ACL": acl,
+                "ContentType": file.content_type
+            })
+
+        return "{}{}".format(app.config["S3_LOCATION"], file.filename)
+
+    except:
+        print("Error occurred while attempting upload")
+        return
 
 if __name__ == "__main__":
 
