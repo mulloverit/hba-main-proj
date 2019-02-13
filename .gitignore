@@ -1,3 +1,4 @@
+.DS_Store
 hba-proj-env/
 __pycache__
 *.pyc
