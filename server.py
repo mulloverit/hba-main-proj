@@ -23,37 +23,44 @@ def upload_images():
     except:
         flash("Please provide two valid files for upload.")
         return
+
+    try:
+       username = session['username'] 
         
-    # IF USER IS LOGGED IN -- add to database and upload to s3
+    # IF USER IS LOGGED IN -- upload to user's s3 loc and add to db
     if session.get('username', False):
     
         user = User.query.filter(User.username == session['username']).one()
         user_id = user.user_id
+        flash("Logged in.")
 
         for img in input_imgs:
 
-            current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            # Upload files to S3 
             im = Image.open(img)
+            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username) # from s3_manipulation
 
-            im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username)
+            # If valid URL returned, add to db with upload completion time
+            if im_s3_url:
 
-            input_image = InputImage(im_user_id=user_id, 
-                    im_upload_datetime=current_datetime,
-                    im_size_x=im.size[0],
-                    im_size_y=im.size[1],
-                    im_format=im.format,
-                    im_mode=im.mode,
-                    im_s3_url=im_s3_url)
+                upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+                success = True
+            
+            # Otherwise, report a failure with timestamp
+            else:
+        
+                upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                success = False
 
-            db.sesssion.add(input_image)
-        db.session.commit()
-        flash("Logged in. Files will persist after page refresh.")
+            # Add files to database
+            db_add_input_img(username, diff_img, input_1, input_2, succeeded=success) # from database_manipulation
 
+    # IF USER IS NOT LOGGED IN -- upload to tmp s3 loc, do not store in db
     else:
+
         flash("Not logged in - uploaded images will not persist if page refreshed.")
 
-        # If user is logged in and we don't neeed to add to database,
-        # let them know we've recieved temp images
 
     flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
     

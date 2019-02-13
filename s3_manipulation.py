@@ -21,4 +21,4 @@ def upload_file_to_s3(file, bucket_name, username, acl="private"):
 
     except:
         print("Error occurred while attempting upload")
-        return
+        return False

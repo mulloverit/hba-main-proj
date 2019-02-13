@@ -50,7 +50,8 @@ def load_input_imgs():
                                im_format=im_format,
                                im_mode=im_mode,
                                im_s3_url=im_s3_url,
-                               im_upload_datetime=CURRENT_DATE)
+                               im_upload_begin_datetime=CURRENT_DATE,
+                               im_upload_complete_datetime=CURRENT_DATE)
 
         db.session.add(input_img)
 
@@ -75,7 +76,8 @@ def load_diff_imgs():
                              diff_format=diff_format,
                              diff_mode=diff_mode,
                              diff_s3_url=diff_s3_url,
-                             diff_upload_datetime=CURRENT_DATE)
+                             diff_upload_begin_datetime=CURRENT_DATE,
+                             diff_upload_complete_datetime=CURRENT_DATE)
 
         db.session.add(diff_img)
 

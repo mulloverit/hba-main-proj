@@ -1,9 +1,11 @@
 """Utility file for interacting with main database"""
 from datetime import datetime
 import os
+from PIL import Image
 from sqlalchemy import func
 
 from model import User, InputImage, DiffImage, connect_to_db, db
+from s3_manipulation import upload_file_to_s3
 
 
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
@@ -25,21 +27,31 @@ def db_add_new_users(username, email, password??, fname, lname):
 
     db.session.commit()
 
-def db_add_input_img(username, diff_img, input_1, input_2):
+def db_add_input_img(username, diff_img, input_1, input_2, succeeded=True):
     """Load input img data into db"""
     
-    # NEEDS LOGIC FOR GETTING IMAGE METADATA
+    im = Image.open(img)
+    upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    
+    if succeeded:
+        im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username)
+        upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    input_img = InputImage(im_user_id=im_user_id,
-                           im_size_x=im_size_x,
-                           im_size_y=im_size_y,
-                           im_format=im_format,
-                           im_mode=im_mode,
-                           im_s3_url=im_s3_url,
-                           im_upload_date=CURRENT_DATE)
+    else:
+        # will require database to handle date/datetime as a string instead of datetime obejct
+        upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
 
-    db.session.add(input_img)
+    input_image = InputImage(im_user_id=user_id, 
+            im_upload_begin_datetime=upload_begin_current_datetime,
+            im_upload_complete_datetime=upload_complete_current_datetime,
+            im_size_x=im.size[0],
+            im_size_y=im.size[1],
+            im_format=im.format,
+            im_mode=im.mode,
+            im_s3_url=im_s3_url)
 
+    im.close()
+    db.sesssion.add(input_image)
     db.session.commit()
 
 def db_add_diff_img(username, diff_img, input_1, input_2):

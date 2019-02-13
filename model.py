@@ -17,7 +17,7 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     fname = db.Column(db.String(50), nullable=False)
     lname = db.Column(db.String(50), nullable=False)
-    sign_up_date = db.Column(db.Date, nullable=False)
+    sign_up_date = db.Column(db.String(50), nullable=False)
 
 
     def __repr__(self):
@@ -35,7 +35,8 @@ class InputImage(db.Model):
 
     im_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     im_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    im_upload_datetime = db.Column(db.DateTime, nullable=False)
+    im_upload_begin_datetime = db.Column(db.String(50), nullable=False)
+    im_upload_complete_datetime = db.Column(db.String(50), nullable=False)
     im_size_x = db.Column(db.Integer, nullable=False)
     im_size_y = db.Column(db.Integer, nullable=False)
     im_format = db.Column(db.String(10), nullable=False)
@@ -48,7 +49,8 @@ class InputImage(db.Model):
         return (f"""<InputImage:
                     im_id={self.im_id}, 
                     im_user_id={self.im_user_id}), 
-                    im_upload_datetime={self.im_upload_datetime},
+                    im_upload_begin_datetime={self.im_upload_datetime},
+                    im_upload_complete_datetime={self.im_upload_datetime},
                     im_size_x={self.im_size_x},
                     im_size_y={self.im_size_y},
                     im_format={self.im_format},
@@ -65,7 +67,8 @@ class DiffImage(db.Model):
     diff_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     im_1_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
     im_2_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
-    diff_upload_datetime = db.Column(db.DateTime, nullable=False)
+    diff_upload_begin_datetime = db.Column(db.String(50), nullable=False)
+    diff_upload_complete_datetime = db.Column(db.String(50), nullable=False)
     diff_size_x = db.Column(db.Integer, nullable=False)
     diff_size_y = db.Column(db.Integer, nullable=False)
     diff_format = db.Column(db.String(10), nullable=False)
@@ -80,7 +83,8 @@ class DiffImage(db.Model):
                     diff_user_id={self.diff_user_id}),
                     im_1_id={self.im_1_id},
                     im_2_id={self.im_2_id},
-                    diff_upload_datetime={self.diff_upload_datetime},
+                    diff_upload_begin_datetime={self.diff_upload_datetime},
+                    diff_upload_complete_datetime={self.diff_upload_datetime},
                     diff_size_x={self.diff_size_x},
                     diff_size_y={self.diff_size_y},
                     diff_format={self.diff_format},
