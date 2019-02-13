@@ -45,7 +45,7 @@ class InputImage(db.Model):
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return password."""
-        return (f"""<User:
+        return (f"""<InputImage:
                     im_id={self.im_id}, 
                     im_user_id={self.im_user_id}), 
                     im_upload_date={self.im_upload_date},
@@ -75,7 +75,7 @@ class DiffImage(db.Model):
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return password."""
-        return (f"""<User:
+        return (f"""<DiffImage:
                     diff_id={self.diff_id}, 
                     diff_user_id={self.diff_user_id}),
                     im_1_id={self.im_1_id},
