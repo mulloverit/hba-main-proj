@@ -1,12 +1,11 @@
 """Flask server for image differencing application"""
-
+from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 from PIL import Image
-from datetime import datetime
 
+from config import *
+from s3_manipulation import upload_file_to_s3
 from model import User, InputImage, DiffImage
-#from config import *
-from difflogic import DiffInputImage, check_inputs_and_open, create_cheap_diff, create_boolean_diff, upload_file_to_s3
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY

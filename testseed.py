@@ -1,11 +1,11 @@
 """Utility file to seed image_diffs database for testing"""
 from datetime import datetime
+import os
 from sqlalchemy import func
-
 
 from model import User, InputImage, DiffImage, connect_to_db, db
 from server import app
-import os
+
 
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 
@@ -50,7 +50,7 @@ def load_input_imgs():
                                im_format=im_format,
                                im_mode=im_mode,
                                im_s3_url=im_s3_url,
-                               im_upload_date=CURRENT_DATE)
+                               im_upload_datetime=CURRENT_DATE)
 
         db.session.add(input_img)
 
@@ -75,7 +75,11 @@ def load_diff_imgs():
                              diff_format=diff_format,
                              diff_mode=diff_mode,
                              diff_s3_url=diff_s3_url,
-                             diff_upload_date=CURRENT_DATE)
+                             diff_upload_datetime=CURRENT_DATE)
+
+        db.session.add(diff_img)
+
+    db.session.commit()
 
 if __name__ == "__main__":
 
