@@ -10,63 +10,55 @@ from model import User, InputImage, DiffImage
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-@app.route("/", methods=['POST'])
-def upload_images():
+@app.route("/upload-inputs", methods=['POST'])
+def upload_input_images():
     """Handle initial image upload [no login required]."""
 
     # retrieve images from page
     try:
-        # img_1, img_2 = request.files['img-1'], request.files['img-2'] # valid?
-        img_1 = request.files['img-1']
-        img_2 = request.files['img-2']
+        # img_1 = request.files['img-1']
+        # img_2 = request.files['img-2']
+        input_imgs = [request.files['img-1'], request.files['img-2']]
 
     except:
         flash("Please provide two valid files for upload.")
         return
 
     try:
-       username = session['username'] 
-        
-    # IF USER IS LOGGED IN -- upload to user's s3 loc and add to db
-    if session.get('username', False):
-    
-        user = User.query.filter(User.username == session['username']).one()
-        user_id = user.user_id
-        flash("Logged in.")
+           username = session['username'] 
+           user = User.query.filter(User.username == session['username']).one()
+           user_id = user.user_id
 
         for img in input_imgs:
-
-            # Upload files to S3 
-            im = Image.open(img)
-            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username) # from s3_manipulation
-
-            # If valid URL returned, add to db with upload completion time
-            if im_s3_url:
-
-                upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-                success = True
-            
-            # Otherwise, report a failure with timestamp
-            else:
         
+            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) 
+        
+            if im_s3_url: # If valid URL returned, add to db with upload completion time
+                upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        
+            else: # Otherwise, record a failure with timestamp and notify user
                 upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                success = False
 
-            # Add files to database
-            db_add_input_img(username, diff_img, input_1, input_2, succeeded=success) # from database_manipulation
+            # from database_manipulation
+            db_add_input_img(user_id,
+                             input_1,
+                             input_2,
+                             upload_begin_datetime,
+                             upload_complete_datetime) 
 
-    # IF USER IS NOT LOGGED IN -- upload to tmp s3 loc, do not store in db
-    else:
+            flash("Logging file to S3 failed.")
 
+    # If not logged in, just diff. No s3, no db.
+    except:
+        
         flash("Not logged in - uploaded images will not persist if page refreshed.")
-
 
     flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
     
     return redirect("/")
 
-# @app.route("/", methods="[POST]")
+# @app.route("/submit-diff-request", methods="[POST]")
 # def diff_images():
 #     """Diff images [no login required]."""
 
@@ -75,6 +67,8 @@ def upload_images():
 #     # send two images to image diffing function --> send to server for diff-ing??
 #     # return/render diff'd image
 
+# @app.route("/upload-diff", methods="[POST]")
+# add to html: IF logged in, save diff to s3 for later access
 
 
 @app.route("/")
