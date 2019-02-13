@@ -112,24 +112,16 @@ def register_user():
     fname = request.form['fname']
     lname = request.form['lname']
 
+    
     try:
-        # Check to see if username already taken. If Y, ask for unique username.
+
         if db_check_if_user_exists(username):
+
             flash("Already a user. Please pick a unique username or sign in.")
-            # user = User.query.filter(User.username == username).one()
 
     except:
 
         db_add_new_user(username, email, password, fname, lname)
-        # If N taken, add the new user to psql database table Users
-        # user = User(username=username,
-        #             password=password,
-        #             email=email,
-        #             fname=fname,
-        #             lname=lname)
-
-        # db.session.add(User)
-        # db.session.commit()
 
     return render_template("index.html")
 
