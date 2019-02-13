@@ -3,7 +3,7 @@ import sys, os
 
 from testseed import load_users, load_input_imgs, load_diff_imgs
 
-#################### Class definitions: 
+### Class establishments ###
 
 class InputImage:
 
@@ -29,6 +29,8 @@ class InputImage:
                   Size: {im_size},
                   Mode: {im_mode},
                   Format: {im_format}""")
+
+### Functions ###
 
 def check_inputs_and_open():
     """Manage incoming images"""
@@ -58,7 +60,6 @@ def create_cheap_diff(img_1, img_2, diff_input_1, diff_input_2):
 
     return diff_img
 
-#################### Make boolean difference:
 
 def create_boolean_diff(diff_input_1, diff_input_2):
     """Convert input images to single channel images, output new bool diff"""
