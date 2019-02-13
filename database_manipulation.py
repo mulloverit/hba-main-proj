@@ -27,32 +27,24 @@ def db_add_new_users(username, email, password??, fname, lname):
 
     db.session.commit()
 
-def db_add_input_img(username, diff_img, input_1, input_2, succeeded=True):
+def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
+                     upload_complete_datetime):
     """Load input img data into db"""
     
     im = Image.open(img)
-    upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-    
-    if succeeded:
-        im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username)
-        upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-    else:
-        # will require database to handle date/datetime as a string instead of datetime obejct
-        upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
 
     input_image = InputImage(im_user_id=user_id, 
-            im_upload_begin_datetime=upload_begin_current_datetime,
-            im_upload_complete_datetime=upload_complete_current_datetime,
+            im_upload_begin_datetime=upload_begin_datetime,
+            im_upload_complete_datetime=upload_complete_datetime,
             im_size_x=im.size[0],
             im_size_y=im.size[1],
             im_format=im.format,
             im_mode=im.mode,
             im_s3_url=im_s3_url)
 
-    im.close()
     db.sesssion.add(input_image)
     db.session.commit()
+    im.close()
 
 def db_add_diff_img(username, diff_img, input_1, input_2):
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
