@@ -4,8 +4,9 @@ from flask import Flask, request, jsonify, render_template, flash, redirect, ses
 from PIL import Image
 
 from config import *
-from s3_manipulation import upload_file_to_s3
+from database_manipulation import *
 from model import User, InputImage, DiffImage
+from s3_manipulation import upload_file_to_s3
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -16,21 +17,20 @@ def upload_input_images():
 
     # retrieve images from page
     try:
-        # img_1 = request.files['img-1']
-        # img_2 = request.files['img-2']
         input_imgs = [request.files['img-1'], request.files['img-2']]
+        print(input_imgs)
 
     except:
         flash("Please provide two valid files for upload.")
-        return
+        return redirect("/")
 
     try:
-           username = session['username'] 
-           user = User.query.filter(User.username == session['username']).one()
-           user_id = user.user_id
+        username = session['username']
+        user = User.query.filter(User.username == session['username']).one()
+        user_id = user.user_id
 
         for img in input_imgs:
-        
+
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) 
         
@@ -101,7 +101,7 @@ def sign_in():
 
     return render_template("index.html")
 
-@app.route("/", methods=['POST'])
+@app.route("/register-new", methods=['POST'])
 def register_user():
     """Add a new user to database"""
 
@@ -112,22 +112,24 @@ def register_user():
     fname = request.form['fname']
     lname = request.form['lname']
 
-    # Check to see if username already taken. 
     try:
-        # If Y, ask for unique username.
-        user = User.query.filter(User.username == username).one()
-        flash("Already a user. Please pick a unique username or sign in.")
+        # Check to see if username already taken. If Y, ask for unique username.
+        if db_check_if_user_exists(username):
+            flash("Already a user. Please pick a unique username or sign in.")
+            # user = User.query.filter(User.username == username).one()
 
     except:
-        # If N taken, add the new user to psql database table Users
-        user = User(username=username,
-                    password=password,
-                    email=email,
-                    fname=fname,
-                    lname=lname)
 
-        db.session.add(User)
-        db.session.commit()
+        db_add_new_user(username, email, password, fname, lname)
+        # If N taken, add the new user to psql database table Users
+        # user = User(username=username,
+        #             password=password,
+        #             email=email,
+        #             fname=fname,
+        #             lname=lname)
+
+        # db.session.add(User)
+        # db.session.commit()
 
     return render_template("index.html")
 

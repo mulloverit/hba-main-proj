@@ -1,19 +1,20 @@
 """Utility file for interacting with main database"""
 from datetime import datetime
-import os
+from flask_sqlalchemy import SQLAlchemy 
 from PIL import Image
 from sqlalchemy import func
 
-from model import User, InputImage, DiffImage, connect_to_db, db
-from s3_manipulation import upload_file_to_s3
+from model import User, InputImage, DiffImage, connect_to_db
 
 
+prod_db = SQLAlchemy()
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 
-def db_add_new_users(username, email, password??, fname, lname):
-    """Load new user from into db"""
+def db_check_if_user_exists(username):
+    return User.query.filter(User.username == username).one()
 
-    # NEEDS LOGIC TO PARSE USER DATA ! WHAT TO DO WITH PW?
+def db_add_new_user(username, email, password, fname, lname):
+    """Load new user from into db"""
 
     # user_id not included, as it should populate automatically
     user = User(username=username,
@@ -23,9 +24,8 @@ def db_add_new_users(username, email, password??, fname, lname):
                 lname=lname,
                 sign_up_date=CURRENT_DATE)
 
-    db.session.add(user)
-
-    db.session.commit()
+    prod_db.session.add(user)
+    prod_db.session.commit()
 
 def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
                      upload_complete_datetime):
@@ -42,8 +42,8 @@ def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
             im_mode=im.mode,
             im_s3_url=im_s3_url)
 
-    db.sesssion.add(input_image)
-    db.session.commit()
+    prod_db.sesssion.add(input_image)
+    prod_db.session.commit()
     im.close()
 
 def db_add_diff_img(username, diff_img, input_1, input_2):
@@ -61,8 +61,8 @@ def db_add_diff_img(username, diff_img, input_1, input_2):
                          diff_s3_url=diff_s3_url,
                          diff_upload_date=CURRENT_DATE)
     
-    db.session.add(diff_img)
-    db.session.commit()
+    prod_db.session.add(diff_img)
+    prod_db.session.commit()
 
 if __name__ == "__main__":
 

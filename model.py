@@ -1,7 +1,6 @@
 """Models and database functions for image and user management"""
 
 from flask_sqlalchemy import SQLAlchemy 
-
 db = SQLAlchemy()
 
 ### Class establishments ###
