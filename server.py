@@ -1,30 +1,75 @@
 """Flask server for image differencing application"""
 
-from flask import Flask, request, jsonify, render_template, flash, redirect
+from flask import Flask, request, jsonify, render_template, flash, redirect, session
+from PIL import Image
+from datetime import datetime
+
 from model import User, InputImage, DiffImage
-from config import *
+#from config import *
+from difflogic import DiffInputImage, check_inputs_and_open, create_cheap_diff, create_boolean_diff, upload_file_to_s3
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
 @app.route("/", methods=['POST'])
-def diff_imgs_no_login():
-    """Diff images without forcing user to sign in"""
+def upload_images():
+    """Handle initial image upload [no login required]."""
 
     # retrieve images from page
     try:
+        # img_1, img_2 = request.files['img-1'], request.files['img-2'] # valid?
         img_1 = request.files['img-1']
         img_2 = request.files['img-2']
-        flash("Upload success!")
-    
+
     except:
         flash("Please provide two valid files for upload.")
+        return
+        
+    # IF USER IS LOGGED IN -- add to database and upload to s3
+    if session.get('username', False):
+    
+        user = User.query.filter(User.username == session['username']).one()
+        user_id = user.user_id
+
+        for img in input_imgs:
+
+            current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            im = Image.open(img)
+
+            im_s3_url = upload_file_to_s3(im.filename, S3_BUCKET, user.username)
+
+            input_image = InputImage(im_user_id=user_id, 
+                    im_upload_datetime=current_datetime,
+                    im_size_x=im.size[0],
+                    im_size_y=im.size[1],
+                    im_format=im.format,
+                    im_mode=im.mode,
+                    im_s3_url=im_s3_url)
+
+            db.sesssion.add(input_image)
+        db.session.commit()
+        flash("Logged in. Files will persist after page refresh.")
+
+    else:
+        flash("Not logged in - uploaded images will not persist if page refreshed.")
+
+        # If user is logged in and we don't neeed to add to database,
+        # let them know we've recieved temp images
+
+    flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
     
     return redirect("/")
 
-    # recognize action when user clicks "diff" button
-    # send two images to image diffing function
-    # display diff'd image
+# @app.route("/", methods="[POST]")
+# def diff_images():
+#     """Diff images [no login required]."""
+
+#     # recognize action when user clicks "diff" button
+#     # grab records from database and files from s3
+#     # send two images to image diffing function --> send to server for diff-ing??
+#     # return/render diff'd image
+
+
 
 @app.route("/")
 def show_index():
@@ -85,6 +130,7 @@ def register_user():
         db.session.commit()
 
     return render_template("index.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
