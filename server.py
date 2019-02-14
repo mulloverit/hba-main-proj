@@ -2,6 +2,7 @@
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 from PIL import Image
+from werkzeug.utils import secure_filename
 
 from config import *
 from database_manipulation import *
@@ -9,6 +10,16 @@ from model import User, InputImage, DiffImage
 from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
+TMP_UPLOAD_FOLDER = "tmp/uploads/"
+ALLOWED_FORMATS = set(['png', 'jpg', 'jpeg', 'tif'])
+app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
+
+def allowed_file_formats(filename):
+    """Utility for checking uploaded image formats"""
+
+    # Returns boolean (T/F) based on whether file ext exists AND is in allowed formats set
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_FORMATS
 
 @app.route("/")
 def show_index():
@@ -111,7 +122,13 @@ def upload_input_images():
     # If user not logged in, don't do any more work.
     except:
 
-        flash("Not logged in - uploaded images will not persist if page refreshed.")
+        flash("Not logged in - images temporarily saved.")
+
+        for img in input_imgs:
+            if allowed_file_formats(img.filename):
+                imgname = secure_filename(img.filename)
+                img.save(os.path.join(app.config['TMP_UPLOAD_FOLDER'], imgname))
+
         flash("Click `Diff` button for result!")
     
     return redirect("/")
@@ -120,7 +137,7 @@ def upload_input_images():
 def diff_images():
     """Diff images [no login required]."""
 
-    session.get(input_imgs)
+    # grab images from tmp folder
     diff_img = create_boolean_diff(input_imgs[0], input_imgs[1])
     diff_img.show()
 
