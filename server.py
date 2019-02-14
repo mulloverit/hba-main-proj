@@ -6,20 +6,21 @@ from werkzeug.utils import secure_filename
 
 from config import *
 from database_manipulation import *
+from diff_logic import *
 from model import User, InputImage, DiffImage
 from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
-TMP_UPLOAD_FOLDER = "tmp/uploads/"
-ALLOWED_FORMATS = set(['png', 'jpg', 'jpeg', 'tif'])
-app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
+# TMP_UPLOAD_FOLDER = "tmp/uploads/"
+# ALLOWED_FORMATS = set(['png', 'jpg', 'jpeg', 'tif'])
+# app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
 
-def allowed_file_formats(filename):
-    """Utility for checking uploaded image formats"""
+# def allowed_file_formats(filename):
+#     """Utility for checking uploaded image formats"""
 
-    # Returns boolean (T/F) based on whether file ext exists AND is in allowed formats set
-    return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_FORMATS
+#     # Returns boolean (T/F) based on whether file ext exists AND is in allowed formats set
+#     return '.' in filename and \
+#         filename.rsplit('.', 1)[1].lower() in ALLOWED_FORMATS
 
 @app.route("/")
 def show_index():
@@ -124,28 +125,46 @@ def upload_input_images():
 
         flash("Not logged in - images temporarily saved.")
 
-        for img in input_imgs:
-            if allowed_file_formats(img.filename):
-                imgname = secure_filename(img.filename)
-                img.save(os.path.join(app.config['TMP_UPLOAD_FOLDER'], imgname))
+        input_imgs_paths = []
 
-        flash("Click `Diff` button for result!")
+        for img in input_imgs:
+            input_imgs_paths.append(save_input_img_to_tmp(img))
+            # if allowed_file_formats(img.filename):
+            #     img_name = secure_filename(img.filename)
+            #     img_path = os.path.join(app.config['TMP_UPLOAD_FOLDER'], img_name)
+            #     img.save(img_path)
+            
+
+        session['input_imgs_paths'] = input_imgs_paths
+
+        flash("Click diff button for result!")
     
     return redirect("/")
 
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
     """Diff images [no login required]."""
+    
+    try:
+        
+        bool_img_path = create_boolean_diff(session.get('input_imgs_paths')[0], \
+                                        session.get('input_imgs_paths')[1])
+        session['bool_img_path'] = bool_img_path
+        
+    except:
 
-    # grab images from tmp folder
-    diff_img = create_boolean_diff(input_imgs[0], input_imgs[1])
-    diff_img.show()
+        flash("Diff failed :(")
+
+    print(session.get('input_imgs_paths')[0])
+    print(session.get('input_imgs_paths')[1])
+    print(session.get('bool_img_path'))
 
     return redirect("/")
     
 @app.route("/upload-diff", methods=['POST'])
 def upload_diff():
     """Upload diff to s3 for users who are logged in"""
+
     return redirect("/")
 
 

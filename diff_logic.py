@@ -41,8 +41,8 @@ def check_inputs_and_open():
     except:
 
         print("Please provide image inputs.\n")
-        img_1_path = input("Image 1: ") # 'test-fixtures/imgs/inputs/img1.jpg'
-        img_2_path = input("Image 2: ") # 'test-fixtures/imgs/inputs/img2.jpg'
+        img_1_path = input("Image 1: ").rstrip() # 'test-fixtures/imgs/inputs/img1.jpg'
+        img_2_path = input("Image 2: ").rstrip() # 'test-fixtures/imgs/inputs/img2.jpg'
 
     # Establish image classes and open files for differencing
     img_1, img_2 = DiffInputImage(img_1_path), DiffInputImage(img_2_path)
@@ -61,12 +61,13 @@ def create_cheap_diff(img_1, img_2, diff_input_1, diff_input_2):
     return diff_img
 
 
-def create_boolean_diff(diff_input_1, diff_input_2):
+def create_boolean_diff(diff_input_1_path, diff_input_2_path):
     """Convert input images to single channel images, output new bool diff"""
 
     # Convert input images to single channel, 8-bit, black and white images
-    im1l, im2l = diff_input_1.convert("L"), diff_input_2.convert("L") 
-    diff_input_1.close(), diff_input_2.close()
+    im1, im2 = Image.open(diff_input_1_path), Image.open(diff_input_2_path)
+    im1l, im2l = im1.convert("L"), im2.convert("L") 
+    im1.close(), im2.close() 
 
     # Compute diff at each pixel, find median value of diff 
     bw_diff = ImageChops.difference(im1l, im2l)
@@ -88,9 +89,12 @@ def create_boolean_diff(diff_input_1, diff_input_2):
 
     # Populate bool_img object with new vals and save 
     bool_img.putdata(bool_vals)
-    bool_img.save('test-fixtures/imgs/diffs/diff_{}_{}_bool.jpg'.format(img_1.filename, img_2.filename))
+    bool_img_path = 'test-fixtures/imgs/diffs/diff_{}_{}_bool.jpg' \
+                        .format(os.path.basename(diff_input_1_path), \
+                                os.path.basename(diff_input_2_path))
+    bool_img.save(bool_img_path)
 
-    return bool_img
+    return bool_img_path
 
 if __name__ == "__main__":
 
