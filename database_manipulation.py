@@ -27,8 +27,7 @@ def db_add_new_user(username, email, password, fname, lname):
     db.session.add(user)
     db.session.commit()
 
-def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
-                     upload_complete_datetime):
+def db_add_input_img(user_id, upload_begin_datetime, upload_complete_datetime):
     """Load input img data into db"""
     
     im = Image.open(img)
@@ -46,7 +45,8 @@ def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
     db.session.commit()
     im.close()
 
-def db_add_diff_img(username, diff_img, input_1, input_2):
+def db_add_diff_img(user_id, input_1, input_2, upload_begin_datetime,
+                     upload_complete_datetime):
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
 
     # NEEDS LOGIC FOR GETTING IMAGE METADATA
