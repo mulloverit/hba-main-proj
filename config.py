@@ -15,7 +15,7 @@ def connect_to_db(app):
 # Set up database and flask app 
 db = SQLAlchemy()
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY")
+# app.secret_key = os.environ.get("SECRET_KEY")
 connect_to_db(app)
 
 
