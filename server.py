@@ -71,7 +71,7 @@ def register_user():
     return render_template("index.html")
 
 
-@app.route("/upload-check-inputs", methods=['POST'])
+@app.route("/upload-inputs", methods=['POST'])
 def upload_check_inputs():
     """Handle initial image upload [no login required]."""
 
@@ -88,7 +88,7 @@ def upload_check_inputs():
 
 
     # retrieve images from page
-    upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
     try:
         input_imgs_paths = []
         input_imgs = [request.files['img-1'], request.files['img-2']]
@@ -104,18 +104,21 @@ def upload_check_inputs():
             print("######%%%%%%%%%%", key, "%%%%%%%%%###########")
             print("######%%%%%%%%%%", mime, "%%%%%%%%%###########")
 
-            # filename, bucketname, keyname, 
+
+            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            
             s3.upload_fileobj(
                 img,
                 S3_BUCKET,
                 key)
-
-            print("WEEE")
+            
+            upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
             print("{}{}".format(S3_LOCATION, img.filename))
+            print("WEEE")
+            
             flash("Upload to S3 success")
 
-        
         return redirect("/")
 
         ################# ^^^^^^^^^^^^^^^^^^^ ####################
