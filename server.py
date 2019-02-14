@@ -10,6 +10,65 @@ from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
 
+@app.route("/")
+def show_index():
+        """Index/homepage"""
+
+        return render_template("index.html")
+
+@app.route("/sign-in", methods=['POST'])
+def sign_in():
+    """Log in an existing user"""
+
+    # Retrieve POSTed form data
+    username = request.form['username']
+    password = request.form['password']
+
+    # Check if username exists
+    try:
+        user = User.query.filter(User.username == username).one()
+
+        # If Y, check that password is valid
+        if password == user.password:
+
+            session['username'] = username
+            session['user_id'] = user.user_id
+            flash("Successfully logged in.")
+
+    # If N, notify user of failed login
+    except:
+
+        flash("Login failed.")
+        return redirect("/")
+        
+
+    return render_template("index.html")
+
+@app.route("/register-new", methods=['POST'])
+def register_user():
+    """Add a new user to database"""
+
+    # Retrieve POSTed form data
+    username = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
+    fname = request.form['fname']
+    lname = request.form['lname']
+    
+    try:
+
+        if db_check_if_user_exists(username):
+
+            flash("Already a user. Please pick a unique username or sign in.")
+            return redirect("/")
+
+    except:
+
+        db_add_new_user(username, email, password, fname, lname)
+
+    return render_template("index.html")
+
+
 @app.route("/upload-inputs", methods=['POST'])
 def upload_input_images():
     """Handle initial image upload [no login required]."""
@@ -32,7 +91,7 @@ def upload_input_images():
         for img in input_imgs:
 
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) 
+            im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) # WORKING? PROB NOT
         
             if im_s3_url: # If valid URL returned, add to db with upload completion time
                 upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -51,77 +110,26 @@ def upload_input_images():
 
     # If user not logged in, don't do any more work.
     except:
-        
+
         flash("Not logged in - uploaded images will not persist if page refreshed.")
         flash("Click `Diff` button for result!")
     
     return redirect("/")
 
-# @app.route("/submit-diff-request", methods="[POST]")
-# def diff_images():
-#     """Diff images [no login required]."""
+@app.route("/submit-diff-request", methods=['POST'])
+def diff_images():
+    """Diff images [no login required]."""
 
-#     # recognize action when user clicks "diff" button
-#     # grab records from database and files from s3
-#     # send two images to image diffing function --> send to server for diff-ing??
-#     # return/render diff'd image
+    session.get(input_imgs)
+    diff_img = create_boolean_diff(input_imgs[0], input_imgs[1])
+    diff_img.show()
 
-# @app.route("/upload-diff", methods="[POST]")
-# add to html: IF logged in, save diff to s3 for later access
-
-
-@app.route("/")
-def show_index():
-        """Index/homepage"""
-
-        return render_template("index.html")
-
-@app.route("/", methods=['POST'])
-def sign_in():
-    """Log in an existing user"""
-
-    # Retrieve POSTed form data
-    username = request.form['username']
-    password = request.form['password']
-
-    # Check if username exists
-    try:
-        user = User.query.filter(User.username == username).one()
-
-        # If Y, check that password is valid
-        if user.password == password:
-
-            session['username'] = username
-            flash("Successfully logged in")
-
-    # If N, notify user of failed login
-    except:
-        flash("Login failed")
-
-    return render_template("index.html")
-
-@app.route("/register-new", methods=['POST'])
-def register_user():
-    """Add a new user to database"""
-
-    # Retrieve POSTed form data
-    username = request.form['username']
-    password = request.form['password']
-    email = request.form['email']
-    fname = request.form['fname']
-    lname = request.form['lname']
+    return redirect("/")
     
-    try:
-
-        if db_check_if_user_exists(username):
-
-            flash("Already a user. Please pick a unique username or sign in.")
-
-    except:
-
-        db_add_new_user(username, email, password, fname, lname)
-
-    return render_template("index.html")
+@app.route("/upload-diff", methods=['POST'])
+def upload_diff():
+    """Upload diff to s3 for users who are logged in"""
+    return redirect("/")
 
 
 if __name__ == "__main__":
