@@ -111,7 +111,6 @@ def register_user():
     email = request.form['email']
     fname = request.form['fname']
     lname = request.form['lname']
-
     
     try:
 

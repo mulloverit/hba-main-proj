@@ -1,13 +1,16 @@
 """Utility file for interacting with main database"""
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy 
+import os
 from PIL import Image
 from sqlalchemy import func
 
-from model import User, InputImage, DiffImage, connect_to_db
+from model import User, InputImage, DiffImage, connect_to_db, db
+from server import app
 
-
-prod_db = SQLAlchemy()
+os.system("dropdb Image_Difference_App_Database")
+os.system("createdb Image_Difference_App_Database")
+connect_to_db(app)
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 
 def db_check_if_user_exists(username):
@@ -24,8 +27,8 @@ def db_add_new_user(username, email, password, fname, lname):
                 lname=lname,
                 sign_up_date=CURRENT_DATE)
 
-    prod_db.session.add(user)
-    prod_db.session.commit()
+    db.session.add(user)
+    db.session.commit()
 
 def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
                      upload_complete_datetime):
@@ -42,8 +45,8 @@ def db_add_input_img(user_id, input_1, input_2, upload_begin_datetime,
             im_mode=im.mode,
             im_s3_url=im_s3_url)
 
-    prod_db.sesssion.add(input_image)
-    prod_db.session.commit()
+    db.sesssion.add(input_image)
+    db.session.commit()
     im.close()
 
 def db_add_diff_img(username, diff_img, input_1, input_2):
@@ -61,8 +64,8 @@ def db_add_diff_img(username, diff_img, input_1, input_2):
                          diff_s3_url=diff_s3_url,
                          diff_upload_date=CURRENT_DATE)
     
-    prod_db.session.add(diff_img)
-    prod_db.session.commit()
+    db.session.add(diff_img)
+    db.session.commit()
 
 if __name__ == "__main__":
 
