@@ -8,6 +8,8 @@ from database_manipulation import *
 from model import User, InputImage, DiffImage
 from s3_manipulation import upload_file_to_s3
 
+app.secret_key = "what"
+
 @app.route("/upload-inputs", methods=['POST'])
 def upload_input_images():
     """Handle initial image upload [no login required]."""
@@ -15,12 +17,13 @@ def upload_input_images():
     # retrieve images from page
     try:
         input_imgs = [request.files['img-1'], request.files['img-2']]
-        print(input_imgs)
+        flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
 
     except:
         flash("Please provide two valid files for upload.")
         return redirect("/")
 
+    # If a user is logged in, add their uploads to database and s3
     try:
         username = session['username']
         user = User.query.filter(User.username == session['username']).one()
@@ -36,22 +39,21 @@ def upload_input_images():
         
             else: # Otherwise, record a failure with timestamp and notify user
                 upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                flash("Logging file to S3 failed.")
 
-            # from database_manipulation
-            db_add_input_img(user_id,
+            # Add record to database
+            db_add_input_img(img,
+                             user_id,
                              input_1,
                              input_2,
                              upload_begin_datetime,
                              upload_complete_datetime) 
 
-            flash("Logging file to S3 failed.")
-
-    # If not logged in, just diff. No s3, no db.
+    # If user not logged in, don't do any more work.
     except:
         
         flash("Not logged in - uploaded images will not persist if page refreshed.")
-
-    flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
+        flash("Click `Diff` button for result!")
     
     return redirect("/")
 
