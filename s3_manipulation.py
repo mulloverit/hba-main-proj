@@ -4,9 +4,9 @@ from PIL import Image, ImageChops, ImageStat # imagechops -> "image channel oper
 
 def upload_file_to_s3(file, bucket_name, username, acl="private"):
     """Upload a file to S3 location specific to a user"""
+    
     try:
         
-        print(file, bucket_name, username)
         bucket_loc = bucket_name + "/" + username
 
         s3.upload_fileobj(
@@ -21,5 +21,6 @@ def upload_file_to_s3(file, bucket_name, username, acl="private"):
         return "{}{}".format(app.config["S3_LOCATION"], file.filename)
 
     except:
+
         print("Error occurred while attempting upload")
         return False
