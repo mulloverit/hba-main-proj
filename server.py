@@ -1,6 +1,7 @@
 """Flask server for image differencing application"""
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
+import os
 from PIL import Image
 
 from config import *
@@ -70,67 +71,144 @@ def register_user():
     return render_template("index.html")
 
 
-@app.route("/upload-inputs", methods=['POST'])
-def upload_input_images():
+@app.route("/upload-check-inputs", methods=['POST'])
+def upload_check_inputs():
     """Handle initial image upload [no login required]."""
 
-    # retrieve images from page
     try:
+        
+        username = session['username']
+        user = User.query.filter(User.username == session['username']).one()
+        # user_id = user.user_id
+
+    except:
+
+        username = "tmp"
+        flash("Not logged in.")
+
+
+    # retrieve images from page
+    upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        input_imgs_paths = []
         input_imgs = [request.files['img-1'], request.files['img-2']]
-        flash("Upload success!") # PERHAPS NEEDS TO BE MOVED 
+        
+        ####################### THIS WORKS ########################
+        username = "tmp"
+        for img in input_imgs:
+            mime = img.content_type
+            print("OK", mime)
+            key = username + "/" + img.filename.rsplit("/")[-1]
+            print("######%%%%%%%%%%", img, "%%%%%%%%%###########")
+            print("######%%%%%%%%%%", S3_BUCKET, "%%%%%%%%%###########")
+            print("######%%%%%%%%%%", key, "%%%%%%%%%###########")
+            print("######%%%%%%%%%%", mime, "%%%%%%%%%###########")
+
+            # filename, bucketname, keyname, 
+            s3.upload_fileobj(
+                img,
+                S3_BUCKET,
+                key)
+
+            print("WEEE")
+            S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+            print("{}{}".format(S3_LOCATION, img.filename))
+            flash("Upload to S3 success")
+
+        
+        return redirect("/")
+
+        ################# ^^^^^^^^^^^^^^^^^^^ ####################
+
+
+        ########## do i want to keep this? ##########
+            # img_path = save_input_img_to_tmp(img)
+            ### save input img to tmp logic
+        #     if allowed_file_formats(img.filename):
+        #         img_name = secure_filename(img.filename)
+        #         img_path = os.path.join(app.config['TMP_UPLOAD_FOLDER'], img_name)
+        #         img.save(img_path)
+        #         print(img_path)
+        #         ###
+        #     input_imgs_paths.append(img_path)
+
+
+        
+        # session['input_imgs_paths'] = input_imgs_paths
+
+        return redirect("/upload-to-s3")
+        
 
     except:
         flash("Please provide two valid files for upload.")
         return redirect("/")
 
-    # If a user is logged in, add their uploads to database and s3
-    try:
-        username = session['username']
-        user = User.query.filter(User.username == session['username']).one()
-        user_id = user.user_id
 
-        for img in input_imgs:
-
-            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            print("######%%%%%%%%%%", img, S3_BUCKET, user.username, "%%%%%%%%%###########")
-            im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) # WORKING? PROB NOT
-        
-            if im_s3_url: # If valid URL returned, add to db with upload completion time
-                upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        
-            else: # Otherwise, record a failure with timestamp and notify user
-                upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                db_add_input_img(img,
-                             user_id,
-                             input_1,
-                             input_2,
-                             upload_begin_datetime,
-                             upload_complete_datetime) 
-                flash("Logging file to S3 failed.")
-
-            # Add record to database
-            # db_add_input_img(img,
-            #                  user_id,
-            #                  input_1,
-            #                  input_2,
-            #                  upload_begin_datetime,
-            #                  upload_complete_datetime) 
-
-    # If user not logged in, don't do any more work.
-    except:
-
-        flash("Not logged in - images temporarily saved.")
-
-        input_imgs_paths = []
-
-        for img in input_imgs:
-            input_imgs_paths.append(save_input_img_to_tmp(img))
-
-        session['input_imgs_paths'] = input_imgs_paths
-
-        flash("Click diff button for result!")
+# @app.route("/upload-to-s3")
+# def upload_to_s3():
     
-    return redirect("/")
+    
+#     for img in session.get('input_imgs_paths'):
+#         print (img)
+        
+#         upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+#         # im_s3_url = upload_file_to_s3(img.filename, S3_BUCKET, user.username) # WORKING? PROB NOT
+#         try:
+#             #bucket_loc = S3_BUCKET + "/" + username
+#             open_img = Image.open(img)
+#             mimetype = Image.MIME[open_img.format]
+#             key = username + "/" + open_img.filename.rsplit("/")[-1]
+#             print("######%%%%%%%%%%", img, "%%%%%%%%%###########")
+#             print("######%%%%%%%%%%", open_img, "%%%%%%%%%###########")
+#             print("######%%%%%%%%%%", S3_BUCKET, "%%%%%%%%%###########")
+#             print("######%%%%%%%%%%", key, "%%%%%%%%%###########")
+#             print("######%%%%%%%%%%", mimetype, "%%%%%%%%%###########")
+
+#             # filename, bucketname, keyname, 
+#             s3.upload_fileobj(
+#                 open_img,
+#                 S3_BUCKET,
+#                 key)
+
+#             print("WEEE")
+#             S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
+#             print("{}{}".format(S3_LOCATION, img.filename))
+#             flash("Upload to S3 success")
+#             return redirect("/")
+
+#         except:
+
+#             flash("Error occurred while attempting upload")
+#             return redirect("/")
+
+# DATABASE MANIP - WORRY ABOUT AFTER S3 UPLOADS WORKING    
+    # if im_s3_url: # If valid URL returned, add to db with upload completion time
+    #     upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+    # else: # Otherwise, record a failure with timestamp and notify user
+    #     upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+    #     db_add_input_img(img,
+    #                  user_id,
+    #                  input_1,
+    #                  input_2,
+    #                  upload_begin_datetime,
+    #                  upload_complete_datetime) 
+    #     flash("Logging file to S3 failed.")
+
+# HANDLING FOR WHEN A USER IS NOT LOGGED IN - PROB WANT TO CHANGE THIS LOGIC FROM local tmp dir to username=tmp
+#     # If user not logged in, don't do any more work.
+#         input_imgs_paths = []
+
+#         for img in input_imgs:
+#             img_path = save_input_img_to_tmp(img)
+#             input_imgs_paths.append(img_path)
+
+#         session['input_imgs_paths'] = input_imgs_paths
+
+#         flash("Click diff button for result!")
+    
+#     return redirect("/")
 
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
