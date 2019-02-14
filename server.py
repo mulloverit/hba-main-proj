@@ -92,6 +92,7 @@ def upload_input_images():
         for img in input_imgs:
 
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            print("######%%%%%%%%%%", img, S3_BUCKET, user.username, "%%%%%%%%%###########")
             im_s3_url = upload_file_to_s3(img, S3_BUCKET, user.username) # WORKING? PROB NOT
         
             if im_s3_url: # If valid URL returned, add to db with upload completion time
@@ -99,15 +100,21 @@ def upload_input_images():
         
             else: # Otherwise, record a failure with timestamp and notify user
                 upload_complete_datetime = ("FAILED AT " + datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-                flash("Logging file to S3 failed.")
-
-            # Add record to database
-            db_add_input_img(img,
+                db_add_input_img(img,
                              user_id,
                              input_1,
                              input_2,
                              upload_begin_datetime,
                              upload_complete_datetime) 
+                flash("Logging file to S3 failed.")
+
+            # Add record to database
+            # db_add_input_img(img,
+            #                  user_id,
+            #                  input_1,
+            #                  input_2,
+            #                  upload_begin_datetime,
+            #                  upload_complete_datetime) 
 
     # If user not logged in, don't do any more work.
     except:
@@ -134,6 +141,8 @@ def diff_images():
         bool_img_path = create_boolean_diff(session.get('input_imgs_paths')[0], \
                                         session.get('input_imgs_paths')[1])
         session['bool_img_path'] = bool_img_path
+
+        # if user is loggged in add to db?
 
     except:
 

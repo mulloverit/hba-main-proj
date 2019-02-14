@@ -1,7 +1,6 @@
 """Utility file for interacting with main database"""
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy 
-import os
 from PIL import Image
 from sqlalchemy import func
 
