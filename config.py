@@ -20,12 +20,15 @@ def save_input_img_to_tmp(img):
         return img_path
         #input_imgs_paths.append(img_path)
 
-def save_bool_img_to_tmp(img_path):
+def save_bool_img_to_tmp(diff_input_1_path, diff_input_2_path, bool_img):
     """Utility to temporarily store boolean images for non-auth'd users"""
-    if allowed_file_formats(img_path):
-        img_name = secure_filename(img_path).rsplit('.')
-        tmp_path = os.path.join(app.config['TMP_BOOL_FOLDER'], img_name)
-        img.save(tmp_path)
+
+    fi_1 = os.path.basename(diff_input_1_path).rsplit('.')[0]
+    fi_2 = os.path.basename(diff_input_2_path).rsplit('.')[0]
+    bool_img_path = '{}DIFF__{}__{}__BOOL.jpg'.format(TMP_BOOL_FOLDER, fi_1, fi_2)
+    bool_img.save(bool_img_path)
+    return bool_img_path
+    
 
 def connect_to_db(app):
     """Connect the database to Flask application"""

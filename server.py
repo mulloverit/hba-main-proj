@@ -2,7 +2,6 @@
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 from PIL import Image
-from werkzeug.utils import secure_filename
 
 from config import *
 from database_manipulation import *
@@ -11,16 +10,6 @@ from model import User, InputImage, DiffImage
 from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
-# TMP_UPLOAD_FOLDER = "tmp/uploads/"
-# ALLOWED_FORMATS = set(['png', 'jpg', 'jpeg', 'tif'])
-# app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
-
-# def allowed_file_formats(filename):
-#     """Utility for checking uploaded image formats"""
-
-#     # Returns boolean (T/F) based on whether file ext exists AND is in allowed formats set
-#     return '.' in filename and \
-#         filename.rsplit('.', 1)[1].lower() in ALLOWED_FORMATS
 
 @app.route("/")
 def show_index():
@@ -129,11 +118,6 @@ def upload_input_images():
 
         for img in input_imgs:
             input_imgs_paths.append(save_input_img_to_tmp(img))
-            # if allowed_file_formats(img.filename):
-            #     img_name = secure_filename(img.filename)
-            #     img_path = os.path.join(app.config['TMP_UPLOAD_FOLDER'], img_name)
-            #     img.save(img_path)
-            
 
         session['input_imgs_paths'] = input_imgs_paths
 
@@ -146,18 +130,14 @@ def diff_images():
     """Diff images [no login required]."""
     
     try:
-        
+
         bool_img_path = create_boolean_diff(session.get('input_imgs_paths')[0], \
                                         session.get('input_imgs_paths')[1])
         session['bool_img_path'] = bool_img_path
-        
+
     except:
 
         flash("Diff failed :(")
-
-    print(session.get('input_imgs_paths')[0])
-    print(session.get('input_imgs_paths')[1])
-    print(session.get('bool_img_path'))
 
     return redirect("/")
     

@@ -1,7 +1,7 @@
 from PIL import Image, ImageChops, ImageStat # imagechops -> "image channel operations"
 import sys, os
 
-from config import S3_KEY, S3_SECRET, S3_BUCKET
+from config import S3_KEY, S3_SECRET, S3_BUCKET, TMP_BOOL_FOLDER, save_bool_img_to_tmp
 
 ### Class establishments ###
 
@@ -88,12 +88,9 @@ def create_boolean_diff(diff_input_1_path, diff_input_2_path):
             bool_vals.append(0)
 
     # Populate bool_img object with new vals and save 
-    bool_img.putdata(bool_vals)
-    bool_img_path = 'test-fixtures/imgs/diffs/diff_{}_{}_bool.jpg' \
-                        .format(os.path.basename(diff_input_1_path), \
-                                os.path.basename(diff_input_2_path))
-    bool_img.save(bool_img_path)
-
+    bool_img.putdata(bool_vals) 
+    bool_img_path = save_bool_img_to_tmp(diff_input_1_path, diff_input_2_path, bool_img)
+    
     return bool_img_path
 
 if __name__ == "__main__":
