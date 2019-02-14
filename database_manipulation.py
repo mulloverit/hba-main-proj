@@ -5,12 +5,9 @@ import os
 from PIL import Image
 from sqlalchemy import func
 
-from model import User, InputImage, DiffImage, connect_to_db, db
-from server import app
+from config import db
+from model import User, InputImage, DiffImage
 
-os.system("dropdb Image_Difference_App_Database")
-os.system("createdb Image_Difference_App_Database")
-connect_to_db(app)
 CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 
 def db_check_if_user_exists(username):
@@ -66,7 +63,3 @@ def db_add_diff_img(username, diff_img, input_1, input_2):
     
     db.session.add(diff_img)
     db.session.commit()
-
-if __name__ == "__main__":
-
-    connect_to_db(app)

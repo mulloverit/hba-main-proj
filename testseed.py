@@ -3,7 +3,8 @@ from datetime import datetime
 import os
 from sqlalchemy import func
 
-from model import User, InputImage, DiffImage, connect_to_db, db
+from config import connect_to_db
+from model import User, InputImage, DiffImage, db
 from server import app
 
 

@@ -1,7 +1,6 @@
 """Models and database functions for image and user management"""
+from config import connect_to_db, db, app
 
-from flask_sqlalchemy import SQLAlchemy 
-db = SQLAlchemy()
 
 ### Class establishments ###
 
@@ -89,17 +88,6 @@ class DiffImage(db.Model):
                     diff_format={self.diff_format},
                     diff_mode={self.diff_mode},
                     diff_s3_url={self.diff_s3_url}""")
-
-
-### Helper functions ###
-
-def connect_to_db(app):
-    """Connect the database to Flask application"""
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///imgdiffs'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db.app = app
-    db.init_app(app)
 
 if __name__ == "__main__":
     from server import app

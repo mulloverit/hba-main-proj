@@ -8,9 +8,6 @@ from database_manipulation import *
 from model import User, InputImage, DiffImage
 from s3_manipulation import upload_file_to_s3
 
-app = Flask(__name__)
-app.secret_key = SECRET_KEY
-
 @app.route("/upload-inputs", methods=['POST'])
 def upload_input_images():
     """Handle initial image upload [no login required]."""
