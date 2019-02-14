@@ -1,3 +1,4 @@
+import boto3, botocore
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy 
 import os, subprocess
@@ -51,6 +52,11 @@ app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
 # AWS S3 specific environment variabls
 os.system("source secrets.sh") # NOT WORKING
 S3_BUCKET = os.environ.get("S3_BUCKET_NAME")
-S3_KEY = os.environ.get("S3_ACCESS_KEY")
+S3_KEY = os.environ.get("S3_KEY")
 S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
 S3_LOCATION = 'http://{}s3.amazonaws.com/'.format(S3_BUCKET)
+s3 = boto3.client(
+   "s3",
+   aws_access_key_id=S3_KEY,
+   aws_secret_access_key=S3_SECRET
+)
