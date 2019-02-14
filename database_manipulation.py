@@ -8,7 +8,7 @@ from sqlalchemy import func
 from config import db
 from model import User, InputImage, DiffImage
 
-CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
+
 
 def db_check_if_user_exists(username):
     return User.query.filter(User.username == username).one()
@@ -16,13 +16,15 @@ def db_check_if_user_exists(username):
 def db_add_new_user(username, email, password, fname, lname):
     """Load new user from into db"""
 
+    current_date = datetime.today().strftime('%m-%d-%Y')
+    
     # user_id not included, as it should populate automatically
     user = User(username=username,
                 email=email,
                 password=password,
                 fname=fname,
                 lname=lname,
-                sign_up_date=CURRENT_DATE)
+                sign_up_date=current_date)
 
     db.session.add(user)
     db.session.commit()
