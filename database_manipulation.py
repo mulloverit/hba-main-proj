@@ -27,7 +27,7 @@ def db_add_new_user(username, email, password, fname, lname):
     db.session.add(user)
     db.session.commit()
 
-def db_add_input_img(user_id, upload_begin_datetime, upload_complete_datetime):
+def db_add_input_img(img, user_id, upload_begin_datetime, upload_complete_datetime):
     """Load input img data into db"""
     
     im = Image.open(img)
@@ -45,21 +45,23 @@ def db_add_input_img(user_id, upload_begin_datetime, upload_complete_datetime):
     db.session.commit()
     im.close()
 
-def db_add_diff_img(user_id, input_1, input_2, upload_begin_datetime,
+def db_add_diff_img(img, user_id, im_1_id, im_2_id, diff_s3_url, upload_begin_datetime,
                      upload_complete_datetime):
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
 
     # NEEDS LOGIC FOR GETTING IMAGE METADATA
+    diff = Image.open(img)
 
-    diff_img = DiffImage(diff_user_id=diff_user_id,
+    diff_img = DiffImage(diff_user_id=user_id,
                          im_1_id=im_1_id,
                          im_2_id=im_2_id,
-                         diff_size_x=diff_size_x,
-                         diff_size_y=diff_size_y,
-                         diff_format=diff_format,
-                         diff_mode=diff_mode,
+                         diff_size_x=diff.size[0],
+                         diff_size_y=diff.size[1],
+                         diff_format=diff.format,
+                         diff_mode=diff.mode,
                          diff_s3_url=diff_s3_url,
-                         diff_upload_date=CURRENT_DATE)
+                         diff_upload_begin_datetime=upload_begin_datetime,
+                         diff_upload_complete_datetime=upload_complete_datetime)
     
     db.session.add(diff_img)
     db.session.commit()
