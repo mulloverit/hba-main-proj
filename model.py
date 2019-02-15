@@ -1,6 +1,8 @@
 """Models and database functions for image and user management"""
 from config import connect_to_db, db, app
 
+# Used this to clear out previously established table prior to uuid addition
+# db.metadata.clear()
 
 ### Class establishments ###
 
@@ -17,17 +19,18 @@ class User(db.Model):
     lname = db.Column(db.String(50), nullable=False)
     sign_up_date = db.Column(db.String(50), nullable=False)
 
-    # class method takes static method decorator
-    @staticmethod
-    def find_by_username(username):
-        """Check if user exists in the database"""
+    # TO DO: add class and instance methods to deal with repetitive server tasks
+    # # class method takes static method decorator
+    # @staticmethod
+    # def find_by_username(username):
+    #     """Check if user exists in the database"""
 
-    # instance methods take self as arg
-    def is_valid_password(self, attempted_password): # model should be agnostic as to where this is coming from, so don't call it "request_password" bc doens't have to be a request --> "attempted_pw"
+    # # instance methods take self as arg
+    # def is_valid_password(self, attempted_password): # model should be agnostic as to where this is coming from, so don't call it "request_password" bc doens't have to be a request --> "attempted_pw"
  
-    # this should maybe be an instance method instead of class method
-    #def check_password_validity(username, user_input_password):
-        """Check to see if pw matches database record"""
+    # # this should maybe be an instance method instead of class method
+    # #def check_password_validity(username, user_input_password):
+    #     """Check to see if pw matches database record"""
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return email or password."""
@@ -58,14 +61,14 @@ class InputImage(db.Model):
         return (f"""<InputImage:
                     im_id={self.im_id}, 
                     im_user_id={self.im_user_id}), 
-                    im_upload_begin_datetime={self.im_upload_datetime},
-                    im_upload_complete_datetime={self.im_upload_datetime},
+                    im_upload_begin_datetime={self.im_upload_begin_datetime},
+                    im_upload_complete_datetime={self.im_upload_complete_datetime},
                     im_size_x={self.im_size_x},
                     im_size_y={self.im_size_y},
                     im_format={self.im_format},
                     im_mode={self.im_mode},
                     im_s3_url={self.im_s3_url},
-                    im_uuid={self.img_uuid}""")
+                    im_uuid={self.im_uuid}""")
 
 
 class DiffImage(db.Model):
@@ -94,14 +97,14 @@ class DiffImage(db.Model):
                     diff_user_id={self.diff_user_id}),
                     im_1_id={self.im_1_id},
                     im_2_id={self.im_2_id},
-                    diff_upload_begin_datetime={self.diff_upload_datetime},
-                    diff_upload_complete_datetime={self.diff_upload_datetime},
+                    diff_upload_begin_datetime={self.diff_upload_begin_datetime},
+                    diff_upload_complete_datetime={self.diff_upload_complete_datetime},
                     diff_size_x={self.diff_size_x},
                     diff_size_y={self.diff_size_y},
                     diff_format={self.diff_format},
                     diff_mode={self.diff_mode},
                     diff_s3_url={self.diff_s3_url},
-                    diff_uuid={self.img_uuid}""")
+                    diff_uuid={self.diff_uuid}""")
 
 if __name__ == "__main__":
     from server import app

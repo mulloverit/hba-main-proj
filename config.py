@@ -4,8 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 import os, subprocess
 from werkzeug.utils import secure_filename
 
-print("Config file loaded.")
+# print("Config file loaded.")
 
+# To do: move these functions into a utils.py file
 def allowed_file_formats(filename):
     """Utility for checking uploaded image formats"""
 
@@ -58,6 +59,11 @@ S3_KEY = os.environ.get("S3_KEY")
 S3_SECRET = os.environ.get("S3_SECRET_ACCESS_KEY")
 S3_LOCATION = 'http://{}s3.amazonaws.com/'.format(S3_BUCKET)
 s3 = boto3.client(
+   "s3",
+   aws_access_key_id=S3_KEY,
+   aws_secret_access_key=S3_SECRET
+)
+s3_dl = boto3.resource(
    "s3",
    aws_access_key_id=S3_KEY,
    aws_secret_access_key=S3_SECRET

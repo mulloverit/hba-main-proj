@@ -3,3 +3,4 @@ hba-proj-env/
 __pycache__
 *.pyc
 secrets.sh
+TESTING_DB_ADD.py

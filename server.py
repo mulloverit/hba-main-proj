@@ -1,4 +1,5 @@
 """Flask server for image differencing application"""
+from io import StringIO
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 import os
@@ -93,38 +94,22 @@ def upload_inputs():
         username = session['username']
         user = User.query.filter(User.username == session['username']).one()
         user_id = user.user_id
-        print("NEAT")
         
     except:
 
+        # Maintain a db username item for "tmp" at loc user_id = 1
         username = "tmp"
         user_id = 1
-        print("OK")
-        flash("Not logged in.")
-
-    # Maintain a db username item for "tmp" at loc user_id = 1
-    # user = User.query.filter(User.username == session['username']).one()
-    # user_id = user.user_id
 
     try:
 
         input_imgs = [request.files['img-1'], request.files['img-2']]
         
-        ####################### THIS WORKS ########################
+        # TO DO: add use of secure_filename and allowed_formats
+        
+        count = 0 # This is lame, but need some way to add img uuids to session uniquely?
         
         for img in input_imgs:
-
-            print("you cannot use pil to open this rn")
-            im = Image.open(img)
-            print("jk yes you can")
-
-            img_size_x = im.size[0]
-            img_size_y = im.size[1]
-            img_format = im.format
-            img_mode = im.mode
-
-            print(img_size_x, img_size_y, img_format, img_mode)
-            #im.close()
                     
             # Upload to S3
             img_uuid = str(uuid.uuid4())
@@ -132,67 +117,26 @@ def upload_inputs():
             base_filename = img.filename.rsplit("/")[-1]
             key = username + "/" + img_uuid + "_" + base_filename
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-            print(im, S3_BUCKET, key) # debugging help
-            
+            print("OK 3")
             s3.upload_fileobj(
                 img,
                 S3_BUCKET,
-                key)
-
+                key,
+                ExtraArgs={
+                    'ContentType': mime
+                    })
+            print("OK 4")
             upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
             img_s3_url = "{}{}".format(S3_LOCATION, key)
             
-            # print(img_s3_url) # debugging help
-            # print("WEEE I've uploaded")
-            
-            # # Add record to database
-            # print("@@@@@@", img, "@@@@@@")
-            # print("@@@@@@", user_id, "@@@@@@")
-            # print("@@@@@@", upload_begin_datetime, "@@@@@@")
-            # print("@@@@@@", upload_complete_datetime, "@@@@@@")
-            # print("@@@@@@", img_uuid, "@@@@@@")
-
-            ## WORKS UP UNTIL HERE 
-            statement = db_add_input_img(user_id,
-                                         img_size_x,
-                                         img_size_y,
-                                         img_format,
-                                         img_mode,
-                                         img_s3_url,
-                                         upload_begin_datetime,
-                                         upload_complete_datetime,
-                                         img_uuid)
-            print(statement)
-            print("WEEE I've been added to the database")
-
-            # Need a way to retrieve image_id back from database addition
-            #print(InputImage.query.filter(InputImage.image_id == ???).one())
+            print("UPLOADED: ", img_s3_url) # debugging help
+            count += 1
         
-        flash("Upload to S3 success")
+        flash("Upload to S3 a success!")
 
         return redirect("/")
 
-        ################# ^^^^^^^^^^^^^^^^^^^ ####################
-
-
-        ########## do i want to keep this? ##########
-            # img_path = save_input_img_to_tmp(img)
-            ### save input img to tmp logic
-        #     if allowed_file_formats(img.filename):
-        #         img_name = secure_filename(img.filename)
-        #         img_path = os.path.join(app.config['TMP_UPLOAD_FOLDER'], img_name)
-        #         img.save(img_path)
-        #         print(img_path)
-        #         ###
-        #     input_imgs_paths.append(img_path)
-
-
-        # session['input_imgs_paths'] = input_imgs_paths
-
-        return redirect("/") # change to route that displays images on page w ajax
-        
     except:
 
         flash("Please provide two valid files for upload.")
@@ -200,15 +144,84 @@ def upload_inputs():
         return redirect("/")
 
 
+### Where/when to add image to database with appropriate metadata?
+# # Images are corrupted when going to S3 if opened before uploading
+            # # But image also can't be opened _after_ being uploaded to S3
+            # # Thinking I'll need to abstract the addition to database away from here
+            # # and download file from s3 for database addition?? How else to get metadata?
+            # # open image, grab metadata, close image
+            # im = Image.open(img)
+            # img_size_x = im.size[0]
+            # img_size_y = im.size[1]
+            # img_format = im.format
+            # img_mode = im.mode
+            # im.close()
+            
+            # image_database_record = db_add_input_img(user_id,
+            #                              img_size_x,
+            #                              img_size_y,
+            #                              img_format,
+            #                              img_mode,
+            #                              img_s3_url,
+            #                              upload_begin_datetime,
+            #                              upload_complete_datetime,
+            #                              img_uuid)
+
+            # print("Added to database with UUID: ", image_database_record.im_uuid)
+            # session_string_name = ('Image_' + str(count) + '_uuid')
+            # session[session_string_name] = image_database_record.im_uuid
+
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
     """Diff images [no login required]."""
     
     try:
+        
+        print("OK 1")
+        print(session['Image_1_uuid'])
+        image_1_row = InputImage.query.filter(InputImage.im_uuid == session['Image_1_uuid']).first()
+        image_2_row = InputImage.query.filter(InputImage.im_uuid == session['Image_2_uuid']).first()
 
-        bool_img_path = create_boolean_diff(session.get('input_imgs_paths')[0], \
-                                        session.get('input_imgs_paths')[1])
-        session['bool_img_path'] = bool_img_path
+        print("OK 2")
+        image_2_s3_url = image_1_row.im_s3_url
+        image_2_s3_url = image_2_row.im_s3_url
+
+        # This is brittle - to do: split on something else or store Key separate from Url in db
+        image_key_1 = image_2_s3_url.split("s3.amazonaws.com")[-1]
+        image_key_2 = image_2_s3_url.split("s3.amazonaws.com")[-1]
+        
+        print("OK 3")
+        print(image_key_1)
+        print(image_key_2)
+        
+        print("OK 4")
+        image_keys = [image_key_1, image_key_2]
+        files = []
+        
+        print("OK 5")
+        for image_key in image_keys:
+            
+            filename = image_key.split('/')[-1]
+            print("OK 6")
+            print(s3_dl, S3_BUCKET, image_key, filename)
+
+            try:
+                s3_dl.Bucket(S3_BUCKET).download_file(image_key, filename)
+            
+            except botocore.exceptions.ClientError as e:
+               if e.response['Error']['Code'] == "404":
+                   print("The object does not exist.")
+               else:
+                   raise
+
+            print("OK 7")
+            files.append(filename)
+
+        print("OK 8")
+        bool_img_path = create_boolean_diff(files[0], files[1])
+        print("OK 9")
+
+        #session['bool_img_path'] = bool_img_path
 
     except:
 

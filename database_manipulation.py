@@ -33,7 +33,7 @@ def db_add_input_img(user_id, img_size_x, img_size_y, img_format,
                      upload_complete_datetime, img_uuid):
     """Load input img data into db"""
 
-    input_image = InputImage(user_id=user_id, 
+    input_image = InputImage(im_user_id=user_id, 
             im_size_x=img_size_x,
             im_size_y=img_size_y,
             im_format=img_format,
@@ -44,9 +44,10 @@ def db_add_input_img(user_id, img_size_x, img_size_y, img_format,
             im_uuid=img_uuid)
 
     # need a way to return image_id to server.py
-    db.sesssion.add(input_image)
+    db.session.add(input_image)
     db.session.commit()
-    return("success")
+    return(InputImage.query.filter(InputImage.im_uuid == img_uuid).first())
+    #return("success")
 
 def db_add_diff_img(img, user_id, im_1_id, im_2_id, diff_s3_url, upload_begin_datetime,
                      upload_complete_datetime, uuid):
