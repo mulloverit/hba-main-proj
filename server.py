@@ -5,6 +5,10 @@ from flask import Flask, request, jsonify, render_template, flash, redirect, ses
 import os
 from PIL import Image
 import uuid
+from werkzeug.datastructures import FileStorage
+import numpy as np
+import cv2
+
 
 from config import *
 from database_manipulation import *
@@ -117,7 +121,7 @@ def upload_inputs():
             base_filename = img.filename.rsplit("/")[-1]
             key = username + "/" + img_uuid + "_" + base_filename
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            print("OK 3")
+
             s3.upload_fileobj(
                 img,
                 S3_BUCKET,
@@ -125,15 +129,32 @@ def upload_inputs():
                 ExtraArgs={
                     'ContentType': mime
                     })
-            print("OK 4")
+    
             upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
             img_s3_url = "{}{}".format(S3_LOCATION, key)
             
             print("UPLOADED: ", img_s3_url) # debugging help
             count += 1
-        
+
+            ## TRYING THIS OUT https://gist.github.com/mjul/32d697b734e7e9171cdb
+            print("OK 1")
+            in_memory_file = StringIO()
+            print("OK 2")
+            img.save(in_memory_file)
+            print("OK 3")
+            data = np.fromstring(in_memory_file.getvalue(), dtype=np.uint8)
+            print("OK 4")
+            color_image_flag = 1
+            print("OK 5")
+            img = cv2.imdecode(data, color_image_flag)
+            print("OK 6")
+
+
+        print("INPUT IMGS LIST: ", input_imgs)
         flash("Upload to S3 a success!")
+        
+        
 
         return redirect("/")
 
@@ -168,9 +189,10 @@ def upload_inputs():
             #                              img_uuid)
 
             # print("Added to database with UUID: ", image_database_record.im_uuid)
-            # session_string_name = ('Image_' + str(count) + '_uuid')
-            # session[session_string_name] = image_database_record.im_uuid
-
+            # image_session_key = ('Image_' + str(count) + '_uuid')
+            # session[image_session_key] = image_database_record.im_uuid
+            # print(session[image_session_key])
+            
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
     """Diff images [no login required]."""
