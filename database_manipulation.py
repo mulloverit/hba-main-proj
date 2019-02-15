@@ -28,25 +28,25 @@ def db_add_new_user(username, email, password, fname, lname):
     db.session.add(user)
     db.session.commit()
 
-def db_add_input_img(img, user_id, upload_begin_datetime, upload_complete_datetime, uuid):
+def db_add_input_img(user_id, img_size_x, img_size_y, img_format,
+                     img_mode, img_s3_url, upload_begin_datetime,
+                     upload_complete_datetime, img_uuid):
     """Load input img data into db"""
-    
-    im = Image.open(img)
 
-    input_image = InputImage(im_user_id=user_id, 
+    input_image = InputImage(user_id=user_id, 
+            im_size_x=img_size_x,
+            im_size_y=img_size_y,
+            im_format=img_format,
+            im_mode=img_mode,
+            im_s3_url=img_s3_url,
             im_upload_begin_datetime=upload_begin_datetime,
             im_upload_complete_datetime=upload_complete_datetime,
-            im_size_x=im.size[0],
-            im_size_y=im.size[1],
-            im_format=im.format,
-            im_mode=im.mode,
-            im_s3_url=im_s3_url,
-            uuid=uuid)
+            im_uuid=uuid)
 
     # need a way to return image_id to server.py
     db.sesssion.add(input_image)
     db.session.commit()
-    im.close()
+    return("success")
 
 def db_add_diff_img(img, user_id, im_1_id, im_2_id, diff_s3_url, upload_begin_datetime,
                      upload_complete_datetime, uuid):
@@ -65,7 +65,7 @@ def db_add_diff_img(img, user_id, im_1_id, im_2_id, diff_s3_url, upload_begin_da
                          diff_s3_url=diff_s3_url,
                          diff_upload_begin_datetime=upload_begin_datetime,
                          diff_upload_complete_datetime=upload_complete_datetime,
-                         uuid=uuid)
+                         diff_uuid=uuid)
     
     db.session.add(diff_img)
     db.session.commit()

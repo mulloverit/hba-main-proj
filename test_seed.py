@@ -54,7 +54,7 @@ def load_input_imgs():
                                im_s3_url=im_s3_url,
                                im_upload_begin_datetime=CURRENT_DATETIME,
                                im_upload_complete_datetime=CURRENT_DATETIME,
-                               img_uuid=img_uuid)
+                               im_uuid=img_uuid)
 
         db.session.add(input_img)
 
@@ -81,7 +81,7 @@ def load_diff_imgs():
                              diff_s3_url=diff_s3_url,
                              diff_upload_begin_datetime=CURRENT_DATETIME,
                              diff_upload_complete_datetime=CURRENT_DATETIME,
-                             img_uuid=img_uuid)
+                             diff_uuid=img_uuid)
 
         db.session.add(diff_img)
 

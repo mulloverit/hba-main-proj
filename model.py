@@ -40,7 +40,7 @@ class InputImage(db.Model):
     im_format = db.Column(db.String(10), nullable=False)
     im_mode = db.Column(db.String(10), nullable=False)
     im_s3_url = db.Column(db.String(500), nullable=False)
-    img_uuid = db.Column(db.String(500), nullable=False)
+    im_uuid = db.Column(db.String(500), nullable=False)
 
 
     def __repr__(self):
@@ -55,7 +55,7 @@ class InputImage(db.Model):
                     im_format={self.im_format},
                     im_mode={self.im_mode},
                     im_s3_url={self.im_s3_url},
-                    img_uuid={self.img_uuid}""")
+                    im_uuid={self.img_uuid}""")
 
 
 class DiffImage(db.Model):
@@ -74,7 +74,7 @@ class DiffImage(db.Model):
     diff_format = db.Column(db.String(10), nullable=False)
     diff_mode = db.Column(db.String(10), nullable=False)
     diff_s3_url = db.Column(db.String(500), nullable=False)
-    img_uuid = db.Column(db.String(500), nullable=False)
+    diff_uuid = db.Column(db.String(500), nullable=False)
 
 
     def __repr__(self):
@@ -91,7 +91,7 @@ class DiffImage(db.Model):
                     diff_format={self.diff_format},
                     diff_mode={self.diff_mode},
                     diff_s3_url={self.diff_s3_url},
-                    img_uuid={self.img_uuid}""")
+                    diff_uuid={self.img_uuid}""")
 
 if __name__ == "__main__":
     from server import app
