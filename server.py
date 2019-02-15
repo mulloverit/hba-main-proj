@@ -79,13 +79,15 @@ def upload_inputs():
     try:
         
         username = session['username']
-        user = User.query.filter(User.username == session['username']).one()
-        # user_id = user.user_id
-
+        
     except:
 
         username = "tmp" 
         flash("Not logged in.")
+
+    # Maintain a db username item for "tmp" at loc user_id = 1
+    user = User.query.filter(User.username == session['username']).one()
+    user_id = user.user_id
 
     try:
 
@@ -96,8 +98,9 @@ def upload_inputs():
         for img in input_imgs:
 
             # Upload to S3
+            uuid = uuid.uuid4()
             mime = img.content_type
-            key = username + "/" + img.filename.rsplit("/")[-1]
+            key = username + "/" + uuid + "/" + img.filename.rsplit("/")[-1]
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             
             s3.upload_fileobj(
@@ -109,18 +112,28 @@ def upload_inputs():
             S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
             img_s3_location = "{}{}".format(S3_LOCATION, key)
             print(img_s3_location) # debugging help
+            print("WEEE I've uploadded")
             
             # Add record to database
-            # db_add_input_img(img,
-            #                  user_id,
-            #                  input_1,
-            #                  input_2,
-            #                  upload_begin_datetime,
-            #                  upload_complete_datetime) 
-    
 
-            print("WEEE")
-            flash("Upload to S3 success")
+            print("@@@@@@", img, "@@@@@@")
+            print("@@@@@@", user_id, "@@@@@@")
+            print("@@@@@@", upload_begin_datetime, "@@@@@@")
+            print("@@@@@@", upload_complete_datetime, "@@@@@@")
+            print("@@@@@@", uuid, "@@@@@@")
+
+            db_add_input_img(img,
+                             user_id,
+                             upload_begin_datetime,
+                             upload_complete_datetime,
+                             uuid)
+        
+            print("WEEE I've been added to the database")
+
+            # Need a way to retrieve image_id back from database addition
+            #print(InputImage.query.filter(InputImage.image_id == ???).one())
+        
+        flash("Upload to S3 success")
 
         return redirect("/")
 

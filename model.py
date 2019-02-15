@@ -40,6 +40,7 @@ class InputImage(db.Model):
     im_format = db.Column(db.String(10), nullable=False)
     im_mode = db.Column(db.String(10), nullable=False)
     im_s3_url = db.Column(db.String(500), nullable=False)
+    uuid = db.Column(db.String(500), nullable=False)
 
 
     def __repr__(self):
@@ -72,6 +73,7 @@ class DiffImage(db.Model):
     diff_format = db.Column(db.String(10), nullable=False)
     diff_mode = db.Column(db.String(10), nullable=False)
     diff_s3_url = db.Column(db.String(500), nullable=False)
+    uuid = db.Column(db.String(500), nullable=False)
 
 
     def __repr__(self):
