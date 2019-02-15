@@ -62,6 +62,7 @@ def register_user():
         if db_check_if_user_exists(username):
 
             flash("Already a user. Please pick a unique username or sign in.")
+            
             return redirect("/")
 
     except:
@@ -86,15 +87,13 @@ def upload_check_inputs():
         username = "tmp"
         flash("Not logged in.")
 
-
-    # retrieve images from page
-
     try:
-        input_imgs_paths = []
+
+        username = "tmp"
         input_imgs = [request.files['img-1'], request.files['img-2']]
         
         ####################### THIS WORKS ########################
-        username = "tmp"
+        
         for img in input_imgs:
 
             mime = img.content_type
@@ -138,7 +137,6 @@ def upload_check_inputs():
         #     input_imgs_paths.append(img_path)
 
 
-        
         # session['input_imgs_paths'] = input_imgs_paths
 
         return redirect("/") # change to route that displays images on page w ajax
