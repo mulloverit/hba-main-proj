@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 import os
 from PIL import Image
+import uuid
 
 from config import *
 from database_manipulation import *
@@ -79,15 +80,20 @@ def upload_inputs():
     try:
         
         username = session['username']
+        user = User.query.filter(User.username == session['username']).one()
+        user_id = user.user_id
+        print("NEAT")
         
     except:
 
-        username = "tmp" 
+        username = "tmp"
+        user_id = 1
+        print("OK")
         flash("Not logged in.")
 
     # Maintain a db username item for "tmp" at loc user_id = 1
-    user = User.query.filter(User.username == session['username']).one()
-    user_id = user.user_id
+    # user = User.query.filter(User.username == session['username']).one()
+    # user_id = user.user_id
 
     try:
 
@@ -97,37 +103,57 @@ def upload_inputs():
         
         for img in input_imgs:
 
+            print("you cannot use pil to open this rn")
+            im = Image.open(img)
+            print("jk yes you can")
+
+            img_size_x = im.size[0]
+            img_size_y = im.size[1]
+            img_format = im.format
+            img_mode = im.mode
+
+            print(img_size_x, img_size_y, img_format, img_mode)
+            #im.close()
+                    
             # Upload to S3
-            uuid = uuid.uuid4()
+            img_uuid = str(uuid.uuid4())
             mime = img.content_type
-            key = username + "/" + uuid + "/" + img.filename.rsplit("/")[-1]
+            base_filename = img.filename.rsplit("/")[-1]
+            key = username + "/" + img_uuid + "_" + base_filename
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+            print(im, S3_BUCKET, key) # debugging help
             
             s3.upload_fileobj(
                 img,
                 S3_BUCKET,
                 key)
-            
+
             upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
-            img_s3_location = "{}{}".format(S3_LOCATION, key)
-            print(img_s3_location) # debugging help
+            S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
+            img_s3_url = "{}{}".format(S3_LOCATION, key)
+            
+            print(img_s3_url) # debugging help
             print("WEEE I've uploadded")
             
             # Add record to database
-
             print("@@@@@@", img, "@@@@@@")
             print("@@@@@@", user_id, "@@@@@@")
             print("@@@@@@", upload_begin_datetime, "@@@@@@")
             print("@@@@@@", upload_complete_datetime, "@@@@@@")
-            print("@@@@@@", uuid, "@@@@@@")
+            print("@@@@@@", img_uuid, "@@@@@@")
 
-            db_add_input_img(img,
-                             user_id,
-                             upload_begin_datetime,
-                             upload_complete_datetime,
-                             uuid)
-        
+            ## WORKS UP UNTIL HERE 
+            statement = db_add_input_img(user_id,
+                                         img_size_x,
+                                         img_size_y,
+                                         img_format,
+                                         img_mode,
+                                         img_s3_url,
+                                         upload_begin_datetime,
+                                         upload_complete_datetime,
+                                         img_uuid)
+            print(statement)
             print("WEEE I've been added to the database")
 
             # Need a way to retrieve image_id back from database addition
