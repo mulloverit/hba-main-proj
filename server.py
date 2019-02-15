@@ -73,7 +73,7 @@ def register_user():
 
 
 @app.route("/upload-inputs", methods=['POST'])
-def upload_check_inputs():
+def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     try:
@@ -89,13 +89,14 @@ def upload_check_inputs():
 
     try:
 
-        username = "tmp"
+        # username = "tmp"
         input_imgs = [request.files['img-1'], request.files['img-2']]
         
         ####################### THIS WORKS ########################
         
         for img in input_imgs:
 
+            # Upload to S3
             mime = img.content_type
             key = username + "/" + img.filename.rsplit("/")[-1]
             upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -107,14 +108,15 @@ def upload_check_inputs():
             
             upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             S3_LOCATION = 'http://{}.s3.amazonaws.com/'.format(S3_BUCKET)
-            img_s3_location = "{}{}".format(S3_LOCATION, img.filename)
+            img_s3_location = "{}{}".format(S3_LOCATION, key)
+            print(img_s3_location) # debugging help
             
-            db_add_input_img(img,
-                             user_id,
-                             input_1,
-                             input_2,
-                             upload_begin_datetime,
-                             upload_complete_datetime) 
+            # db_add_input_img(img,
+            #                  user_id,
+            #                  input_1,
+            #                  input_2,
+            #                  upload_begin_datetime,
+            #                  upload_complete_datetime) 
     
 
             print("WEEE")
