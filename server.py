@@ -24,17 +24,23 @@ def sign_in():
     """Log in an existing user"""
 
     # Retrieve POSTed form data
-    username = request.form['username']
-    password = request.form['password']
+    request_username = request.form['username']
+    request_password = request.form['password']
 
     # Check if username exists
     try:
-        user = User.query.filter(User.username == username).one()
+        user = User.query.filter(User.username == request_username).one()
 
         # If Y, check that password is valid
-        if password == user.password:
+        if user.password == request_password:
+            # could get rid of lines 27-28 and do:
+        # if user.password == request.form['password']
 
-            session['username'] = username
+            # could create helper function in place of these lines
+            # add_to_session(key, value)
+            # sign_in_user(user) # _not_ a class/instance method -- goes under "utils" bc it is glue logic rather than user specifc
+            # Session.sign_in_user(user) 
+            session['username'] = request_username
             session['user_id'] = user.user_id
             flash("Successfully logged in.")
 
@@ -59,7 +65,7 @@ def register_user():
     lname = request.form['lname']
     
     try:
-
+        # if User.exists(username) # make class method
         if db_check_if_user_exists(username):
 
             flash("Already a user. Please pick a unique username or sign in.")
@@ -67,8 +73,10 @@ def register_user():
             return redirect("/")
 
     except:
-
+    
         db_add_new_user(username, email, password, fname, lname)
+        # db_add_new_user(username, email, request.form['password'],
+        #                request.form['fname'], request.form['lname']) # fname --> first_name etc
 
     return render_template("index.html")
 
@@ -78,7 +86,10 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     try:
-        
+        # abstract this to a method called current_user -- ths would go into utils/session helpers where
+        # you also have sign_in and sign_out.
+        # if current_user:
+            # replaces this whole try/except 
         username = session['username']
         user = User.query.filter(User.username == session['username']).one()
         user_id = user.user_id
@@ -133,15 +144,15 @@ def upload_inputs():
             S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
             img_s3_url = "{}{}".format(S3_LOCATION, key)
             
-            print(img_s3_url) # debugging help
-            print("WEEE I've uploadded")
+            # print(img_s3_url) # debugging help
+            # print("WEEE I've uploaded")
             
-            # Add record to database
-            print("@@@@@@", img, "@@@@@@")
-            print("@@@@@@", user_id, "@@@@@@")
-            print("@@@@@@", upload_begin_datetime, "@@@@@@")
-            print("@@@@@@", upload_complete_datetime, "@@@@@@")
-            print("@@@@@@", img_uuid, "@@@@@@")
+            # # Add record to database
+            # print("@@@@@@", img, "@@@@@@")
+            # print("@@@@@@", user_id, "@@@@@@")
+            # print("@@@@@@", upload_begin_datetime, "@@@@@@")
+            # print("@@@@@@", upload_complete_datetime, "@@@@@@")
+            # print("@@@@@@", img_uuid, "@@@@@@")
 
             ## WORKS UP UNTIL HERE 
             statement = db_add_input_img(user_id,

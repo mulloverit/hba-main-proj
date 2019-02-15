@@ -17,6 +17,17 @@ class User(db.Model):
     lname = db.Column(db.String(50), nullable=False)
     sign_up_date = db.Column(db.String(50), nullable=False)
 
+    # class method takes static method decorator
+    @staticmethod
+    def find_by_username(username):
+        """Check if user exists in the database"""
+
+    # instance methods take self as arg
+    def is_valid_password(self, attempted_password): # model should be agnostic as to where this is coming from, so don't call it "request_password" bc doens't have to be a request --> "attempted_pw"
+ 
+    # this should maybe be an instance method instead of class method
+    #def check_password_validity(username, user_input_password):
+        """Check to see if pw matches database record"""
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return email or password."""
@@ -24,7 +35,6 @@ class User(db.Model):
                         user_id={self.user_id},
                         username={self.username}),
                         sign_up_date={self.sign_up_date}""")
-
 
 class InputImage(db.Model):
     """Input image model."""

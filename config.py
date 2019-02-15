@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 import os, subprocess
 from werkzeug.utils import secure_filename
 
+print("Config file loaded.")
+
 def allowed_file_formats(filename):
     """Utility for checking uploaded image formats"""
 

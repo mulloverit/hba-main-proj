@@ -41,7 +41,7 @@ def db_add_input_img(user_id, img_size_x, img_size_y, img_format,
             im_s3_url=img_s3_url,
             im_upload_begin_datetime=upload_begin_datetime,
             im_upload_complete_datetime=upload_complete_datetime,
-            im_uuid=uuid)
+            im_uuid=img_uuid)
 
     # need a way to return image_id to server.py
     db.sesssion.add(input_image)
