@@ -84,12 +84,11 @@ def upload_inputs():
 
     except:
 
-        username = "tmp"
+        username = "tmp" 
         flash("Not logged in.")
 
     try:
 
-        # username = "tmp"
         input_imgs = [request.files['img-1'], request.files['img-2']]
         
         ####################### THIS WORKS ########################
@@ -111,6 +110,7 @@ def upload_inputs():
             img_s3_location = "{}{}".format(S3_LOCATION, key)
             print(img_s3_location) # debugging help
             
+            # Add record to database
             # db_add_input_img(img,
             #                  user_id,
             #                  input_1,
