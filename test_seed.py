@@ -44,7 +44,7 @@ def load_input_imgs():
 
     for row in open("test-fixtures/input-images.txt"):
         row = row.rstrip()
-        im_user_id, im_size_x, im_size_y, im_format, im_mode, im_s3_url = row.split("|")
+        im_user_id, im_size_x, im_size_y, im_format, im_mode, im_s3_url, img_uuid = row.split("|")
 
         input_img = InputImage(im_user_id=im_user_id,
                                im_size_x=im_size_x,
@@ -53,7 +53,8 @@ def load_input_imgs():
                                im_mode=im_mode,
                                im_s3_url=im_s3_url,
                                im_upload_begin_datetime=CURRENT_DATETIME,
-                               im_upload_complete_datetime=CURRENT_DATETIME)
+                               im_upload_complete_datetime=CURRENT_DATETIME,
+                               img_uuid=img_uuid)
 
         db.session.add(input_img)
 
@@ -68,7 +69,7 @@ def load_diff_imgs():
 
     for row in open("test-fixtures/diff-images.txt"):
         row = row.rstrip()
-        diff_user_id, im_1_id, im_2_id, diff_size_x, diff_size_y, diff_format, diff_mode, diff_s3_url = row.split("|")
+        diff_user_id, im_1_id, im_2_id, diff_size_x, diff_size_y, diff_format, diff_mode, diff_s3_url, img_uuid = row.split("|")
 
         diff_img = DiffImage(diff_user_id=diff_user_id,
                              im_1_id=im_1_id,
@@ -79,7 +80,8 @@ def load_diff_imgs():
                              diff_mode=diff_mode,
                              diff_s3_url=diff_s3_url,
                              diff_upload_begin_datetime=CURRENT_DATETIME,
-                             diff_upload_complete_datetime=CURRENT_DATETIME)
+                             diff_upload_complete_datetime=CURRENT_DATETIME,
+                             img_uuid=img_uuid)
 
         db.session.add(diff_img)
 
