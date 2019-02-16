@@ -6,9 +6,6 @@ import os
 from PIL import Image
 import uuid
 from werkzeug.datastructures import FileStorage
-import numpy as np
-import cv2
-
 
 from config import *
 from database_manipulation import *
