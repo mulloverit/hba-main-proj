@@ -111,7 +111,7 @@ def upload_inputs():
         
         # TO DO: add use of secure_filename and allowed_formats
         
-        count = 0 # This is lame, but need some way to add img uuids to session uniquely?
+        count = 1 # This is lame, but need some way to add img uuids to session uniquely?
         
         for img in input_imgs:
                     
@@ -134,24 +134,14 @@ def upload_inputs():
             S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
             img_s3_url = "{}{}".format(S3_LOCATION, key)
             
+            image_s3_url_session_key = ('Image_' + str(count) + '_s3_key')
+            session[image_s3_url_session_key] = key
             print("UPLOADED: ", img_s3_url) # debugging help
             count += 1
 
-            ## TRYING THIS OUT https://gist.github.com/mjul/32d697b734e7e9171cdb
-            print("OK 1")
-            in_memory_file = StringIO()
-            print("OK 2")
-            img.save(in_memory_file)
-            print("OK 3")
-            data = np.fromstring(in_memory_file.getvalue(), dtype=np.uint8)
-            print("OK 4")
-            color_image_flag = 1
-            print("OK 5")
-            img = cv2.imdecode(data, color_image_flag)
-            print("OK 6")
-
-
         print("INPUT IMGS LIST: ", input_imgs)
+        print("Session Image 1: ", session['Image_1_s3_key'])
+        print("Session Image 2: ", session['Image_2_s3_key'])
         flash("Upload to S3 a success!")
         
         
@@ -199,36 +189,19 @@ def diff_images():
     
     try:
         
-        print("OK 1")
-        print(session['Image_1_uuid'])
-        image_1_row = InputImage.query.filter(InputImage.im_uuid == session['Image_1_uuid']).first()
-        image_2_row = InputImage.query.filter(InputImage.im_uuid == session['Image_2_uuid']).first()
-
-        print("OK 2")
-        image_2_s3_url = image_1_row.im_s3_url
-        image_2_s3_url = image_2_row.im_s3_url
-
-        # This is brittle - to do: split on something else or store Key separate from Url in db
-        image_key_1 = image_2_s3_url.split("s3.amazonaws.com")[-1]
-        image_key_2 = image_2_s3_url.split("s3.amazonaws.com")[-1]
+        image_1_s3_key = session['Image_1_s3_key']
+        image_2_s3_key = session['Image_2_s3_key']
+        image_keys = [image_1_s3_key, image_2_s3_key]
         
-        print("OK 3")
-        print(image_key_1)
-        print(image_key_2)
-        
-        print("OK 4")
-        image_keys = [image_key_1, image_key_2]
         files = []
         
-        print("OK 5")
         for image_key in image_keys:
             
             filename = image_key.split('/')[-1]
-            print("OK 6")
-            print(s3_dl, S3_BUCKET, image_key, filename)
-
+            file_location = 'tmp/downloads/' + filename
+        
             try:
-                s3_dl.Bucket(S3_BUCKET).download_file(image_key, filename)
+                s3_dl.Bucket(S3_BUCKET).download_file(image_key, file_location)
             
             except botocore.exceptions.ClientError as e:
                if e.response['Error']['Code'] == "404":
@@ -236,14 +209,13 @@ def diff_images():
                else:
                    raise
 
-            print("OK 7")
-            files.append(filename)
+            files.append(file_location)
 
-        print("OK 8")
         bool_img_path = create_boolean_diff(files[0], files[1])
-        print("OK 9")
 
-        #session['bool_img_path'] = bool_img_path
+        session['bool_img_path'] = bool_img_path
+
+        flash("Diff succeeded.")
 
     except:
 
