@@ -107,7 +107,7 @@ def upload_inputs():
         input_imgs = [request.files['img-1'], request.files['img-2']]
         
         # TO DO: add use of secure_filename and allowed_formats
-        
+    
         count = 1 # This is lame, but need some way to add img uuids to session uniquely?
         
         for img in input_imgs:
@@ -130,10 +130,21 @@ def upload_inputs():
             upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
             img_s3_url = "{}{}".format(S3_LOCATION, key)
-            
-            image_s3_url_session_key = ('Image_' + str(count) + '_s3_key')
-            session[image_s3_url_session_key] = key
             print("UPLOADED: ", img_s3_url) # debugging help
+
+            
+            # store s3_key and upload times in session
+            image_count_string = ('Image_' + str(count))
+            image_s3_key = (image_count_string + '_s3_key')
+            image_upload_begin_datetime_key = (image_count_string + '_upload_begin_datetime')
+            image_upload_complete_datetime_key = (image_count_string + '_upload_complete_datetime')
+            image_uuid_key = (image_count_string + '_uuid')
+            
+            session[image_s3_key] = key
+            session[image_upload_begin_datetime_key] = upload_complete_datetime
+            session[image_upload_complete_datetime_key] = upload_complete_datetime
+            session[image_uuid_key] = img_uuid
+
             count += 1
 
         print("INPUT IMGS LIST: ", input_imgs)
@@ -141,8 +152,6 @@ def upload_inputs():
         print("Session Image 2: ", session['Image_2_s3_key'])
         flash("Upload to S3 a success!")
         
-        
-
         return redirect("/")
 
     except:
@@ -150,35 +159,6 @@ def upload_inputs():
         flash("Please provide two valid files for upload.")
         
         return redirect("/")
-
-
-### Where/when to add image to database with appropriate metadata?
-# # Images are corrupted when going to S3 if opened before uploading
-            # # But image also can't be opened _after_ being uploaded to S3
-            # # Thinking I'll need to abstract the addition to database away from here
-            # # and download file from s3 for database addition?? How else to get metadata?
-            # # open image, grab metadata, close image
-            # im = Image.open(img)
-            # img_size_x = im.size[0]
-            # img_size_y = im.size[1]
-            # img_format = im.format
-            # img_mode = im.mode
-            # im.close()
-            
-            # image_database_record = db_add_input_img(user_id,
-            #                              img_size_x,
-            #                              img_size_y,
-            #                              img_format,
-            #                              img_mode,
-            #                              img_s3_url,
-            #                              upload_begin_datetime,
-            #                              upload_complete_datetime,
-            #                              img_uuid)
-
-            # print("Added to database with UUID: ", image_database_record.im_uuid)
-            # image_session_key = ('Image_' + str(count) + '_uuid')
-            # session[image_session_key] = image_database_record.im_uuid
-            # print(session[image_session_key])
             
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
@@ -191,7 +171,7 @@ def diff_images():
         image_keys = [image_1_s3_key, image_2_s3_key]
         
         files = []
-        
+
         for image_key in image_keys:
             
             filename = image_key.split('/')[-1]
@@ -208,9 +188,10 @@ def diff_images():
 
             files.append(file_location)
 
-        bool_img_path = create_boolean_diff(files[0], files[1])
+        bool_img_local_path = create_boolean_diff(files[0], files[1])
 
-        session['bool_img_path'] = bool_img_path
+        session['bool_img_local_path'] = bool_img_local_path
+        session['input_images_local_paths'] = files
 
         flash("Diff succeeded.")
 
@@ -220,9 +201,61 @@ def diff_images():
 
     return redirect("/")
     
-@app.route("/upload-diff", methods=['POST'])
-def upload_diff():
-    """Upload diff to s3 for users who are logged in"""
+@app.route("/save-image-records-to-database", methods=['POST'])
+def save_image_records_to_database():
+    """Save record of input images and diff to database"""
+
+    ### THIS TRY/EXCEPT GRABBING USERNAME AND USER_ID IS REPETITIVE (SAME AS UPLOAD INPUT ROUTE) IT WILL BE ABSTRACTED
+    try:
+        # abstract this to a method called current_user -- ths would go into utils/session helpers where
+        # you also have sign_in and sign_out.
+        # if current_user:
+            # replaces this whole try/except 
+        username = session['username']
+        user = User.query.filter(User.username == session['username']).one()
+        user_id = user.user_id
+        
+    except:
+
+        # Maintain a db username item for "tmp" at loc user_id = 1
+        username = "tmp"
+        user_id = 1
+    ############################################################################
+
+    input_image_1, input_image_2 = session['input_images_local_paths'][0], session['input_images_local_paths'][1]
+    boolean_output_image = session['bool_img_local_path']
+
+    count = 1
+    for image in session['input_images_local_paths']:
+
+        image_count_string = ('Image_' + str(count))
+        img_s3_key = session[image_count_string + '_s3_key']
+        upload_begin_datetime = session[image_count_string + '_upload_begin_datetime']
+        upload_complete_datetime = session[image_count_string + '_upload_begin_datetime']
+        img_uuid = session[image_count_string + '_uuid']
+
+        im = Image.open(image)
+        img_size_x = im.size[0]
+        img_size_y = im.size[1]
+        img_format = im.format
+        img_mode = im.mode
+        im.close()
+        
+
+        image_database_record = db_add_input_img(user_id,
+                                     img_size_x,
+                                     img_size_y,
+                                     img_format,
+                                     img_mode,
+                                     img_s3_key,
+                                     upload_begin_datetime,
+                                     upload_complete_datetime,
+                                     img_uuid)
+
+        print("Added to database with UUID: ", image_database_record.im_uuid)
+        image_session_key = ('Image_' + str(count) + '_uuid')
+        session[image_session_key] = image_database_record.im_uuid
+        print(session[image_session_key])
 
     return redirect("/")
 
