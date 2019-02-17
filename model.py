@@ -11,23 +11,26 @@ class ImageClass:
     def __init__(self, image_object):
         """Instantiate an image object"""
 
+        import uuid
         # self.filepath = filepath
         self.image_object = image_object
-        # self.uuid = str(uuid.uuid4())
+        self.uuid = str(uuid.uuid4())
+    
+    # def get_uuid(self):
 
-    def filename(self):
+    #     # Return image uuid upon request
+    #     # Create uuid instance attribute for image if none exists
+    #     # Guard against more than 1 uuid being created for any instance
 
-        # image = self.image_object
-        image = self
-        return image.filename.rsplit("/")[-1]
+    #     import uuid
 
-    def mimetype(self):
+    #     try:
+    #         return self.uuid
+            
+    #     except:
+    #         self.uuid = str(uuid.uuid4())
 
-        # image = sefl.image_object
-        image = self
-        return image.content_type
-
-    def metadata(self):
+    def image_metadata(self):
         
         from PIL import Image
         
