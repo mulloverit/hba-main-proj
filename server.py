@@ -1,5 +1,5 @@
 """Flask server for image differencing application"""
-from io import StringIO
+from io import StringIO, BytesIO
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template, flash, redirect, session
 import os
@@ -166,6 +166,8 @@ def diff_images():
     
     try:
         
+        # Perform the image differencing operation
+        username = session['username']
         image_1_s3_key = session['Image_1_s3_key']
         image_2_s3_key = session['Image_2_s3_key']
         image_keys = [image_1_s3_key, image_2_s3_key]
@@ -188,10 +190,59 @@ def diff_images():
 
             files.append(file_location)
 
-        bool_img_local_path = create_boolean_diff(files[0], files[1])
+        # bool_img_local_path = create_boolean_diff(files[0], files[1])
+        bool_vals, bw_diff_size = create_boolean_diff(files[0], files[1])
 
-        session['bool_img_local_path'] = bool_img_local_path
+        # session['bool_img_local_path'] = bool_img_local_path
         session['input_images_local_paths'] = files
+
+
+        ############ Upload resulting boolean to S3 ###########
+        ##### Instead of fucking with PIL image object, can i populate a request.file object
+        ##### by faking it from the browser or otherwise? So we can look similar to line 107
+        
+        bool_img = Image.new("L", bw_diff_size)
+        bool_img.putdata(bool_vals) 
+        bool_img_path = save_bool_img_to_tmp(files[0], files[1], bool_img) # config util
+        img_uuid = str(uuid.uuid4())
+        ### mime = Image.MIME[img.format] ## Not working
+        base_filename = bool_img_path.rsplit("/")[-1]
+        key = username + "/" + img_uuid + "_" + base_filename
+        upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        print(s3, bool_img, S3_BUCKET, key)
+        print("$$$$$$$$$$$$$$$")
+        in_mem_file = BytesIO()
+
+        print("$$$$$$$$$$$$$$$")
+        bool_img.save(in_mem_file, format='JPEG')
+        upload_img = in_mem_file.getvalue()
+        print(type(upload_img))
+        print(type(bool_img))
+        print(type(bool_img_path))
+
+        print("###############")
+        print(S3_BUCKET, key)
+        s3.upload_fileobj(
+            bool_img, # I'm pretty sure this is a PIL object (pointer?) not an actual image
+            S3_BUCKET,
+            key)
+        print("OK 4")
+
+        # s3.upload_fileobj(
+        #     boolean_img,
+        #     S3_BUCKET,
+        #     key,
+        #     ExtraArgs={
+        #         'ContentType': mime
+        #         })
+
+        upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
+        img_s3_url = "{}{}".format(S3_LOCATION, key)
+        print("UPLOADED: ", img_s3_url) # debugging help
+
+
 
         flash("Diff succeeded.")
 
@@ -205,7 +256,9 @@ def diff_images():
 def save_image_records_to_database():
     """Save record of input images and diff to database"""
 
-    ### THIS TRY/EXCEPT GRABBING USERNAME AND USER_ID IS REPETITIVE (SAME AS UPLOAD INPUT ROUTE) IT WILL BE ABSTRACTED
+    ##########  THIS TRY/EXCEPT GRABBING USERNAME AND USER_ID IS  ##############
+    ##### REPETITIVE (SAME AS UPLOAD INPUT ROUTE) IT WILL BE ABSTRACTED ########
+
     try:
         # abstract this to a method called current_user -- ths would go into utils/session helpers where
         # you also have sign_in and sign_out.
@@ -220,11 +273,14 @@ def save_image_records_to_database():
         # Maintain a db username item for "tmp" at loc user_id = 1
         username = "tmp"
         user_id = 1
+
     ############################################################################
+
 
     input_image_1, input_image_2 = session['input_images_local_paths'][0], session['input_images_local_paths'][1]
     boolean_output_image = session['bool_img_local_path']
 
+    # Add records of input images to database table
     count = 1
     for image in session['input_images_local_paths']:
 
@@ -252,10 +308,46 @@ def save_image_records_to_database():
                                      upload_complete_datetime,
                                      img_uuid)
 
+        image_session_uuid_key = ('Image_' + str(count) + '_uuid')
+        image_session_ID_key = ('Image_' + str(count) + '_IMGID')
+        session[image_session_uuid_key] = image_database_record.im_uuid
+        session[image_session_ID_key] = image_database_record.im_id
+        print(session[image_session_uuid_key])
+        print(session[image_session_ID_key])
         print("Added to database with UUID: ", image_database_record.im_uuid)
-        image_session_key = ('Image_' + str(count) + '_uuid')
-        session[image_session_key] = image_database_record.im_uuid
-        print(session[image_session_key])
+
+        # Add boolean record to database
+        im = Image.open(boolean_output_image)
+        img_size_x = im.size[0]
+        img_size_y = im.size[1]
+        img_format = im.format
+        img_mode = im.mode
+        im.close()
+
+        input_img_id_1 = session['input_images_local_paths'][0]
+        input_img_id_2 = session['input_images_local_paths'][1]
+
+        image_database_record = db_add_input_img(user_id,
+                                     input_img_id_1, ###
+                                     input_img_id_2, ###
+                                     img_size_x,
+                                     img_size_y,
+                                     img_format,
+                                     img_mode,
+                                     img_s3_key,
+                                     upload_begin_datetime,
+                                     upload_complete_datetime,
+                                     img_uuid)
+
+        session['Boolean_uuid'] = image_database_record.im_uuid
+        print(session['Boolean_uuid'])
+        print("Added to database with UUID: ", image_database_record.im_uuid)
+
+
+
+
+
+
 
     return redirect("/")
 

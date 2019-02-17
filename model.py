@@ -52,7 +52,7 @@ class InputImage(db.Model):
     im_size_y = db.Column(db.Integer, nullable=False)
     im_format = db.Column(db.String(10), nullable=False)
     im_mode = db.Column(db.String(10), nullable=False)
-    im_s3_url = db.Column(db.String(500), nullable=False)
+    im_s3_url = db.Column(db.String(1000), nullable=False)
     im_uuid = db.Column(db.String(500), nullable=False)
 
 

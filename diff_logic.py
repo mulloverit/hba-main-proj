@@ -74,8 +74,27 @@ def create_boolean_diff(diff_input_1_path, diff_input_2_path):
     bw_stat = ImageStat.Stat(bw_diff)
     bw_median = bw_stat.median
 
-    # Est new image to populate later, est empty list for boolean vals
-    bool_img = Image.new("L", bw_diff.size)
+    # # Est new image to populate later, est empty list for boolean vals
+    # bool_img = Image.new("L", bw_diff.size)
+    # bool_vals = []
+
+    # # Change all values to either 0 or 255, split based on median val of diff
+    # for pixel in bw_diff.getdata():
+
+    #     if pixel > bw_median[0]:
+    #         bool_vals.append(255)
+    
+    #     else:
+    #         bool_vals.append(0)
+
+    # # Populate bool_img object with new vals and save 
+    # bool_img.putdata(bool_vals) 
+    # bool_img_path = save_bool_img_to_tmp(diff_input_1_path, diff_input_2_path, bool_img) #config util
+    
+    # return bool_img_path, bool_img
+
+
+    # TRY OUT CREATING NEW IMAGE IN SERVER 
     bool_vals = []
 
     # Change all values to either 0 or 255, split based on median val of diff
@@ -87,11 +106,7 @@ def create_boolean_diff(diff_input_1_path, diff_input_2_path):
         else:
             bool_vals.append(0)
 
-    # Populate bool_img object with new vals and save 
-    bool_img.putdata(bool_vals) 
-    bool_img_path = save_bool_img_to_tmp(diff_input_1_path, diff_input_2_path, bool_img)
-    
-    return bool_img_path
+    return bool_vals, bw_diff.size
 
 if __name__ == "__main__":
 
