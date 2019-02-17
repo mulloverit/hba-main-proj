@@ -16,20 +16,6 @@ class ImageClass:
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
     
-    # def get_uuid(self):
-
-    #     # Return image uuid upon request
-    #     # Create uuid instance attribute for image if none exists
-    #     # Guard against more than 1 uuid being created for any instance
-
-    #     import uuid
-
-    #     try:
-    #         return self.uuid
-            
-    #     except:
-    #         self.uuid = str(uuid.uuid4())
-
     def image_metadata(self):
         
         from PIL import Image
