@@ -16,23 +16,33 @@ class ImageClass:
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
     
-    def image_metadata(self):
-        
         from PIL import Image
-        
-        # image = Image.open(self.filepath)
         image = Image.open(self.image_object)
-        image_size = image.size
-        image_format = image.format
-        image_mode = image.mode
-        image_mimetype = Image.MIME[image.format]
-
+        self.size = image.size
+        self.format = image.format
+        self.mode = image.mode
+        self.mimetype = Image.MIME[image.format]
         image.close()
 
-        return {"size": image_size,
-                "format": image_format,
-                "mode": image_mode,
-                "mimetype": image_mimetype}
+
+
+    # def image_metadata(self):
+        
+    #     from PIL import Image
+        
+    #     # image = Image.open(self.filepath)
+    #     image = Image.open(self.image_object)
+    #     image_size = image.size
+    #     image_format = image.format
+    #     image_mode = image.mode
+    #     image_mimetype = Image.MIME[image.format]
+
+    #     image.close()
+
+    #     return {"size": image_size,
+    #             "format": image_format,
+    #             "mode": image_mode,
+    #             "mimetype": image_mimetype}
 
 
 
