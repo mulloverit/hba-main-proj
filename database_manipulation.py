@@ -49,24 +49,26 @@ def db_add_input_img(user_id, img_size_x, img_size_y, img_format,
     return(InputImage.query.filter(InputImage.im_uuid == img_uuid).first())
     #return("success")
 
-def db_add_diff_img(img, user_id, im_1_id, im_2_id, diff_s3_url, upload_begin_datetime,
-                     upload_complete_datetime, uuid):
+def db_add_diff_img(user_id, im_1_id, im_2_id, img_size_x, img_size_y,
+                    img_format, img_mode, diff_s3_url, upload_begin_datetime,
+                     upload_complete_datetime, diff_uuid):
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
 
     # NEEDS LOGIC FOR GETTING IMAGE METADATA
-    diff = Image.open(img)
+    # diff = Image.open(img)
 
     diff_img = DiffImage(diff_user_id=user_id,
                          im_1_id=im_1_id,
                          im_2_id=im_2_id,
-                         diff_size_x=diff.size[0],
-                         diff_size_y=diff.size[1],
-                         diff_format=diff.format,
-                         diff_mode=diff.mode,
+                         diff_size_x=img_size_x,
+                         diff_size_y=img_size_y,
+                         diff_format=img_format,
+                         diff_mode=img_mode,
                          diff_s3_url=diff_s3_url,
                          diff_upload_begin_datetime=upload_begin_datetime,
                          diff_upload_complete_datetime=upload_complete_datetime,
-                         diff_uuid=uuid)
+                         diff_uuid=diff_uuid)
     
     db.session.add(diff_img)
     db.session.commit()
+    return(DiffImage.query.filter(DiffImage.diff_uuid == diff_uuid).first())

@@ -6,6 +6,48 @@ from config import connect_to_db, db, app
 
 ### Class establishments ###
 
+class ImageClass:
+
+    def __init__(self, image_object):
+        """Instantiate an image object"""
+
+        # self.filepath = filepath
+        self.image_object = image_object
+        # self.uuid = str(uuid.uuid4())
+
+    def filename(self):
+
+        # image = self.image_object
+        image = self
+        return image.filename.rsplit("/")[-1]
+
+    def mimetype(self):
+
+        # image = sefl.image_object
+        image = self
+        return image.content_type
+
+    def metadata(self):
+        
+        from PIL import Image
+        
+        # image = Image.open(self.filepath)
+        image = Image.open(self.image_object)
+        image_size = image.size
+        image_format = image.format
+        image_mode = image.mode
+        image_mimetype = Image.MIME[image.format]
+
+        image.close()
+
+        return {"size": image_size,
+                "format": image_format,
+                "mode": image_mode,
+                "mimetype": image_mimetype}
+
+
+
+
 class User(db.Model):
     """User model."""
 
@@ -20,8 +62,8 @@ class User(db.Model):
     sign_up_date = db.Column(db.String(50), nullable=False)
 
     # TO DO: add class and instance methods to deal with repetitive server tasks
-    # # class method takes static method decorator
-    # @staticmethod
+    # # class method takes classmethod decorator
+    # @classmethod
     # def find_by_username(username):
     #     """Check if user exists in the database"""
 
@@ -38,6 +80,7 @@ class User(db.Model):
                         user_id={self.user_id},
                         username={self.username}),
                         sign_up_date={self.sign_up_date}""")
+
 
 class InputImage(db.Model):
     """Input image model."""
@@ -106,7 +149,7 @@ class DiffImage(db.Model):
                     diff_s3_url={self.diff_s3_url},
                     diff_uuid={self.diff_uuid}""")
 
-if __name__ == "__main__":
-    from server import app
-    connect_to_db(app)
-    print("Connected to DB.")
+# if __name__ == "__main__":
+#     from server import app
+#     connect_to_db(app)
+#     print("Connected to DB.")

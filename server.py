@@ -10,7 +10,7 @@ from werkzeug.datastructures import FileStorage
 from config import *
 from database_manipulation import *
 from diff_logic import *
-from model import User, InputImage, DiffImage
+from model import User, InputImage, DiffImage, ImageClass
 from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
@@ -110,6 +110,11 @@ def upload_inputs():
     
         count = 1 # This is lame, but need some way to add img uuids to session uniquely?
         
+        print("OK 1")
+        image_1 = ImageClass(request.files['img-1'])
+        print("OK 2")
+        print("FILENAME: ", image_1.filename)
+        print("OK 3")
         for img in input_imgs:
                     
             # Upload to S3
@@ -190,59 +195,10 @@ def diff_images():
 
             files.append(file_location)
 
-        # bool_img_local_path = create_boolean_diff(files[0], files[1])
-        bool_vals, bw_diff_size = create_boolean_diff(files[0], files[1])
+        bool_img_local_path = create_boolean_diff(files[0], files[1])
 
-        # session['bool_img_local_path'] = bool_img_local_path
+        session['bool_img_local_path'] = bool_img_local_path
         session['input_images_local_paths'] = files
-
-
-        ############ Upload resulting boolean to S3 ###########
-        ##### Instead of fucking with PIL image object, can i populate a request.file object
-        ##### by faking it from the browser or otherwise? So we can look similar to line 107
-        
-        bool_img = Image.new("L", bw_diff_size)
-        bool_img.putdata(bool_vals) 
-        bool_img_path = save_bool_img_to_tmp(files[0], files[1], bool_img) # config util
-        img_uuid = str(uuid.uuid4())
-        ### mime = Image.MIME[img.format] ## Not working
-        base_filename = bool_img_path.rsplit("/")[-1]
-        key = username + "/" + img_uuid + "_" + base_filename
-        upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-        print(s3, bool_img, S3_BUCKET, key)
-        print("$$$$$$$$$$$$$$$")
-        in_mem_file = BytesIO()
-
-        print("$$$$$$$$$$$$$$$")
-        bool_img.save(in_mem_file, format='JPEG')
-        upload_img = in_mem_file.getvalue()
-        print(type(upload_img))
-        print(type(bool_img))
-        print(type(bool_img_path))
-
-        print("###############")
-        print(S3_BUCKET, key)
-        s3.upload_fileobj(
-            bool_img, # I'm pretty sure this is a PIL object (pointer?) not an actual image
-            S3_BUCKET,
-            key)
-        print("OK 4")
-
-        # s3.upload_fileobj(
-        #     boolean_img,
-        #     S3_BUCKET,
-        #     key,
-        #     ExtraArgs={
-        #         'ContentType': mime
-        #         })
-
-        upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
-        img_s3_url = "{}{}".format(S3_LOCATION, key)
-        print("UPLOADED: ", img_s3_url) # debugging help
-
-
 
         flash("Diff succeeded.")
 
@@ -310,43 +266,40 @@ def save_image_records_to_database():
 
         image_session_uuid_key = ('Image_' + str(count) + '_uuid')
         image_session_ID_key = ('Image_' + str(count) + '_IMGID')
+        print(image_session_ID_key)
         session[image_session_uuid_key] = image_database_record.im_uuid
         session[image_session_ID_key] = image_database_record.im_id
         print(session[image_session_uuid_key])
         print(session[image_session_ID_key])
-        print("Added to database with UUID: ", image_database_record.im_uuid)
+        print("InputImage added to database with UUID: ", image_database_record.im_uuid)
+        count += 1
 
-        # Add boolean record to database
-        im = Image.open(boolean_output_image)
-        img_size_x = im.size[0]
-        img_size_y = im.size[1]
-        img_format = im.format
-        img_mode = im.mode
-        im.close()
+    # Add boolean record to database
+    im = Image.open(boolean_output_image)
+    diff_size_x = im.size[0]
+    diff_size_y = im.size[1]
+    diff_format = im.format
+    diff_mode = im.mode
+    im.close()
 
-        input_img_id_1 = session['input_images_local_paths'][0]
-        input_img_id_2 = session['input_images_local_paths'][1]
+    input_diff_id_1 = session['Image_1_IMGID']
+    input_diff_id_2 = session['Image_2_IMGID']
 
-        image_database_record = db_add_input_img(user_id,
-                                     input_img_id_1, ###
-                                     input_img_id_2, ###
-                                     img_size_x,
-                                     img_size_y,
-                                     img_format,
-                                     img_mode,
-                                     img_s3_key,
-                                     upload_begin_datetime,
-                                     upload_complete_datetime,
-                                     img_uuid)
+    diff_database_record = db_add_diff_img(user_id,
+                                 input_diff_id_1,
+                                 input_diff_id_2,
+                                 diff_size_x,
+                                 diff_size_y,
+                                 diff_format,
+                                 diff_mode,
+                                 img_s3_key, #### THIS IS WRONG - currently inherits from InputImage 2
+                                 upload_begin_datetime,
+                                 upload_complete_datetime,
+                                 diff_uuid) #### THIS IS WRONG - currently inherits from InputImage 2
 
-        session['Boolean_uuid'] = image_database_record.im_uuid
-        print(session['Boolean_uuid'])
-        print("Added to database with UUID: ", image_database_record.im_uuid)
-
-
-
-
-
+    session['Boolean_uuid'] = diff_database_record.diff_uuid
+    print(session['Boolean_uuid'])
+    print("Diff added to database with UUID: ", diff_database_record.diff_uuid)
 
 
     return redirect("/")
