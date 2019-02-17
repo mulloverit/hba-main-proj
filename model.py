@@ -8,44 +8,55 @@ from config import connect_to_db, db, app
 
 class ImageClass:
 
-    def __init__(self, image_object):
+    def __init__(self, image_object, owner):
         """Instantiate an image object"""
 
         import uuid
         # self.filepath = filepath
+        self.owner = owner
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
     
         from PIL import Image
+
         image = Image.open(self.image_object)
+
         self.size = image.size
         self.format = image.format
         self.mode = image.mode
         self.mimetype = Image.MIME[image.format]
-        image.close()
+        self.filename = image.filename
+
+        #image.close()
 
 
+    def action_time(self):
+        """Return the current moment in time for record keeping of image actions"""
 
-    # def image_metadata(self):
+        return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+
+    def upload_to_s3(self, S3_BUCKET):
+
+        import boto3, botocore
+        from config import s3, s3_dl
+
+        upload_begin_datetime = self.action_time
+        key = self.owner + "/" + self.uuid + "_" + self.filename
         
-    #     from PIL import Image
-        
-    #     # image = Image.open(self.filepath)
-    #     image = Image.open(self.image_object)
-    #     image_size = image.size
-    #     image_format = image.format
-    #     image_mode = image.mode
-    #     image_mimetype = Image.MIME[image.format]
+        # Halleluja, get past "ValueError: Fileobj must implement read"
+        # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
+        with open(self.filename, 'rb') as data:
+            s3.upload_fileobj(
+                    data,
+                    S3_BUCKET,
+                    key,
+                    ExtraArgs={
+                        'ContentType': self.mimetype
+                        })
 
-    #     image.close()
-
-    #     return {"size": image_size,
-    #             "format": image_format,
-    #             "mode": image_mode,
-    #             "mimetype": image_mimetype}
-
-
-
+        upload_complete_datetime = self.action_time
+    
 
 class User(db.Model):
     """User model."""
