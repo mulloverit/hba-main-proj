@@ -106,20 +106,18 @@ def upload_inputs():
     try:
         
         tmp_request_image_files = []
-        # request_image_objects = []
 
         for request_image in [request.files['img-1'], request.files['img-2']]:
 
             tmp_path = 'tmp/uploads/{}_{}'.format(username, request_image.filename)
             request_image.save(tmp_path)
-            tmp_request_image_files.append(tmp_path)
-            
+
             request_image_object = ImageClass(request_image, tmp_path, username)
             request_image_object.upload_to_s3(S3_BUCKET)
-            # request_image_objects.append(request_image_object.json())
+
+            tmp_request_image_files.append(tmp_path)
 
         session['tmp_request_image_files'] = tmp_request_image_files
-        # session['request_image_objects'] = request_image_objects
 
         flash("Upload to S3 a success!")
         
@@ -133,53 +131,19 @@ def upload_inputs():
             
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
-    """Diff images [no login required]."""
+    """Diff images from local dir [no s3 and no login required]."""
     
     try:
-        
-        # is this going to be local or are inputs from s3?
 
-        tmp_request_image_file_1 = session['tmp_request_image_files'][0]
-        tmp_request_image_file_2 = session['tmp_request_image_files'][1]
+        #tmp_request_image_file_1 = session['tmp_request_image_files'][0]
+        #tmp_request_image_file_2 = session['tmp_request_image_files'][1]
 
-        # request_image_object_1 = session['request_image_objects'][0]
-        # request_image_object_2 = session['request_image_objects'][1]
+        boolean_diff_path = create_boolean_diff(
+                                        session['tmp_request_image_files'][0],
+                                        session['tmp_request_image_files'][1])
 
-
-        boolean_diff_path = create_boolean_diff(tmp_request_image_file_1, tmp_request_image_file_2)
-        print(boolean_diff_path)
-        print("yep")
-        #create_boolean_diff(request_image_object_1.filename, request_image_object_2.filename)
-
-
-        # Perform the image differencing operation
-        # username = session['username']
-        # image_1_s3_key = session['Image_1_s3_key']
-        # image_2_s3_key = session['Image_2_s3_key']
-        # image_keys = [image_1_s3_key, image_2_s3_key]
-        
-        # files = []
-
-        # for image_key in image_keys:
-            
-        #     filename = image_key.split('/')[-1]
-        #     file_location = 'tmp/downloads/' + filename
-        
-        #     try:
-        #         s3_dl.Bucket(S3_BUCKET).download_file(image_key, file_location)
-            
-        #     except botocore.exceptions.ClientError as e:
-        #        if e.response['Error']['Code'] == "404":
-        #            print("The object does not exist.")
-        #        else:
-        #            raise
-
-        #     files.append(file_location)
-
-        # bool_img_local_path = create_boolean_diff(files[0], files[1])
-
-        # session['bool_img_local_path'] = bool_img_local_path
-        # session['input_images_local_paths'] = files
+        #boolean_diff_path = create_boolean_diff(tmp_request_image_file_1, tmp_request_image_file_2)
+        session['tmp_boolean_diff_image_file'] = boolean_diff_path
 
         flash("Diff succeeded.")
 
