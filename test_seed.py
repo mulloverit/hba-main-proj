@@ -46,15 +46,15 @@ def load_input_imgs():
         row = row.rstrip()
         im_user_id, im_size_x, im_size_y, im_format, im_mode, im_s3_url, img_uuid = row.split("|")
 
-        input_img = InputImage(im_user_id=im_user_id,
-                               im_size_x=im_size_x,
-                               im_size_y=im_size_y,
-                               im_format=im_format,
-                               im_mode=im_mode,
-                               im_s3_url=im_s3_url,
-                               im_upload_begin_datetime=CURRENT_DATETIME,
-                               im_upload_complete_datetime=CURRENT_DATETIME,
-                               im_uuid=img_uuid)
+        input_img = InputImage(image_user_id=im_user_id,
+                               image_size_x=im_size_x,
+                               image_size_y=im_size_y,
+                               image_format=im_format,
+                               image_mode=im_mode,
+                               image_s3_url=im_s3_url,
+                               image_upload_begin_datetime=CURRENT_DATETIME,
+                               image_upload_complete_datetime=CURRENT_DATETIME,
+                               image_uuid=img_uuid)
 
         db.session.add(input_img)
 
