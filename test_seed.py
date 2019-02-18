@@ -7,8 +7,6 @@ from config import connect_to_db
 from model import User, InputImage, DiffImage, db
 from server import app
 
-
-CURRENT_DATE = datetime.today().strftime('%m-%d-%Y')
 CURRENT_DATETIME = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
 def load_users():
@@ -29,7 +27,7 @@ def load_users():
                     password=password,
                     fname=fname,
                     lname=lname,
-                    sign_up_date=CURRENT_DATE)
+                    sign_up_datetime=CURRENT_DATETIME)
 
         db.session.add(user)
 

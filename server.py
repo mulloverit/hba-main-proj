@@ -11,7 +11,7 @@ from werkzeug.datastructures import FileStorage
 from config import *
 from database_manipulation import *
 from diff_logic import *
-from model import User, InputImage, DiffImage, ImageClass
+from model import User, InputImage, DiffImage, ImageClass, UserClass
 from s3_manipulation import upload_file_to_s3
 
 app.secret_key = "what"
@@ -26,31 +26,20 @@ def show_index():
 def sign_in():
     """Log in an existing user"""
 
-    # Retrieve POSTed form data
-    request_username = request.form['username']
-    request_password = request.form['password']
-
-    # Check if username exists
+    user = UserClass(request.form['username'])
+    
     try:
-        user = User.query.filter(User.username == request_username).one() # THIS IS NOT WORKING 
+        user.find_by_username() # creates self.user_record (row from DB table)
+        user.check_password(request.form['password'])
+        session['username'] = user.username
+        session['user_id'] = user.user_record.user_id # uses self.user_record here
 
-        # If Y, check that password is valid
-        if user.password == request_password:
-            # could get rid of lines 27-28 and do:
-        # if user.password == request.form['password']
+        flash("Successfully logged in.")
 
-            # could create helper function in place of these lines
-            # add_to_session(key, value)
-            # sign_in_user(user) # _not_ a class/instance method -- goes under "utils" bc it is glue logic rather than user specifc
-            # Session.sign_in_user(user) 
-            session['username'] = request_username
-            session['user_id'] = user.user_id
-            flash("Successfully logged in.")
-
-    # If N, notify user of failed login
     except:
 
-        flash("Login failed.")
+        flash("Login failed. Continue as guest or try again.")
+
         return redirect("/")
 
     return render_template("index.html")
@@ -59,26 +48,21 @@ def sign_in():
 def register_user():
     """Add a new user to database"""
 
-    # Retrieve POSTed form data
-    username = request.form['username']
-    password = request.form['password']
-    email = request.form['email']
-    fname = request.form['fname']
-    lname = request.form['lname']
-    
-    try:
-        # if User.exists(username) # make class method
-        if db_check_if_user_exists(username):
+    user = UserClass(request.form['username'], request.form['password'],
+                     request.form['email'], request.form['fname'], request.form['lname'])
+    #session['username'] = user.username
 
-            flash("Already a user. Please pick a unique username or sign in.")
-            
-            return redirect("/")
-
-    except:
+    if user.find_by_username() == None:
+        
+        user.register_new()
+        user.find_by_username()
+        #session['user_id'] = user.user_record.user_id
+        
+        flash("Successfully registered.")
     
-        db_add_new_user(username, email, password, fname, lname)
-        # db_add_new_user(username, email, request.form['password'],
-        #                request.form['fname'], request.form['lname']) # fname --> first_name etc
+    else:
+
+        flash("Already a user. Please pick a unique username or sign in.")
 
     return render_template("index.html")
 
@@ -87,20 +71,9 @@ def register_user():
 def upload_inputs():
     """Handle initial image upload [no login required]."""
 
-    try:
-        # abstract this to a method called current_user -- ths would go into utils/session helpers where
-        # you also have sign_in and sign_out.
-        # if current_user:
-            # replaces this whole try/except 
-        username = session['username']
-        user = User.query.filter(User.username == session['username']).one()
-        user_id = user.user_id
-        
-    except:
+    #### CURENT USER FUNCTION ####
 
-        # Maintain a db username item for "tmp" at loc user_id = 1
-        username = "tmp"
-        user_id = 1
+    username, user_id = current_user()
 
     try:
         
@@ -134,20 +107,7 @@ def upload_inputs():
 def diff_images():
     """Diff images from local dir [no s3 and no login required]."""
     
-    try:
-        # abstract this to a method called current_user -- ths would go into utils/session helpers where
-        # you also have sign_in and sign_out.
-        # if current_user:
-            # replaces this whole try/except 
-        username = session['username']
-        user = User.query.filter(User.username == session['username']).one()
-        user_id = user.user_id
-        
-    except:
-
-        # Maintain a db username item for "tmp" at loc user_id = 1
-        username = "tmp"
-        user_id = 1
+    username, user_id = current_user()
 
     try:
 

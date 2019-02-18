@@ -1,3 +1,3 @@
-1 | 1 | 2 | 4567 | 4567 | JPEG | RGB | s3://fake-data/cmahon/0000001/test.jpg | dbcda0db-218a-4859-8959-6c2bcf9667d6
-1 | 3 | 4 | 4567 | 4567 | JPEG | RGB | s3://fake-data/cmahon/0000002/test.jpg | 01f7048d-c02c-492a-b7d6-0bd10a87150e
-4 | 13 | 14 | 3902 | 4000 | JPEG | RGB | s3://fake-data/breinhart/0000001/test.jpg | 2da2c9a8-c250-48cb-9654-01c1e3a6f207
+1|1|2|4567|4567|JPEG|RGB|s3://fake-data/cmahon/0000001/test.jpg|dbcda0db-218a-4859-8959-6c2bcf9667d6
+1|3|4|4567|4567|JPEG|RGB|s3://fake-data/cmahon/0000002/test.jpg|01f7048d-c02c-492a-b7d6-0bd10a87150e
+4|13|14|3902|4000|JPEG|RGB|s3://fake-data/breinhart/0000001/test.jpg|2da2c9a8-c250-48cb-9654-01c1e3a6f207

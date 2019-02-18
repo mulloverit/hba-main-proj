@@ -1,5 +1,6 @@
 """Models and database functions for image and user management"""
 from config import connect_to_db, db, app
+from datetime import datetime
 
 # Used this to clear out previously established table prior to uuid addition
 # db.metadata.clear()
@@ -7,6 +8,11 @@ from config import connect_to_db, db, app
 ### Class establishments ###
 
 class ImageClass:
+
+    # QUESTION:
+    # how to handle instance methods that can only be valid
+    # once another instance method has been called? ie can't add to db
+    # without a valide s3 url -- need an exception?
 
     def __init__(self, image_object, tmp_path, owner):
         """Instantiate an image object"""
@@ -27,23 +33,20 @@ class ImageClass:
         self.mimetype = Image.MIME[image.format]
         #image.close()
 
-
-    # def action_time(self):
-    #     """Return the current moment in time for record keeping of image actions"""
-
-    #     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-    # since diffs also need to do this, should this be pulled out into a separate utility?
     def upload_to_s3(self, S3_BUCKET):
+        """ Uploads an image file to s3, creating instance attributes:
+            - upload_begin_datetime
+            - s3_key
+            - upload_complete_datetime
+            - s3_location
+        """
 
         import boto3, botocore
         from config import s3, s3_dl
-        from datetime import datetime
+        #from datetime import datetime
 
         try:
 
-            # self.upload_begin_datetime = self.action_time
-            # ^^^ FAIL, results in: 'image_upload_begin_datetime': <bound method ImageClass.action_time of <__main__.ImageClass object at 0x1046d5e10>>, 'image_upload_complete_datetime': <bound method ImageClass.action_time of <__main__.ImageClass object at 0x1046d5e10>>
             self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
             
@@ -58,7 +61,6 @@ class ImageClass:
                             'ContentType': self.mimetype
                             })
 
-            # self.upload_complete_datetime = self.action_time
             self.upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             self.s3_location = "http://{}.s3.amazonaws.com/{}".format(S3_BUCKET, self.s3_key)
 
@@ -68,16 +70,16 @@ class ImageClass:
 
             return "Failed"
 
-    # since diffs also need to do this, should this be pulled out into a separate utility?
-    def add_to_database(self, user_id, input_images=None):
-        """Load input img data into db"""
+    # def get_id_by_uuid(self):
 
-        # how to handle instance methods that can only be valid
-        # once another instance method has been called? ie can't add to db
-        # without a valide s3 url -- need an exception
+    #     InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
+
+    def add_to_database(self, user_id, input_images=None):
+        """Create database record for an image. Handles input images & diffs."""
+
 
         if input_images == None:
-            
+
             image_record = InputImage(image_user_id=user_id, 
                     image_size_x=self.size[0],
                     image_size_y=self.size[1],
@@ -88,11 +90,8 @@ class ImageClass:
                     image_upload_complete_datetime=self.upload_complete_datetime,
                     image_uuid=self.uuid)
 
-            # db.session.add(image_record)
-            # db.session.commit()
-            # return(InputImage.query.filter(InputImage.image_uuid == self.uuid).first())
-
         else:
+
             input_uuid_1 = input_images[0]
             input_uuid_2 = input_images[1]
 
@@ -110,14 +109,59 @@ class ImageClass:
                                  diff_upload_begin_datetime=self.upload_begin_datetime,
                                  diff_upload_complete_datetime=self.upload_complete_datetime,
                                  diff_uuid=self.uuid)
-            # return "OK DIFF"
-            # db.session.add(image_record)
-            # db.session.commit()
-            # return(DiffImage.query.filter(DiffImage.diff_uuid == diff_uuid).first())
 
         db.session.add(image_record)
         db.session.commit()
 
+class UserClass:
+
+    def __init__(self, username, password=None, email=None,
+                 first_name=None, last_name=None):
+
+                 self.username = username
+                 self.password = password
+                 self.email = email
+                 self.first_name = first_name
+                 self.last_name = last_name
+
+    def find_by_username(self):
+        """Search for a user record in database based on username. If user 
+            does not exist, return None."""
+        try:
+
+            self.user_record = User.query.filter(User.username == self.username).first()
+            return self.user_record
+    
+        except:
+
+            return None
+
+    # # this should really be a "sign-in" utility
+    # def check_password(self, submitted_password):
+    #     """Check a user submitted password against database record password
+    #         for specified username. If they do not match, return None."""
+    #     try:
+
+    #         self.user_record.password == submitted_password
+
+    #     except:
+
+    #         return None
+
+    def register_new(self):
+        """Register a new user, add them to the database."""
+
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        user_record = User(username=self.username, 
+                            email=self.email, 
+                            password=self.password,
+                            fname=self.first_name, 
+                            lname=self.last_name,
+                            sign_up_datetime=current_datetime)
+
+        db.session.add(user_record)
+        db.session.commit()
 
 
 class User(db.Model):
@@ -131,7 +175,7 @@ class User(db.Model):
     password = db.Column(db.String(50), nullable=False)
     fname = db.Column(db.String(50), nullable=False)
     lname = db.Column(db.String(50), nullable=False)
-    sign_up_date = db.Column(db.String(50), nullable=False)
+    sign_up_datetime = db.Column(db.String(50), nullable=False)
 
     # TO DO: add class and instance methods to deal with repetitive server tasks
     # # class method takes classmethod decorator
@@ -148,10 +192,11 @@ class User(db.Model):
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return email or password."""
+
         return(f"""<User:
                         user_id={self.user_id},
-                        username={self.username}),
-                        sign_up_date={self.sign_up_date}""")
+                        username={self.username},
+                        sign_up_datetime={self.sign_up_datetime}""")
 
 
 class InputImage(db.Model):
@@ -173,6 +218,7 @@ class InputImage(db.Model):
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return password."""
+
         return (f"""<InputImage:
                     image_id={self.image_id}, 
                     image_user_id={self.image_user_id}), 
