@@ -8,24 +8,23 @@ from config import connect_to_db, db, app
 
 class ImageClass:
 
-    def __init__(self, image_object, owner):
+    def __init__(self, image_object, tmp_path, owner):
         """Instantiate an image object"""
 
         import uuid
         # self.filepath = filepath
         self.owner = owner
+        self.tmp_path = tmp_path
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
     
         from PIL import Image
-
         image = Image.open(self.image_object)
 
         self.size = image.size
         self.format = image.format
         self.mode = image.mode
         self.mimetype = Image.MIME[image.format]
-        self.filename = image.filename
 
         #image.close()
 
@@ -40,23 +39,31 @@ class ImageClass:
 
         import boto3, botocore
         from config import s3, s3_dl
-
-        upload_begin_datetime = self.action_time
-        key = self.owner + "/" + self.uuid + "_" + self.filename
         
-        # Halleluja, get past "ValueError: Fileobj must implement read"
-        # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
-        with open(self.filename, 'rb') as data:
-            s3.upload_fileobj(
-                    data,
-                    S3_BUCKET,
-                    key,
-                    ExtraArgs={
-                        'ContentType': self.mimetype
-                        })
+        try:
 
-        upload_complete_datetime = self.action_time
-    
+            self.upload_begin_datetime = self.action_time
+            self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
+            
+            # Halleluja, get past "ValueError: Fileobj must implement read"
+            # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
+            with open(self.tmp_path, 'rb') as data:
+                s3.upload_fileobj(
+                        data,
+                        S3_BUCKET,
+                        self.s3_key,
+                        ExtraArgs={
+                            'ContentType': self.mimetype
+                            })
+
+            self.upload_complete_datetime = self.action_time
+            self.s3_location = "http://{}.s3.amazonaws.com/{}".format(S3_BUCKET, self.s3_key)
+
+            return "Success"
+
+        except:
+
+            return None
 
 class User(db.Model):
     """User model."""

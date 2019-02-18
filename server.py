@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, render_template, flash, redirect, ses
 import os
 from PIL import Image
 import uuid
+from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from config import *
@@ -104,57 +105,23 @@ def upload_inputs():
 
     try:
 
-        input_imgs = [request.files['img-1'], request.files['img-2']]
+        request_file_1 = request.files['img-1']
+        request_file_2 = request.files['img-2']
+
+        tmp_path_upload_1 = 'tmp/uploads/{}_{}'.format(username, request_file_1.filename)
+        tmp_path_upload_2 = 'tmp/uploads/{}_{}'.format(username, request_file_2.filename)
+
+        locally_saved_user_upload_1 = request_file_1.save(tmp_path_upload_1)
+        locally_saved_user_upload_2 = request_file_2.save(tmp_path_upload_2)
         
         # TO DO: add use of secure_filename and allowed_formats
-    
-        count = 1 # This is lame, but need some way to add img uuids to session uniquely?
+
+        input_image_1 = ImageClass(request_file_1, tmp_path_upload_1, username)
+        input_image_2 = ImageClass(request_file_2, tmp_path_upload_1, username)
+
+        input_image_1.upload_to_s3(S3_BUCKET)
+        input_image_2.upload_to_s3(S3_BUCKET)
         
-        print("OK 1")
-        image_1 = ImageClass(request.files['img-1'])
-        print("OK 2")
-        print("FILENAME: ", image_1.filename)
-        print("OK 3")
-        for img in input_imgs:
-                    
-            # Upload to S3
-            img_uuid = str(uuid.uuid4())
-            mime = img.content_type
-            base_filename = img.filename.rsplit("/")[-1]
-            key = username + "/" + img_uuid + "_" + base_filename
-            upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-            s3.upload_fileobj(
-                img,
-                S3_BUCKET,
-                key,
-                ExtraArgs={
-                    'ContentType': mime
-                    })
-    
-            upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            S3_LOCATION = "http://{}.s3.amazonaws.com/".format(S3_BUCKET)
-            img_s3_url = "{}{}".format(S3_LOCATION, key)
-            print("UPLOADED: ", img_s3_url) # debugging help
-
-            
-            # store s3_key and upload times in session
-            image_count_string = ('Image_' + str(count))
-            image_s3_key = (image_count_string + '_s3_key')
-            image_upload_begin_datetime_key = (image_count_string + '_upload_begin_datetime')
-            image_upload_complete_datetime_key = (image_count_string + '_upload_complete_datetime')
-            image_uuid_key = (image_count_string + '_uuid')
-            
-            session[image_s3_key] = key
-            session[image_upload_begin_datetime_key] = upload_complete_datetime
-            session[image_upload_complete_datetime_key] = upload_complete_datetime
-            session[image_uuid_key] = img_uuid
-
-            count += 1
-
-        print("INPUT IMGS LIST: ", input_imgs)
-        print("Session Image 1: ", session['Image_1_s3_key'])
-        print("Session Image 2: ", session['Image_2_s3_key'])
         flash("Upload to S3 a success!")
         
         return redirect("/")
@@ -171,6 +138,10 @@ def diff_images():
     
     try:
         
+        # is this going to be local or are inputs from s3?
+        create_boolean_diff(input_image_1.filename, input_image_2.filename)
+
+
         # Perform the image differencing operation
         username = session['username']
         image_1_s3_key = session['Image_1_s3_key']
