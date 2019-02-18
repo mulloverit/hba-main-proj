@@ -13,7 +13,7 @@ class ImageClass:
 
         import uuid
         
-        self.owner = owner
+        self.owner = owner # username
         self.tmp_path = tmp_path
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
@@ -25,24 +25,26 @@ class ImageClass:
         self.format = image.format
         self.mode = image.mode
         self.mimetype = Image.MIME[image.format]
-
         #image.close()
 
 
-    def action_time(self):
-        """Return the current moment in time for record keeping of image actions"""
+    # def action_time(self):
+    #     """Return the current moment in time for record keeping of image actions"""
 
-        return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    #     return datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-
+    # since diffs also need to do this, should this be pulled out into a separate utility?
     def upload_to_s3(self, S3_BUCKET):
 
         import boto3, botocore
         from config import s3, s3_dl
+        from datetime import datetime
 
         try:
 
-            self.upload_begin_datetime = self.action_time
+            # self.upload_begin_datetime = self.action_time
+            # ^^^ FAIL, results in: 'image_upload_begin_datetime': <bound method ImageClass.action_time of <__main__.ImageClass object at 0x1046d5e10>>, 'image_upload_complete_datetime': <bound method ImageClass.action_time of <__main__.ImageClass object at 0x1046d5e10>>
+            self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
             
             # Halleluja, get past "ValueError: Fileobj must implement read"
@@ -56,7 +58,8 @@ class ImageClass:
                             'ContentType': self.mimetype
                             })
 
-            self.upload_complete_datetime = self.action_time
+            # self.upload_complete_datetime = self.action_time
+            self.upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             self.s3_location = "http://{}.s3.amazonaws.com/{}".format(S3_BUCKET, self.s3_key)
 
             return "Success"
@@ -65,29 +68,55 @@ class ImageClass:
 
             return None
 
-    # how to handle instance methods that can only be valid
-    # once another instance method has been called? ie can't add to db
-    # without a valide s3 url -- need an exception
-    def add_to_database(self):
+    # since diffs also need to do this, should this be pulled out into a separate utility?
+    def add_to_database(self, user_id, input_images=None):
         """Load input img data into db"""
 
-        user = User.query.filter(User.username == self.owner).one()
-        user_id = user.user_id
+        # how to handle instance methods that can only be valid
+        # once another instance method has been called? ie can't add to db
+        # without a valide s3 url -- need an exception
 
-        image_record = InputImage(image_user_id=user_id, 
-                image_size_x=self.size[0],
-                image_size_y=self.size[1],
-                image_format=self.format,
-                image_mode=self.mode,
-                image_s3_url=self.s3_location,
-                image_upload_begin_datetime=self.upload_begin_datetime,
-                image_upload_complete_datetime=self.upload_complete_datetime,
-                image_uuid=self.uuid)
+        if input_images == None:
+            
+            image_record = InputImage(image_user_id=user_id, 
+                    image_size_x=self.size[0],
+                    image_size_y=self.size[1],
+                    image_format=self.format,
+                    image_mode=self.mode,
+                    image_s3_url=self.s3_location,
+                    image_upload_begin_datetime=self.upload_begin_datetime,
+                    image_upload_complete_datetime=self.upload_complete_datetime,
+                    image_uuid=self.uuid)
 
-        # need a way to return image_id to server.py
+            # db.session.add(image_record)
+            # db.session.commit()
+            # return(InputImage.query.filter(InputImage.image_uuid == self.uuid).first())
+
+        else:
+
+            #return "OK DIFF"
+            input_1_record = InputImage.query.filter(InputImage.image_uuid == self.uuid).first()
+            input_2_record = InputImage.query.filter(InputImage.image_uuid == self.uuid).first()
+
+            image_record = DiffImage(diff_user_id=user_id,
+                                 im_1_id=input_1_record.image_uuid,
+                                 im_2_id=input_2_record.image_uuid,
+                                 diff_size_x=self.size[0],
+                                 diff_size_y=self.size[1],
+                                 diff_format=self.format,
+                                 diff_mode=self.mode,
+                                 diff_s3_url=self.s3_location,
+                                 diff_upload_begin_datetime=self.upload_begin_datetime,
+                                 diff_upload_complete_datetime=self.upload_complete_datetime,
+                                 diff_uuid=self.uuid)
+    
+            # db.session.add(image_record)
+            # db.session.commit()
+            # return(DiffImage.query.filter(DiffImage.diff_uuid == diff_uuid).first())
+
         db.session.add(image_record)
         db.session.commit()
-        return(InputImage.query.filter(InputImage.image_uuid == self.uuid).first())
+
 
 
 class User(db.Model):
