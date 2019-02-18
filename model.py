@@ -66,7 +66,7 @@ class ImageClass:
 
         except:
 
-            return None
+            return "Failed"
 
     # since diffs also need to do this, should this be pulled out into a separate utility?
     def add_to_database(self, user_id, input_images=None):
@@ -93,14 +93,15 @@ class ImageClass:
             # return(InputImage.query.filter(InputImage.image_uuid == self.uuid).first())
 
         else:
+            input_uuid_1 = input_images[0]
+            input_uuid_2 = input_images[1]
 
-            #return "OK DIFF"
-            input_1_record = InputImage.query.filter(InputImage.image_uuid == self.uuid).first()
-            input_2_record = InputImage.query.filter(InputImage.image_uuid == self.uuid).first()
-
+            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
+            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+            
             image_record = DiffImage(diff_user_id=user_id,
-                                 im_1_id=input_1_record.image_uuid,
-                                 im_2_id=input_2_record.image_uuid,
+                                 im_1_id=input_1_record.image_id,
+                                 im_2_id=input_2_record.image_id,
                                  diff_size_x=self.size[0],
                                  diff_size_y=self.size[1],
                                  diff_format=self.format,
@@ -109,7 +110,7 @@ class ImageClass:
                                  diff_upload_begin_datetime=self.upload_begin_datetime,
                                  diff_upload_complete_datetime=self.upload_complete_datetime,
                                  diff_uuid=self.uuid)
-    
+            # return "OK DIFF"
             # db.session.add(image_record)
             # db.session.commit()
             # return(DiffImage.query.filter(DiffImage.diff_uuid == diff_uuid).first())
