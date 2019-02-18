@@ -12,15 +12,15 @@ class ImageClass:
         """Instantiate an image object"""
 
         import uuid
-        # self.filepath = filepath
+        
         self.owner = owner
         self.tmp_path = tmp_path
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
     
         from PIL import Image
-        image = Image.open(self.image_object)
 
+        image = Image.open(self.image_object)
         self.size = image.size
         self.format = image.format
         self.mode = image.mode
@@ -39,7 +39,7 @@ class ImageClass:
 
         import boto3, botocore
         from config import s3, s3_dl
-        
+
         try:
 
             self.upload_begin_datetime = self.action_time
@@ -64,6 +64,31 @@ class ImageClass:
         except:
 
             return None
+
+    # how to handle instance methods that can only be valid
+    # once another instance method has been called? ie can't add to db
+    # without a valide s3 url -- need an exception
+    def add_to_database(self):
+        """Load input img data into db"""
+
+        user = User.query.filter(User.username == self.owner).one()
+        user_id = user.user_id
+
+        image_record = InputImage(image_user_id=user_id, 
+                image_size_x=self.size[0],
+                image_size_y=self.size[1],
+                image_format=self.format,
+                image_mode=self.mode,
+                image_s3_url=self.s3_location,
+                image_upload_begin_datetime=self.upload_begin_datetime,
+                image_upload_complete_datetime=self.upload_complete_datetime,
+                image_uuid=self.uuid)
+
+        # need a way to return image_id to server.py
+        db.session.add(image_record)
+        db.session.commit()
+        return(InputImage.query.filter(InputImage.image_uuid == self.uuid).first())
+
 
 class User(db.Model):
     """User model."""
@@ -104,31 +129,31 @@ class InputImage(db.Model):
 
     __tablename__ = "input_images"
 
-    im_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    im_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    im_upload_begin_datetime = db.Column(db.String(50), nullable=False)
-    im_upload_complete_datetime = db.Column(db.String(50), nullable=False)
-    im_size_x = db.Column(db.Integer, nullable=False)
-    im_size_y = db.Column(db.Integer, nullable=False)
-    im_format = db.Column(db.String(10), nullable=False)
-    im_mode = db.Column(db.String(10), nullable=False)
-    im_s3_url = db.Column(db.String(1000), nullable=False)
-    im_uuid = db.Column(db.String(500), nullable=False)
+    image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    image_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    image_upload_begin_datetime = db.Column(db.String(50), nullable=False)
+    image_upload_complete_datetime = db.Column(db.String(50), nullable=False)
+    image_size_x = db.Column(db.Integer, nullable=False)
+    image_size_y = db.Column(db.Integer, nullable=False)
+    image_format = db.Column(db.String(10), nullable=False)
+    image_mode = db.Column(db.String(10), nullable=False)
+    image_s3_url = db.Column(db.String(1000), nullable=False)
+    image_uuid = db.Column(db.String(500), nullable=False)
 
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return password."""
         return (f"""<InputImage:
-                    im_id={self.im_id}, 
-                    im_user_id={self.im_user_id}), 
-                    im_upload_begin_datetime={self.im_upload_begin_datetime},
-                    im_upload_complete_datetime={self.im_upload_complete_datetime},
-                    im_size_x={self.im_size_x},
-                    im_size_y={self.im_size_y},
-                    im_format={self.im_format},
-                    im_mode={self.im_mode},
-                    im_s3_url={self.im_s3_url},
-                    im_uuid={self.im_uuid}""")
+                    image_id={self.image_id}, 
+                    image_user_id={self.image_user_id}), 
+                    image_upload_begin_datetime={self.image_upload_begin_datetime},
+                    image_upload_complete_datetime={self.image_upload_complete_datetime},
+                    image_size_x={self.image_size_x},
+                    image_size_y={self.image_size_y},
+                    image_format={self.image_format},
+                    image_mode={self.image_mode},
+                    image_s3_url={self.image_s3_url},
+                    image_uuid={self.image_uuid}""")
 
 
 class DiffImage(db.Model):
@@ -138,8 +163,8 @@ class DiffImage(db.Model):
 
     diff_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     diff_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    im_1_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
-    im_2_id = db.Column(db.Integer, db.ForeignKey('input_images.im_id'))
+    im_1_id = db.Column(db.Integer, db.ForeignKey('input_images.image_id'))
+    im_2_id = db.Column(db.Integer, db.ForeignKey('input_images.image_id'))
     diff_upload_begin_datetime = db.Column(db.String(50), nullable=False)
     diff_upload_complete_datetime = db.Column(db.String(50), nullable=False)
     diff_size_x = db.Column(db.Integer, nullable=False)

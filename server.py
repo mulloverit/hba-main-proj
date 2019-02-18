@@ -115,9 +115,9 @@ def upload_inputs():
 
             request_image_object = ImageClass(request_image, tmp_path, username)
             request_image_object.upload_to_s3(S3_BUCKET)
+            request_image_object.add_to_database()
 
             session['tmp_request_image_files'].append(tmp_path)
-
 
         flash("Upload to S3 a success!")
         
@@ -173,50 +173,10 @@ def save_image_records_to_database():
         user_id = 1
 
     ############################################################################
-
-
-    input_image_1, input_image_2 = session['input_images_local_paths'][0], session['input_images_local_paths'][1]
-    boolean_output_image = session['bool_img_local_path']
-
-    # Add records of input images to database table
-    count = 1
-    for image in session['input_images_local_paths']:
-
-        image_count_string = ('Image_' + str(count))
-        img_s3_key = session[image_count_string + '_s3_key']
-        upload_begin_datetime = session[image_count_string + '_upload_begin_datetime']
-        upload_complete_datetime = session[image_count_string + '_upload_begin_datetime']
-        img_uuid = session[image_count_string + '_uuid']
-
-        im = Image.open(image)
-        img_size_x = im.size[0]
-        img_size_y = im.size[1]
-        img_format = im.format
-        img_mode = im.mode
-        im.close()
-        
-
-        image_database_record = db_add_input_img(user_id,
-                                     img_size_x,
-                                     img_size_y,
-                                     img_format,
-                                     img_mode,
-                                     img_s3_key,
-                                     upload_begin_datetime,
-                                     upload_complete_datetime,
-                                     img_uuid)
-
-        image_session_uuid_key = ('Image_' + str(count) + '_uuid')
-        image_session_ID_key = ('Image_' + str(count) + '_IMGID')
-        print(image_session_ID_key)
-        session[image_session_uuid_key] = image_database_record.im_uuid
-        session[image_session_ID_key] = image_database_record.im_id
-        print(session[image_session_uuid_key])
-        print(session[image_session_ID_key])
-        print("InputImage added to database with UUID: ", image_database_record.im_uuid)
-        count += 1
+    
 
     # Add boolean record to database
+    boolean_output_image = session['bool_img_local_path']
     im = Image.open(boolean_output_image)
     diff_size_x = im.size[0]
     diff_size_y = im.size[1]
