@@ -1,44 +1,18 @@
+from datetime import datetime
 
-# ---------------------------------------------------------------------------- #
-
-# Add boolean record to database
-    # im = Image.open(boolean_output_image)
-    # diff_size_x = im.size[0]
-    # diff_size_y = im.size[1]
-    # diff_format = im.format
-    # diff_mode = im.mode
-    # im.close()
-
-    # input_diff_id_1 = session['Image_1_diffID']
-    # input_diff_id_2 = session['Image_2_diffID']
-
-    # diff_database_record = db_add_diff_img(user_id,
-    #                              input_diff_id_1,
-    #                              input_diff_id_2,
-    #                              diff_size_x,
-    #                              diff_size_y,
-    #                              diff_format,
-    #                              diff_mode,
-    #                              diff_s3_key, #### THIS IS WRONG - currently inherits from InputImage 2
-    #                              upload_begin_datetime,
-    #                              upload_complete_datetime,
-    #                              diff_uuid)
-
-    # session['Boolean_uuid'] = diff_database_record.diff_uuid
-    # print(session['Boolean_uuid'])
-    # print("Diff added to database with UUID: ", diff_database_record.diff_uuid)
-
+from config import connect_to_db, db, app
+from model import User, InputImage, DiffImage, ImageClass, UserClass 
 
 # ---------------------------------------------------------------------------- #
 
 def user_sign_in(submitted_username, submitted_password):
     
+
     user = UserClass(submitted_username)
     user_record = user.find_by_username()
 
-    # if no existing user
     if user_record and (user_record.password == submitted_password):
-
+        
         return "Successfully logged in."
 
     elif user_record:
@@ -46,30 +20,43 @@ def user_sign_in(submitted_username, submitted_password):
         return "Username and password do not match."
 
     else:
+
         return "Username does not exist. Please register or continue as guest."
 
 
-#     try:
-#         user.find_by_username() # creates self.user_record (row from DB table)
-#         user.check_password(request.form['password'])
-#         session['username'] = user.username
-#         session['user_id'] = user.user_record.user_id # uses self.user_record here
+def user_registration_new(submitted_username, submitted_password,
+                          submitted_email, submitted_first_name,
+                          submitted_last_name):
 
-#         flash("Successfully logged in.")
+    user = UserClass(submitted_username, submitted_password,
+                     submitted_email, submitted_first_name, submitted_last_name)
 
-#     except:
+    if not user.find_by_username():
 
-#         flash("Login failed. Continue as guest or try again.")
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
+        user_record = User(username=submitted_username, 
+                            password=submitted_password,
+                            email=submitted_email,
+                            fname=submitted_first_name, 
+                            lname=submitted_last_name,
+                            sign_up_datetime=current_datetime)
 
+        db.session.add(user_record)
+        db.session.commit()
 
-# def user_sign_out():
+        return "Successfully registered. Please sign in."
+    
+    else:
+
+        return "Already a user. Please pick a unique username or sign in."
+
 
 
 def current_user():
 
-    user = User.query.filter(User.username == session['username']).one()
-    user_id = user.user_id
+    user_record = User.query.filter(User.username == session['username']).one()
+    user_id = user_record.user_id
 
     return session['username'], user_id
 

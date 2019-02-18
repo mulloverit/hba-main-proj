@@ -136,32 +136,20 @@ class UserClass:
 
             return None
 
-    # # this should really be a "sign-in" utility
-    # def check_password(self, submitted_password):
-    #     """Check a user submitted password against database record password
-    #         for specified username. If they do not match, return None."""
-    #     try:
+    # def register_new(self):
+    #     """Register a new user, add them to the database."""
 
-    #         self.user_record.password == submitted_password
+    #     current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-    #     except:
+    #     user_record = User(username=self.username, 
+    #                         email=self.email, 
+    #                         password=self.password,
+    #                         fname=self.first_name, 
+    #                         lname=self.last_name,
+    #                         sign_up_datetime=current_datetime)
 
-    #         return None
-
-    def register_new(self):
-        """Register a new user, add them to the database."""
-
-        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-        user_record = User(username=self.username, 
-                            email=self.email, 
-                            password=self.password,
-                            fname=self.first_name, 
-                            lname=self.last_name,
-                            sign_up_datetime=current_datetime)
-
-        db.session.add(user_record)
-        db.session.commit()
+    #     db.session.add(user_record)
+    #     db.session.commit()
 
 
 class User(db.Model):

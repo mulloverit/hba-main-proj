@@ -13,6 +13,7 @@ from database_manipulation import *
 from diff_logic import *
 from model import User, InputImage, DiffImage, ImageClass, UserClass
 from s3_manipulation import upload_file_to_s3
+from utils import user_sign_in, user_registration_new
 
 app.secret_key = "what"
 
@@ -20,27 +21,19 @@ app.secret_key = "what"
 def show_index():
         """Index/homepage"""
 
+        session['username'] = 'tmp'
         return render_template("index.html")
 
 @app.route("/sign-in", methods=['POST'])
 def sign_in():
     """Log in an existing user"""
 
-    user = UserClass(request.form['username'])
-    
-    try:
-        user.find_by_username() # creates self.user_record (row from DB table)
-        user.check_password(request.form['password'])
-        session['username'] = user.username
-        session['user_id'] = user.user_record.user_id # uses self.user_record here
+    message = user_sign_in(request.form['username'], request.form['password'])
 
-        flash("Successfully logged in.")
+    if "Success" in message:
+        session['username'] = request.form['username']
 
-    except:
-
-        flash("Login failed. Continue as guest or try again.")
-
-        return redirect("/")
+    flash (message)
 
     return render_template("index.html")
 
@@ -48,21 +41,10 @@ def sign_in():
 def register_user():
     """Add a new user to database"""
 
-    user = UserClass(request.form['username'], request.form['password'],
+    message = user_registration_new(request.form['username'], request.form['password'],
                      request.form['email'], request.form['fname'], request.form['lname'])
-    #session['username'] = user.username
-
-    if user.find_by_username() == None:
-        
-        user.register_new()
-        user.find_by_username()
-        #session['user_id'] = user.user_record.user_id
-        
-        flash("Successfully registered.")
     
-    else:
-
-        flash("Already a user. Please pick a unique username or sign in.")
+    flash (message)
 
     return render_template("index.html")
 
@@ -70,8 +52,6 @@ def register_user():
 @app.route("/upload-inputs", methods=['POST'])
 def upload_inputs():
     """Handle initial image upload [no login required]."""
-
-    #### CURENT USER FUNCTION ####
 
     username, user_id = current_user()
 
