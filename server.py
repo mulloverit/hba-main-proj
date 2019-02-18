@@ -105,19 +105,19 @@ def upload_inputs():
 
     try:
         
-        tmp_request_image_files = []
+        session['tmp_request_image_files'] = []
 
         for request_image in [request.files['img-1'], request.files['img-2']]:
 
             tmp_path = 'tmp/uploads/{}_{}'.format(username, request_image.filename)
+            
             request_image.save(tmp_path)
 
             request_image_object = ImageClass(request_image, tmp_path, username)
             request_image_object.upload_to_s3(S3_BUCKET)
 
-            tmp_request_image_files.append(tmp_path)
+            session['tmp_request_image_files'].append(tmp_path)
 
-        session['tmp_request_image_files'] = tmp_request_image_files
 
         flash("Upload to S3 a success!")
         
@@ -135,14 +135,11 @@ def diff_images():
     
     try:
 
-        #tmp_request_image_file_1 = session['tmp_request_image_files'][0]
-        #tmp_request_image_file_2 = session['tmp_request_image_files'][1]
-
         boolean_diff_path = create_boolean_diff(
                                         session['tmp_request_image_files'][0],
-                                        session['tmp_request_image_files'][1])
+                                        session['tmp_request_image_files'][1]
+                                        )
 
-        #boolean_diff_path = create_boolean_diff(tmp_request_image_file_1, tmp_request_image_file_2)
         session['tmp_boolean_diff_image_file'] = boolean_diff_path
 
         flash("Diff succeeded.")
