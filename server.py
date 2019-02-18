@@ -15,7 +15,9 @@ from model import User, InputImage, DiffImage, ImageClass, UserClass
 from s3_manipulation import upload_file_to_s3
 from utils import user_sign_in, user_registration_new
 
+
 app.secret_key = "what"
+
 
 @app.route("/")
 def show_index():
@@ -23,6 +25,7 @@ def show_index():
 
         session['username'] = 'tmp'
         return render_template("index.html")
+
 
 @app.route("/sign-in", methods=['POST'])
 def sign_in():
@@ -36,6 +39,7 @@ def sign_in():
     flash (message)
 
     return render_template("index.html")
+
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
@@ -58,7 +62,7 @@ def upload_inputs():
     try:
         
         session['tmp_request_image_files'] = []
-        session['request_image_uuids'] = []
+        session['request_image_ids'] = []
 
         for request_image in [request.files['img-1'], request.files['img-2']]:
 
@@ -71,7 +75,7 @@ def upload_inputs():
             request_image_object.add_to_database(user_id)
             
             session['tmp_request_image_files'].append(tmp_path)
-            session['request_image_uuids'].append(request_image_object.uuid)
+            session['request_image_ids'].append(request_image_object.image_id)
 
         flash("Upload to S3 a success!")
         
@@ -82,7 +86,8 @@ def upload_inputs():
         flash("Please provide two valid files for upload.")
         
         return redirect("/")
-            
+
+
 @app.route("/submit-diff-request", methods=['POST'])
 def diff_images():
     """Diff images from local dir [no s3 and no login required]."""
@@ -98,7 +103,7 @@ def diff_images():
         
         difference_image = ImageClass(boolean_diff_path, boolean_diff_path, username) # wants path not PIL object
         difference_image.upload_to_s3(S3_BUCKET)
-        difference_image.add_to_database(user_id, input_images=session['request_image_uuids'])
+        difference_image.add_to_database(user_id, input_image_ids=session['request_image_ids'])
 
         flash("Diff succeeded.")
 
@@ -108,7 +113,6 @@ def diff_images():
 
     return redirect("/")
     
-
 
 if __name__ == "__main__":
     app.run(debug=True)

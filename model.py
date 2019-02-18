@@ -74,11 +74,11 @@ class ImageClass:
 
     #     InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
 
-    def add_to_database(self, user_id, input_images=None):
+    def add_to_database(self, user_id, input_image_ids=None):
         """Create database record for an image. Handles input images & diffs."""
 
 
-        if input_images == None:
+        if input_image_ids == None:
 
             image_record = InputImage(image_user_id=user_id, 
                     image_size_x=self.size[0],
@@ -92,15 +92,12 @@ class ImageClass:
 
         else:
 
-            input_uuid_1 = input_images[0]
-            input_uuid_2 = input_images[1]
-
-            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
-            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+            input_image_id_1 = input_image_ids[0]
+            input_image_id_2 = input_image_ids[1]
             
             image_record = DiffImage(diff_user_id=user_id,
-                                 im_1_id=input_1_record.image_id,
-                                 im_2_id=input_2_record.image_id,
+                                 im_1_id=input_image_id_1,
+                                 im_2_id=input_image_id_2,
                                  diff_size_x=self.size[0],
                                  diff_size_y=self.size[1],
                                  diff_format=self.format,

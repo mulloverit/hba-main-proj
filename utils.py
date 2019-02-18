@@ -52,16 +52,12 @@ def user_registration_new(submitted_username, submitted_password,
         return "Already a user. Please pick a unique username or sign in."
 
 
-
 def current_user():
 
     user_record = User.query.filter(User.username == session['username']).one()
     user_id = user_record.user_id
 
     return session['username'], user_id
-
-    # username = "tmp"
-    # user_id = 1
 
 
 # ---------------------------------------------------------------------------- #
