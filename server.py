@@ -61,21 +61,33 @@ def upload_inputs():
 
     try:
         
-        session['tmp_request_image_files'] = []
+        session['user_submitted_image_temporary_paths'] = []
         session['request_image_ids'] = []
 
-        for request_image in [request.files['img-1'], request.files['img-2']]:
+        for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
 
-            tmp_path = 'tmp/uploads/{}_{}'.format(username, request_image.filename)
+            user_submitted_image_temporary_path = ('tmp/uploads/{}_{}'.format(
+                                                username,
+                                                user_submitted_image.filename))
             
-            request_image.save(tmp_path)
+            user_submitted_image.save(user_submitted_image_temporary_path)
 
-            request_image_object = ImageClass(request_image, tmp_path, username)
-            request_image_object.upload_to_s3(S3_BUCKET)
-            request_image_object.add_to_database(user_id)
+            user_submitted_image_object = ImageClass(user_submitted_image,
+                                            user_submitted_image_temporary_path,
+                                            username,
+                                            )
+
+            user_submitted_image_object.upload_to_s3(S3_BUCKET)
             
-            session['tmp_request_image_files'].append(tmp_path)
-            session['request_image_ids'].append(request_image_object.image_id)
+            user_submitted_image_object.add_to_database(user_id)
+            
+            session['user_submitted_image_temporary_paths'].append(
+                                            user_submitted_image_temporary_path,
+                                            )
+            
+            session['request_image_ids'].append(
+                                user_submitted_image_object.image_id,
+                                )
 
         flash("Upload to S3 a success!")
         
@@ -97,13 +109,18 @@ def diff_images():
     try:
 
         boolean_diff_path = create_boolean_diff(
-                                        session['tmp_request_image_files'][0],
-                                        session['tmp_request_image_files'][1]
-                                        )
+                                session['user_submitted_image_temporary_paths'][0],
+                                session['user_submitted_image_temporary_paths'][1],
+                                )
         
-        difference_image = ImageClass(boolean_diff_path, boolean_diff_path, username) # wants path not PIL object
+        # wants path not PIL object
+        difference_image = ImageClass(boolean_diff_path, boolean_diff_path,
+                                      username) 
+
         difference_image.upload_to_s3(S3_BUCKET)
-        difference_image.add_to_database(user_id, input_image_ids=session['request_image_ids'])
+        
+        difference_image.add_to_database(user_id,
+                                input_image_ids=session['request_image_ids'])
 
         flash("Diff succeeded.")
 
