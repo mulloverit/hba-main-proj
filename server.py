@@ -105,22 +105,39 @@ def upload_inputs():
 
     try:
 
-        request_file_1 = request.files['img-1']
-        request_file_2 = request.files['img-2']
+        input_request_images = [request.files['img-1'], request.files['img-2']]
 
-        tmp_path_upload_1 = 'tmp/uploads/{}_{}'.format(username, request_file_1.filename)
-        tmp_path_upload_2 = 'tmp/uploads/{}_{}'.format(username, request_file_2.filename)
-
-        locally_saved_user_upload_1 = request_file_1.save(tmp_path_upload_1)
-        locally_saved_user_upload_2 = request_file_2.save(tmp_path_upload_2)
+        count = 1
         
-        # TO DO: add use of secure_filename and allowed_formats
+        for request_image in input_request_images:
 
-        input_image_1 = ImageClass(request_file_1, tmp_path_upload_1, username)
-        input_image_2 = ImageClass(request_file_2, tmp_path_upload_1, username)
+            tmp_path = 'tmp/uploads/{}_{}'.format(username, request_image.filename)
+            
+            request_image.save(tmp_path)
+            
+            request_image_object = ImageClass(request_image, tmp_path, username)
+            
+            request_image_object.upload_to_s3(S3_BUCKET)
 
-        input_image_1.upload_to_s3(S3_BUCKET)
-        input_image_2.upload_to_s3(S3_BUCKET)
+
+
+
+        # request_file_1 = request.files['img-1']
+        # request_file_2 = request.files['img-2']
+
+        # tmp_path_upload_1 = 'tmp/uploads/{}_{}'.format(username, request_file_1.filename)
+        # tmp_path_upload_2 = 'tmp/uploads/{}_{}'.format(username, request_file_2.filename)
+
+        # locally_saved_user_upload_1 = request_file_1.save(tmp_path_upload_1)
+        # locally_saved_user_upload_2 = request_file_2.save(tmp_path_upload_2)
+        
+        # # TO DO: add use of secure_filename and allowed_formats
+
+        # input_image_1 = ImageClass(request_file_1, tmp_path_upload_1, username)
+        # input_image_2 = ImageClass(request_file_2, tmp_path_upload_1, username)
+
+        # input_image_1.upload_to_s3(S3_BUCKET)
+        # input_image_2.upload_to_s3(S3_BUCKET)
         
         flash("Upload to S3 a success!")
         
