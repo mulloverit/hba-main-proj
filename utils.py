@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask import session
 
 from config import connect_to_db, db, app
 from model import User, InputImage, DiffImage, ImageClass, UserClass 

@@ -9,11 +9,10 @@ from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from config import *
-from database_manipulation import *
 from diff_logic import *
 from model import User, InputImage, DiffImage, ImageClass, UserClass
 from s3_manipulation import upload_file_to_s3
-from utils import user_sign_in, user_registration_new
+from utils import *
 
 
 app.secret_key = "what"
@@ -62,21 +61,21 @@ def upload_inputs():
     try:
         
         session['user_submitted_image_temporary_paths'] = []
-        session['request_image_ids'] = []
-
+        session['request_image_uuids'] = []
+        
         for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
-
+            
             user_submitted_image_temporary_path = ('tmp/uploads/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
             
             user_submitted_image.save(user_submitted_image_temporary_path)
-
+            
             user_submitted_image_object = ImageClass(user_submitted_image,
                                             user_submitted_image_temporary_path,
                                             username,
                                             )
-
+            
             user_submitted_image_object.upload_to_s3(S3_BUCKET)
             
             user_submitted_image_object.add_to_database(user_id)
@@ -85,8 +84,8 @@ def upload_inputs():
                                             user_submitted_image_temporary_path,
                                             )
             
-            session['request_image_ids'].append(
-                                user_submitted_image_object.image_id,
+            session['request_image_uuids'].append(
+                                user_submitted_image_object.uuid,
                                 )
 
         flash("Upload to S3 a success!")
@@ -113,14 +112,13 @@ def diff_images():
                                 session['user_submitted_image_temporary_paths'][1],
                                 )
         
-        # wants path not PIL object
         difference_image = ImageClass(boolean_diff_path, boolean_diff_path,
-                                      username) 
+                                      username) # wants path not PIL object as 1st arg
 
         difference_image.upload_to_s3(S3_BUCKET)
         
         difference_image.add_to_database(user_id,
-                                input_image_ids=session['request_image_ids'])
+                                input_image_uuids=session['request_image_uuids'])
 
         flash("Diff succeeded.")
 

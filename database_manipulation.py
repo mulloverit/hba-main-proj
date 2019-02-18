@@ -54,9 +54,6 @@ def db_add_diff_img(user_id, im_1_id, im_2_id, img_size_x, img_size_y,
                      upload_complete_datetime, diff_uuid):
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
 
-    # NEEDS LOGIC FOR GETTING IMAGE METADATA
-    # diff = Image.open(img)
-
     diff_img = DiffImage(diff_user_id=user_id,
                          im_1_id=im_1_id,
                          im_2_id=im_2_id,

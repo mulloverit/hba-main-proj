@@ -6,13 +6,12 @@ from datetime import datetime
 # db.metadata.clear()
 
 ### Class establishments ###
-
-class ImageClass:
-
-    # QUESTION:
+# QUESTION:
     # how to handle instance methods that can only be valid
     # once another instance method has been called? ie can't add to db
     # without a valide s3 url -- need an exception?
+
+class ImageClass:
 
     def __init__(self, image_object, tmp_path, owner):
         """Instantiate an image object"""
@@ -35,15 +34,11 @@ class ImageClass:
 
     def upload_to_s3(self, S3_BUCKET):
         """ Uploads an image file to s3, creating instance attributes:
-            - upload_begin_datetime
-            - s3_key
-            - upload_complete_datetime
-            - s3_location
+            upload_begin_datetime, s3_key, upload_complete_datetime, s3_location
         """
 
         import boto3, botocore
         from config import s3, s3_dl
-        #from datetime import datetime
 
         try:
 
@@ -70,15 +65,11 @@ class ImageClass:
 
             return "Failed"
 
-    # def get_id_by_uuid(self):
-
-    #     InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
-
-    def add_to_database(self, user_id, input_image_ids=None):
+    def add_to_database(self, user_id, input_image_uuids=None):
         """Create database record for an image. Handles input images & diffs."""
 
 
-        if input_image_ids == None:
+        if input_image_uuids == None:
 
             image_record = InputImage(image_user_id=user_id, 
                     image_size_x=self.size[0],
@@ -91,13 +82,16 @@ class ImageClass:
                     image_uuid=self.uuid)
 
         else:
+    
+            input_uuid_1 = input_image_uuids[0]
+            input_uuid_2 = input_image_uuids[1]
 
-            input_image_id_1 = input_image_ids[0]
-            input_image_id_2 = input_image_ids[1]
-            
+            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
+            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+
             image_record = DiffImage(diff_user_id=user_id,
-                                 im_1_id=input_image_id_1,
-                                 im_2_id=input_image_id_2,
+                                 im_1_id=input_1_record.image_id,
+                                 im_2_id=input_2_record.image_id,
                                  diff_size_x=self.size[0],
                                  diff_size_y=self.size[1],
                                  diff_format=self.format,
@@ -111,6 +105,7 @@ class ImageClass:
         db.session.commit()
 
 class UserClass:
+    """Keeps track of metadata about user on site."""
 
     def __init__(self, username, password=None, email=None,
                  first_name=None, last_name=None):
@@ -133,22 +128,6 @@ class UserClass:
 
             return None
 
-    # def register_new(self):
-    #     """Register a new user, add them to the database."""
-
-    #     current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-
-    #     user_record = User(username=self.username, 
-    #                         email=self.email, 
-    #                         password=self.password,
-    #                         fname=self.first_name, 
-    #                         lname=self.last_name,
-    #                         sign_up_datetime=current_datetime)
-
-    #     db.session.add(user_record)
-    #     db.session.commit()
-
-
 class User(db.Model):
     """User model."""
 
@@ -161,19 +140,6 @@ class User(db.Model):
     fname = db.Column(db.String(50), nullable=False)
     lname = db.Column(db.String(50), nullable=False)
     sign_up_datetime = db.Column(db.String(50), nullable=False)
-
-    # TO DO: add class and instance methods to deal with repetitive server tasks
-    # # class method takes classmethod decorator
-    # @classmethod
-    # def find_by_username(username):
-    #     """Check if user exists in the database"""
-
-    # # instance methods take self as arg
-    # def is_valid_password(self, attempted_password): # model should be agnostic as to where this is coming from, so don't call it "request_password" bc doens't have to be a request --> "attempted_pw"
- 
-    # # this should maybe be an instance method instead of class method
-    # #def check_password_validity(username, user_input_password):
-    #     """Check to see if pw matches database record"""
 
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return email or password."""
