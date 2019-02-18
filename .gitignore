@@ -5,3 +5,4 @@ __pycache__
 secrets.sh
 TESTING_DB_ADD.py
 tmp/
+utils.py
