@@ -8,3 +8,10 @@
     height: 50px;
     width: 50px;
 }
+
+.hidden {
+    height: 200px;
+    width: 200px;
+    visibility: visible;
+    background-color: grey;
+}

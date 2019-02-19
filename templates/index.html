@@ -14,9 +14,9 @@
             <p>Upload the two images you'd like to diff.</p>
             <br>
             <!-- multipart/form-data required by flask to upload files -->
-            <form action="/upload-inputs" method="POST" enctype="multipart/form-data">
-                <input type="file" name="img-1"">
-                <input type="file" name="img-2">
+            <form action="/upload-inputs" class="user-input-images-form" method="POST" enctype="multipart/form-data">
+                <input type="file" name="img-1" id="img-1">
+                <input type="file" name="img-2" id="img-2">
                 <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission">
             </form>
             <br>
@@ -33,18 +33,14 @@
     <div class="row">
         <div class="col-6">
             <h3>Input Images</h3>
-                <div class="hidden">
-                    <img src="{{ image_1 }}" id="inputOne" height="100px" width="100px" style="visibility:visible; background-color:grey;"></img>
-                    <img src="{{ image_2 }}" id="inputTwo" height="100px" width="100px" style="visibility:visible;background-color:grey;"></img>
-                </div>  
+                <img src="{{ image_1 }}" id="inputOne" class="hidden"></img>
+                <img src="{{ image_2 }}" id="inputTwo" class="hidden"></img>
         </div>  
         <br>
         <br>
         <div class="col-6">
             <h3>Difference Image</h3>
-                <div class="hidden">
-                    <img src="{{ difference_image }}" id="differenceImage" height="100px" width="100px" style="visibility:visible; background-color:grey;"></img>
-                </div>
+                <img src="{{ difference_image }}" id="differenceImage" class="hidden"></img>
         </div>
     </div>
 </div>
@@ -84,14 +80,52 @@
 <script>
     "use strict";
 
-    // const imageUploadButton = $('#user-image-submission');
-    // const inputImage1 = $('.hidden #inputOne');
-    // const inputImage2 = $('.hidden #inputTwo');
+    // THIS IS WHAT YOU GET BACK FROM IMAGE UPLOAD ROUTE
+    // {
+    //   "image_1": "static/images/tmp_camila-mahon-im1.jpeg", 
+    //   "image_2": "static/images/tmp_camilla-mahon-im2.JPG"
+    // }
 
-    // imageUploadButton.on('click', () => {
-    //     inputImage1.show();
-    //     inputImage2.show();
+    // const imageUploadButton = $('#user-image-submission');
+    // const inputImageDisplay1 = $('.hidden #inputOne');
+    // const inputImageDisplay2 = $('.hidden #inputTwo');
+
+    // imageUploadButton.on('click', (response) => {
+    //     response.preventDefault;
+    //     image_1 = response['image_1'];
+    //     image_2 = response['image_2']
+    //     inputImage1.setAttribute('src', image_1);
+    //     inputImage2.setAttribute('src', image_2);
     // })
+
+
+// <form action="/upload-inputs" method="POST" enctype="multipart/form-data">
+// <input type="file" name="img-1">
+// <input type="file" name="img-2">
+// <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission">
+   
+
+   // A string containing the URL to which the request is sent.
+   // A plain object or string that is sent to the server with the request.
+   // A callback function that is executed if the request succeeds.
+
+    // const userInputImage1 = $('.user-input-images-form #img-1');
+    // const userInputImage2 = $('.user-input-images-form #img-2');
+    const inputImageDisplay1 = $('.hidden #inputOne');
+    const inputImageDisplay2 = $('.hidden #inputTwo');
+
+    const formData = {
+        image1 : $('.user-input-images-form #img-1').val();
+        image2 : $('.user-input-images-form #img-2').val();
+    };
+
+    $.post('/upload-inputs', formData, (data) => {
+        const image_1 = ${data.image_1};
+        const image_2 = ${data.image_2};
+
+        inputImageDisplay1.setAttribute('src', image_1);
+        inputImageDisplay2.setAttribute('src', image_2);
+    })
 
 
 </script>

@@ -62,7 +62,7 @@ def upload_inputs():
         
         session['user_submitted_image_temporary_paths'] = []
         session['request_image_uuids'] = []
-        
+        print("THIS")
         for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
@@ -70,7 +70,7 @@ def upload_inputs():
                                                 user_submitted_image.filename))
             
             user_submitted_image.save(user_submitted_image_temporary_path)
-            
+            print("IS")
             user_submitted_image_object = ImageClass(user_submitted_image,
                                             user_submitted_image_temporary_path,
                                             username,
@@ -79,7 +79,7 @@ def upload_inputs():
             user_submitted_image_object.upload_to_s3(S3_BUCKET)
             
             user_submitted_image_object.add_to_database(user_id)
-            
+            print("STILL")
             session['user_submitted_image_temporary_paths'].append(
                                             user_submitted_image_temporary_path,
                                             )
@@ -87,15 +87,25 @@ def upload_inputs():
             session['request_image_uuids'].append(
                                 user_submitted_image_object.uuid,
                                 )
-
+        print("HAPPENING")
         flash("Upload to S3 a success!")
         
-        return render_template("index.html",
-                    image_1=session['user_submitted_image_temporary_paths'][0],
-                    image_2=session['user_submitted_image_temporary_paths'][1],
-                    )
+        # return render_template("index.html",
+        #             image_1=session['user_submitted_image_temporary_paths'][0],
+        #             image_2=session['user_submitted_image_temporary_paths'][1],
+        #             )
 
-        # JSONIFY THIS and return just json instead of a render_template    !!
+
+        # return jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
+        #                image_2=session['user_submitted_image_temporary_paths'][1],
+        #                )
+
+        images = jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
+                       image_2=session['user_submitted_image_temporary_paths'][1],
+                       )
+        
+        return images
+        # OR TRY TO JSONIFY THIS and return just json instead of a render_template    !!
         # return      (image_1=session['user_submitted_image_temporary_paths'][0],
         #             image_2=session['user_submitted_image_temporary_paths'][1],
         #             )
