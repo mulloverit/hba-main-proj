@@ -46,8 +46,10 @@ def connect_to_db(app):
 db = SQLAlchemy()
 app = Flask(__name__)
 connect_to_db(app)
-TMP_UPLOAD_FOLDER = "tmp/uploads/"
-TMP_BOOL_FOLDER = "tmp/bools/"
+# TMP_UPLOAD_FOLDER = "tmp/uploads/"
+# TMP_BOOL_FOLDER = "tmp/bools/"
+TMP_UPLOAD_FOLDER = "static/images/"
+TMP_BOOL_FOLDER = "static/images/"
 ALLOWED_FORMATS = set(['png', 'jpg', 'jpeg', 'tif'])
 app.config['TMP_UPLOAD_FOLDER'] = TMP_UPLOAD_FOLDER
 # app.secret_key = os.environ.get("SECRET_KEY")

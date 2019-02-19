@@ -29,12 +29,25 @@
 
 <br>
 <br>
-<div class="hidden">
-    <img src="{{ image_1 }}" id="inputOne" height="100px" width="100px" style="visibility:visible; background-color:blue;"></img>
-    <img src="{{ image_2 }}" id="inputTwo" height="100px" width="100px" style="visibility:visible;background-color:blue;"></img>
-</div>    
-<br>
-<br>
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h3>Input Images</h3>
+                <div class="hidden">
+                    <img src="{{ image_1 }}" id="inputOne" height="100px" width="100px" style="visibility:visible; background-color:grey;"></img>
+                    <img src="{{ image_2 }}" id="inputTwo" height="100px" width="100px" style="visibility:visible;background-color:grey;"></img>
+                </div>  
+        </div>  
+        <br>
+        <br>
+        <div class="col-6">
+            <h3>Difference Image</h3>
+                <div class="hidden">
+                    <img src="{{ difference_image }}" id="differenceImage" height="100px" width="100px" style="visibility:visible; background-color:grey;"></img>
+                </div>
+        </div>
+    </div>
+</div>
 <hr>
 <br>
 <br>
@@ -71,26 +84,15 @@
 <script>
     "use strict";
 
-    // const imageUploadButton = document.querySelector('#user-image-submission');
-    // const inputImage1 = document.querySelector('.hidden #inputOne');
-    // const inputImage2 = document.querySelector('.hidden #inputTwo');
+    // const imageUploadButton = $('#user-image-submission');
+    // const inputImage1 = $('.hidden #inputOne');
+    // const inputImage2 = $('.hidden #inputTwo');
 
-    // function putImages () {
-    //     inputImage1.setAttribute('style', 'visibility:visible');
-    //     inputImage2.setAttribute('style', 'visibility:visible');
-    // }
+    // imageUploadButton.on('click', () => {
+    //     inputImage1.show();
+    //     inputImage2.show();
+    // })
 
-    // imageUploadButton.addEventListener('click', putImages)
-
-
-    const imageUploadButton = $('#user-image-submission');
-    const inputImage1 = $('.hidden #inputOne');
-    const inputImage2 = $('.hidden #inputTwo');
-
-    imageUploadButton.on('click', () => {
-        inputImage1.hide();
-        inputImage2.hide();
-    })
 
 </script>
 {% endblock %}

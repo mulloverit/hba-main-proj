@@ -129,7 +129,10 @@ def diff_images():
 
         flash("Diff failed :(")
 
-    return render_template("index.html")
+    return render_template("index.html",
+                    image_1=session['user_submitted_image_temporary_paths'][0],
+                    image_2=session['user_submitted_image_temporary_paths'][1],
+                    difference_image=boolean_diff_path)
     
 
 if __name__ == "__main__":
