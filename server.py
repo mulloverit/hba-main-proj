@@ -65,7 +65,7 @@ def upload_inputs():
         
         for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
             
-            user_submitted_image_temporary_path = ('tmp/uploads/{}_{}'.format(
+            user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
             
@@ -90,7 +90,10 @@ def upload_inputs():
 
         flash("Upload to S3 a success!")
         
-        return render_template("index.html")
+        return render_template("index.html",
+                    image_1=session['user_submitted_image_temporary_paths'][0],
+                    image_2=session['user_submitted_image_temporary_paths'][1],
+                    )
 
     except:
 

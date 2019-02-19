@@ -29,10 +29,9 @@
 
 <br>
 <br>
-<div class="imageContainer">
-    <input type="submit" name="tryme" class="tryme">
-    <img src="{{ session['user_submitted_image_temporary_paths'][0] }}" class="vis" id="inputOne"></img>
-    <img src="{{ session['user_submitted_image_temporary_paths'][1] }}" class="vis" id="inputTwo"></img>
+<div class="hidden">
+    <img src="{{ image_1 }}" id="inputOne" height="100px" width="100px" style="visibility:visible; background-color:blue;"></img>
+    <img src="{{ image_2 }}" id="inputTwo" height="100px" width="100px" style="visibility:visible;background-color:blue;"></img>
 </div>    
 <br>
 <br>
@@ -72,26 +71,26 @@
 <script>
     "use strict";
 
-    const signInButton = document.querySelector('.imageContainer .tryme');
-    const imageContainer = document.querySelector('.imageContainer')
-    
+    // const imageUploadButton = document.querySelector('#user-image-submission');
+    // const inputImage1 = document.querySelector('.hidden #inputOne');
+    // const inputImage2 = document.querySelector('.hidden #inputTwo');
 
-    // function changeBackgroundColor () {
-    //     imageContainer.setAttribute('style', 'background-color:yellow');
-    //     }
-    
-    // signInButton.addEventListener('click', changeBackgroundColor)
+    // function putImages () {
+    //     inputImage1.setAttribute('style', 'visibility:visible');
+    //     inputImage2.setAttribute('style', 'visibility:visible');
+    // }
+
+    // imageUploadButton.addEventListener('click', putImages)
 
 
-    const inputImage1 = document.querySelector('.imageContainer #inputOne');
-    const inputImage2 = document.querySelector('.imageContainer #inputTwo');
+    const imageUploadButton = $('#user-image-submission');
+    const inputImage1 = $('.hidden #inputOne');
+    const inputImage2 = $('.hidden #inputTwo');
 
-    function putImages () {
-        inputImage1.setAttribute('style', 'visibility:visible');
-        inputImage2.setAttribute('style', 'visibility:visible')
-    }
-
-    signInButton.addEventListener('click', putImages)
+    imageUploadButton.on('click', () => {
+        inputImage1.hide();
+        inputImage2.hide();
+    })
 
 </script>
 {% endblock %}
