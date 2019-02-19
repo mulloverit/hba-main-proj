@@ -90,13 +90,13 @@ def upload_inputs():
 
         flash("Upload to S3 a success!")
         
-        return redirect("/")
+        return render_template("index.html")
 
     except:
 
         flash("Please provide two valid files for upload.")
         
-        return redirect("/")
+        return render_template("index.html")
 
 
 @app.route("/submit-diff-request", methods=['POST'])
@@ -126,7 +126,7 @@ def diff_images():
 
         flash("Diff failed :(")
 
-    return redirect("/")
+    return render_template("index.html")
     
 
 if __name__ == "__main__":

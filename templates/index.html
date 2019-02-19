@@ -3,7 +3,6 @@
 {% block title %} Homepage {% endblock %}
 
 {% block content %}
-
 <br>
 <br>
 <div class="container">
@@ -18,10 +17,8 @@
             <form action="/upload-inputs" method="POST" enctype="multipart/form-data">
                 <input type="file" name="img-1"">
                 <input type="file" name="img-2">
-                <input type="submit" name="upload-inputs" value="Upload">
+                <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission">
             </form>
-            <br>
-            <br>
             <br>
             <form action="/submit-diff-request" method="POST" enctype="multipart/form-data">
                 <input type="submit" name="diff-input-imgs" value="Diff!">
@@ -29,6 +26,14 @@
         </div>
     </div>
 </div>
+
+<br>
+<br>
+<div class="imageContainer">
+    <input type="submit" name="tryme" class="tryme">
+    <img src="{{ session['user_submitted_image_temporary_paths'][0] }}" class="vis" id="inputOne"></img>
+    <img src="{{ session['user_submitted_image_temporary_paths'][1] }}" class="vis" id="inputTwo"></img>
+</div>    
 <br>
 <br>
 <hr>
@@ -63,4 +68,30 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    "use strict";
+
+    const signInButton = document.querySelector('.imageContainer .tryme');
+    const imageContainer = document.querySelector('.imageContainer')
+    
+
+    // function changeBackgroundColor () {
+    //     imageContainer.setAttribute('style', 'background-color:yellow');
+    //     }
+    
+    // signInButton.addEventListener('click', changeBackgroundColor)
+
+
+    const inputImage1 = document.querySelector('.imageContainer #inputOne');
+    const inputImage2 = document.querySelector('.imageContainer #inputTwo');
+
+    function putImages () {
+        inputImage1.setAttribute('style', 'visibility:visible');
+        inputImage2.setAttribute('style', 'visibility:visible')
+    }
+
+    signInButton.addEventListener('click', putImages)
+
+</script>
 {% endblock %}

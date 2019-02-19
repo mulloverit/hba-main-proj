@@ -1,0 +1,14 @@
+.imageContainer {
+    background-color: grey;
+    height: 100px;
+    width: 100%;
+}
+
+.input-image {
+    height: 50px;
+    width: 50px;
+}
+
+.hidden {
+    visibility: hidden;
+}
