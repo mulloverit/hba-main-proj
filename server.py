@@ -95,6 +95,11 @@ def upload_inputs():
                     image_2=session['user_submitted_image_temporary_paths'][1],
                     )
 
+        # JSONIFY THIS and return just json instead of a render_template    !!
+        # return      (image_1=session['user_submitted_image_temporary_paths'][0],
+        #             image_2=session['user_submitted_image_temporary_paths'][1],
+        #             )
+
     except:
 
         flash("Please provide two valid files for upload.")
