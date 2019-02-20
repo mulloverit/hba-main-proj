@@ -57,12 +57,16 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
+    print("You've at least gotten to the route")
 
     try:
         
         session['user_submitted_image_temporary_paths'] = []
         session['request_image_uuids'] = []
+        
         print("THIS")
+        print (request.files, "@@@@@@@@@@@@")
+
         for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
@@ -90,21 +94,22 @@ def upload_inputs():
         print("HAPPENING")
         flash("Upload to S3 a success!")
         
-        # return render_template("index.html",
-        #             image_1=session['user_submitted_image_temporary_paths'][0],
-        #             image_2=session['user_submitted_image_temporary_paths'][1],
-        #             )
+        return render_template("index.html",
+                    image_1=session['user_submitted_image_temporary_paths'][0],
+                    image_2=session['user_submitted_image_temporary_paths'][1],
+                    )
 
 
         # return jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
         #                image_2=session['user_submitted_image_temporary_paths'][1],
         #                )
 
-        images = jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
-                       image_2=session['user_submitted_image_temporary_paths'][1],
-                       )
+        # images = jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
+        #                image_2=session['user_submitted_image_temporary_paths'][1],
+        #                )
         
-        return images
+        # return images
+        # return jsonify(session['user_submitted_image_temporary_paths'])
         # OR TRY TO JSONIFY THIS and return just json instead of a render_template    !!
         # return      (image_1=session['user_submitted_image_temporary_paths'][0],
         #             image_2=session['user_submitted_image_temporary_paths'][1],
@@ -113,8 +118,9 @@ def upload_inputs():
     except:
 
         flash("Please provide two valid files for upload.")
-        
-        return render_template("index.html")
+        print("Nope just this")
+        # return render_template("index.html")
+        return jsonify("hi")
 
 
 @app.route("/submit-diff-request", methods=['POST'])
