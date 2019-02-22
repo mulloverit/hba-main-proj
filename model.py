@@ -53,7 +53,8 @@ class ImageClass:
                         S3_BUCKET,
                         self.s3_key,
                         ExtraArgs={
-                            'ContentType': self.mimetype
+                            'ContentType': self.mimetype,
+                            'ACL': 'public-read',
                             })
 
             self.upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')

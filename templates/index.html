@@ -5,50 +5,6 @@
 {% block content %}
 <br>
 <br>
-<div id="like_button_container"></div>
-<div id="dynamic-greeting"></div>
-<div class="container">
-    <div class="row">
-        <div class="diff-my-imgs">
-            <hr>
-            <h2 id="greeting-h2">Hey</h2>
-            <br>
-            <p>Upload the two images you'd like to diff.</p>
-            <br>
-            <!-- multipart/form-data required by flask to upload files -->
-            <form action="/upload-inputs" class="user-input-images-form" method="POST" enctype="multipart/form-data">
-                <input type="file" name="img-1" id="img-1">
-                <input type="file" name="img-2" id="img-2">
-                <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission">
-            </form>
-            <br>
-            <form action="/submit-diff-request" method="POST" enctype="multipart/form-data">
-                <input type="submit" name="diff-input-imgs" value="Diff!">
-            </form>
-        </div>
-    </div>
-</div>
-
-<br>
-<br>
-<div class="container">
-    <div class="row">
-        <div class="col-6">
-            <h3>Input Images</h3>
-                <img src="{{ image_1 }}" id="inputOne" class="hidden"></img>
-                <img src="{{ image_2 }}" id="inputTwo" class="hidden"></img>
-        </div>  
-        <br>
-        <br>
-        <div class="col-6">
-            <h3>Difference Image</h3>
-                <img src="{{ difference_image }}" id="differenceImage" class="hidden"></img>
-        </div>
-    </div>
-</div>
-<hr>
-<br>
-<br>
 <div class="container">
     <div class="row">
         <div class="col-6">
@@ -78,9 +34,6 @@
         </div>
     </div>
 </div>
-<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
 <!-- Load our React component. -->
 <script src="../static/js/index.js" type="text/babel"></script>
 {% endblock %}
