@@ -5,11 +5,13 @@
 {% block content %}
 <br>
 <br>
+<div id="like_button_container"></div>
+<div id="dynamic-greeting"></div>
 <div class="container">
     <div class="row">
         <div class="diff-my-imgs">
-            <h2>Just diff my images</h2>
             <hr>
+            <h2 id="greeting-h2">Hey</h2>
             <br>
             <p>Upload the two images you'd like to diff.</p>
             <br>
@@ -76,4 +78,9 @@
         </div>
     </div>
 </div>
+<script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+<!-- Load our React component. -->
+<script src="../static/js/index.js" type="text/babel"></script>
 {% endblock %}
