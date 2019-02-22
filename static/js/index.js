@@ -4,29 +4,25 @@
 'use strict';
 
 class VisitorName extends React.Component {
+  constructor(props){
+    super(props);
+    this.state = {
+      name: "Guest",
+      message: "you are not signed in."
+    }
+  }
+
   render() {
     return (
       <div>
-        Hey, {this.props.name}
+        Hey, {this.state.name}, {this.state.message}
       </div>
     );
   }
 }
+
+
 ReactDOM.render(
-  <VisitorName name="Guest"/>,
+  <VisitorName name=""/>,
   document.getElementById('greeting-h2')
   );
-
-
-
-// const el = React.createElement(
-//   'div',
-//   {className: 'greeting'},
-//   'Hey, ' {this.props.name}
-//   );
-
-// ReactDOM.render(
-//   el,
-//   document.getElementById('greeting-h2')
-//   );
-
