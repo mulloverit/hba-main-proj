@@ -6,14 +6,27 @@
 class VisitorName extends React.Component {
   render() {
     return (
-      <h2>
+      <div>
         Hey, {this.props.name}
-      </h2>
+      </div>
     );
   }
 }
-
 ReactDOM.render(
   <VisitorName name="Guest"/>,
-  document.getElementById('dynamic-greeting')
+  document.getElementById('greeting-h2')
   );
+
+
+
+// const el = React.createElement(
+//   'div',
+//   {className: 'greeting'},
+//   'Hey, ' {this.props.name}
+//   );
+
+// ReactDOM.render(
+//   el,
+//   document.getElementById('greeting-h2')
+//   );
+
