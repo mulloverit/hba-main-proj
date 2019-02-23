@@ -3,49 +3,11 @@
 {% block title %} Workspace {% endblock %}
 
 {% block content %}
-<div class="container">
-<h2 id="greeting-h2">Hey, {{ username }}!</h2>
-</div>
-<div class="container">
-    <div class="row">
-        <div class="diff-my-imgs">
-            <hr>
-            <br>
-            <p>Upload the two images you'd like to diff.</p>
-            <br>
-            <!-- multipart/form-data required by flask to upload files -->
-            <form action="/upload-inputs" class="user-input-images-form" method="POST" enctype="multipart/form-data">
-                <input type="file" name="img-1" id="img-1">
-                <input type="file" name="img-2" id="img-2">
-                <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission">
-            </form>
-            <br>
-            <form action="/submit-diff-request" method="POST" enctype="multipart/form-data">
-                <input type="submit" name="diff-input-imgs" value="Diff!">
-            </form>
-        </div>
-    </div>
-</div>
-<br>
-<br>
-<br>
-<br>
-<div class="container">
-    <div class="row">
-        <div class="col-6">
-            <h3>Input Images</h3>
-                <img src="{{ image_1 }}" id="inputOne" class="hidden"></img>
-                <img src="{{ image_2 }}" id="inputTwo" class="hidden"></img>
-        </div>  
-        <br>
-        <br>
-        <div class="col-6">
-            <h3>Difference Image</h3>
-                <img src="{{ difference_image }}" id="differenceImage" class="hidden"></img>
-        </div>
-    </div>
-</div>
-<hr>
-<br>
-<br>
+
+<div id="unique">Hello</div>
+
+<script src="../static/js/main.js" type="text/babel">
+
+</script> 
+
 {% endblock %}
