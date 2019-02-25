@@ -1,5 +1,14 @@
 "use strict";
 
+FilePond.setOptions({
+  server: {
+    url: '/upload-inputs',
+  }
+})
+
+const inputElement = document.querySelector('input[type="file"]');
+const pond = FilePond.create( inputElement );
+
 class ImageManipulator extends React.Component {
   render () {
     return (
@@ -9,6 +18,7 @@ class ImageManipulator extends React.Component {
         <SearchBar />
         <br />
         <ImageUploadForm />
+        <br />
       </div>
     );
   }
@@ -24,6 +34,20 @@ class SearchBar extends React.Component {
   }
 }
 
+class FilePondTest extends React.Component {
+  constructor(props) {
+    super(props);
+    const inputElement = document.querySelector('input[type="file"]');
+    const pond = FilePond.create( inputElement );
+
+  }
+
+  render() {
+    return (
+      <pond />
+    );
+  }
+}
 
 // form not working yet
 // need to read: https://reactjs.org/docs/forms.html
@@ -41,29 +65,31 @@ class ImageUploadForm extends React.Component {
     this.setState({value: event.target.value});
   }
 
-  handleSubmit(event) {
-    event.preventDefault();
-    const data = [
-      this.fileInputOne.current.files[0].name,
-      this.fileInputTwo.current.files[0].name,
-      ];
-    console.log(data);
-    alert(
-      `Selected files: ${
-        data
-      }`
-    );
+  handleUploadToServer(data) {
+    
+    fetch('/upload-inputs', {
+      method: 'POST',
+      body: data,
+    })
+    .then((response) => {response.json()});
   }
 
-  // handleUploadToServer() {
-  //   const data = new FormData(event.target);
-    
-  //   fetch('/upload-inputs', {
-  //     method: 'POST',
-  //     body: data,
-  //   })
-  //   .then((response) => {response.json()});
-  // }
+  handleSubmit(event) {
+    event.preventDefault();
+    const data = new FormData();
+    data.append('file1', this.fileInputOne.current.files);
+    data.append('file2', this.fileInputTwo.current.files);
+
+
+    fetch('/upload-inputs', {
+      method: 'POST',
+      body: data,
+    })
+    .then((response) => {response.json()});
+
+    // const jsonResponse = handleUploadToServer(data);
+    // return jsonResponse;
+  }
 
   render() {
     return (
