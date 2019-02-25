@@ -32,10 +32,9 @@ class SearchBar extends React.Component {
 class ImageUploadForm extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {value: ''};
-
-  this.handleChange = this.handleChange.bind(this);
-  this.handleSubmit = this.handleSubmit.bind(this);
+    this.fileInputOne = React.createRef();
+    this.fileInputTwo = React.createRef();
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
@@ -44,22 +43,35 @@ class ImageUploadForm extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
-    const data = new FormData(event.target);
-    
-    fetch('/upload-inputs', {
-      method: 'POST',
-      body: data,
-    })
-    .then((response) => {response.json()});
+    const data = [
+      this.fileInputOne.current.files[0].name,
+      this.fileInputTwo.current.files[0].name,
+      ];
+    console.log(data);
+    alert(
+      `Selected files: ${
+        data
+      }`
+    );
   }
+
+  // handleUploadToServer() {
+  //   const data = new FormData(event.target);
+    
+  //   fetch('/upload-inputs', {
+  //     method: 'POST',
+  //     body: data,
+  //   })
+  //   .then((response) => {response.json()});
+  // }
 
   render() {
     return (
       <div>
-        <form action="/upload-inputs" className="user-input-images-form" method="POST" encType="multipart/form-data">
-          <input type="file" name="img-1" id="img-1" value={this.state.value} onChange={this.handleChange} />
-          <input type="file" name="img-2" id="img-2" value={this.state.value} onChange={this.handleChange} />
-          <input type="submit" name="upload-inputs" value="Upload" id="user-image-submission"></input>
+        <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
+          <input type="file" name="img-1" id="img-1" ref={this.fileInputOne} />
+          <input type="file" name="img-2" id="img-2" ref={this.fileInputTwo} />
+          <button type="submit">Submit</button>
         </form>
       </div>
     );

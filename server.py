@@ -59,7 +59,9 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
-
+    print("OK 2")
+    print("WHAT TYPE IS IT", type(request.files))
+    print("WHAT IS IT", request.files)
     try:
         
         user_submitted_image_s3_locations = []
