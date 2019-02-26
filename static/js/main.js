@@ -9,16 +9,33 @@ FilePond.setOptions({
 const inputElement = document.querySelector('input[type="file"]');
 const pond = FilePond.create( inputElement );
 
-class ImageManipulator extends React.Component {
+class DynamicGreeting extends React.Component {
+  render() {
+    return (
+      <div className="container">
+        <div className="row">
+          <div className="col-6">
+            <br />
+            <h1>Hey</h1>
+            <br />
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ImageUploader extends React.Component {
   render () {
     return (
-      <div>
-        <h1>Hey</h1>
-        <br />
-        <SearchBar />
-        <br />
-        <ImageUploadForm />
-        <br />
+      <div className="container">
+        <div className="row">
+          <div className="col-6">
+            <br />
+            <ImageUploadForm />
+            <br />
+          </div>
+        </div>
       </div>
     );
   }
@@ -30,21 +47,6 @@ class SearchBar extends React.Component {
       <form>
         <input type="text" placeholder="Search..." />
       </form>
-    );
-  }
-}
-
-class FilePondTest extends React.Component {
-  constructor(props) {
-    super(props);
-    const inputElement = document.querySelector('input[type="file"]');
-    const pond = FilePond.create( inputElement );
-
-  }
-
-  render() {
-    return (
-      <pond />
     );
   }
 }
@@ -90,21 +92,32 @@ class ImageUploadForm extends React.Component {
     // const jsonResponse = handleUploadToServer(data);
     // return jsonResponse;
   }
-
   render() {
     return (
-      <div>
-        <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
-          <input type="file" name="img-1" id="img-1" ref={this.fileInputOne} />
-          <input type="file" name="img-2" id="img-2" ref={this.fileInputTwo} />
-          <button type="submit">Submit</button>
-        </form>
+      <div className="container">
+        <div className="row">
+          <div className="col-6">
+              <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
+                <input type="file" name="img-1" id="img-1" ref={this.fileInputOne} />
+                <input type="file" name="img-2" id="img-2" ref={this.fileInputTwo} />
+                <button type="submit">Submit</button>
+              </form>
+          </div>
+        </div>
       </div>
     );
   }
 }
 
 ReactDOM.render(
-  <ImageManipulator />,
-  document.getElementById('unique')
-  );
+  <ImageUploader />,
+  document.getElementById('manual-uploads')
+);
+
+ReactDOM.render(
+  <DynamicGreeting />,
+  document.getElementById('dynamic-greeting')
+);
+
+
+
