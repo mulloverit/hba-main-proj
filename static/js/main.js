@@ -41,30 +41,12 @@ class ImageUploader extends React.Component {
   }
 }
 
-class SearchBar extends React.Component {
-  render() {
-    return (
-      <form>
-        <input type="text" placeholder="Search..." />
-      </form>
-    );
-  }
-}
-
-// form not working yet
-// need to read: https://reactjs.org/docs/forms.html
-// IF THIS WERE A CONTROLLED COMPONENT, following changes:
-// however, image uploads are UNCONTROLLED COMPONENTS 
 class ImageUploadForm extends React.Component {
   constructor(props) {
     super(props);
     this.fileInputOne = React.createRef();
     this.fileInputTwo = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleChange(event) {
-    this.setState({value: event.target.value});
   }
 
   handleSubmit(event) {
@@ -98,14 +80,15 @@ class ImageUploadForm extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <ImageUploader />,
-  document.getElementById('manual-uploads')
-);
 
 ReactDOM.render(
   <DynamicGreeting />,
   document.getElementById('dynamic-greeting')
+);
+
+ReactDOM.render(
+  <ImageUploader />,
+  document.getElementById('manual-uploads')
 );
 
 
