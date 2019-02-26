@@ -67,30 +67,19 @@ class ImageUploadForm extends React.Component {
     this.setState({value: event.target.value});
   }
 
-  handleUploadToServer(data) {
-    
-    fetch('/upload-inputs', {
-      method: 'POST',
-      body: data,
-    })
-    .then((response) => {response.json()});
-  }
-
   handleSubmit(event) {
     event.preventDefault();
-    const data = new FormData();
-    data.append('file1', this.fileInputOne.current.files);
-    data.append('file2', this.fileInputTwo.current.files);
+    
+    const formData = new FormData();
+    const fileOne = new File(this.fileInputOne.current.files, this.fileInputOne.current.files.name);
+    const fileTwo = new File(this.fileInputTwo.current.files, this.fileInputOne.current.files.name);
+    const postUrl = "/upload-inputs"
+    const xmlPackage = new XMLHttpRequest();
 
-
-    fetch('/upload-inputs', {
-      method: 'POST',
-      body: data,
-    })
-    .then((response) => {response.json()});
-
-    // const jsonResponse = handleUploadToServer(data);
-    // return jsonResponse;
+    formData.append('file1', fileOne);
+    formData.append('file2', fileTwo);
+    xmlPackage.open("POST", postUrl);
+    xmlPackage.send(formData)
   }
   render() {
     return (
