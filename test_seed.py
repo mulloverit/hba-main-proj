@@ -94,5 +94,5 @@ if __name__ == "__main__":
     db.create_all()
 
     load_users()
-    load_input_imgs()
-    load_diff_imgs()
+    # load_input_imgs()
+    # load_diff_imgs()

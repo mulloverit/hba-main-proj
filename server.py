@@ -36,9 +36,10 @@ def sign_in():
 
     username = request.form['username']
 
+
     flash (message)
 
-    return redirect('/main')
+    return render_template('/main', username=username)
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
@@ -57,7 +58,7 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
-
+    
     try:
         
         user_submitted_image_s3_locations = []
@@ -69,7 +70,7 @@ def upload_inputs():
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
-            
+            print(user_submitted_image_temporary_path)
             user_submitted_image.save(user_submitted_image_temporary_path)
             
             user_submitted_image_object = ImageClass(user_submitted_image,
@@ -102,17 +103,15 @@ def main():
 
     username, user_id = current_user()
     user = UserClass(username)
+    images = ""
 
     if username != "guest":
 
         images = user.all_image_urls()
-        for image in images:
-            print("##", image)
-            cleaned_image = image.strip("'")
-            print ("@@", image)
-        return render_template("main.html", images=images)
 
-    return render_template("main.html")
+        return render_template("main.html", images=images, username=username)
+
+    return render_template("main.html", username=username)
 
 
 @app.route("/submit-diff-request", methods=['POST'])

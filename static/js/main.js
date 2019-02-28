@@ -16,7 +16,7 @@ class DynamicGreeting extends React.Component {
         <div className="row">
           <div className="col-6">
             <br />
-            <h1>Welcome, {this.state.name} !</h1>
+            <h1>Welcome, {UserName} !</h1>
             <br />
           </div>
         </div>
@@ -25,15 +25,14 @@ class DynamicGreeting extends React.Component {
   }
 }
 
-// ---------------------------------------------------------------------------//
-// ---------------------------------------------------------------------------//
-// ---------------------------------------------------------------------------//
-// ---------------------------------------------------------------------------//
-
-
 let Draggable = window.ReactDraggable;
+let UserName = window.username;
 let UserImagesResponse = window.images;
 let UserImagesList = UserImagesResponse.substr(6).slice(0, -6).split("&#39;, &#39;");
+
+UserImagesList = UserImagesList.map(image => {
+  return ({ image: image});
+})
 
 UserImagesList.forEach((image) => {
   console.log(image);
@@ -87,8 +86,7 @@ class DraggableAssetContainer extends React.Component {
     return (
       <Draggable {...dragHandlers} >
         <div className="drag-container-display">
-          I can be dragged anywhere
-          <img src={image} height="200" width="200"/>
+          <img className="drag-image-rows" src={image} />
         </div>
       </Draggable>
     );
@@ -100,16 +98,16 @@ class Tray extends React.Component {
     const rows = [];
     let lastAsset = null;
 
-    this.props.assets.forEach((asset) => {
+    UserImagesList.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer 
           image={asset.image}
-          key={asset.text} />
+          key={asset.image} />
       );
     });
     
     return (
-      <div>{rows}</div>
+      <div id="tray-rows">{rows}</div>
     );
   }
 }
@@ -117,8 +115,7 @@ class Tray extends React.Component {
 class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
-    this.fileInputOne = React.createRef();
-    this.fileInputTwo = React.createRef();
+    this.fileInput = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -128,19 +125,16 @@ class AssetUpload extends React.Component {
     const imageContainerOne = document.getElementById('contained-image');
     const imageContainerTwo = document.getElementById('contained-image-2');
     const formData = new FormData();
-    const fileOne = new File(this.fileInputOne.current.files, this.fileInputOne.current.files.name);
-    const fileTwo = new File(this.fileInputTwo.current.files, this.fileInputOne.current.files.name);
+    const fileOne = new File(this.fileInput.current.files, this.fileInput.current.files.name);
     const postUrl = "/upload-inputs"
     const xmlPackage = new XMLHttpRequest();
 
     formData.append('file1', fileOne);
-    formData.append('file2', fileTwo);
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'json';
     xmlPackage.onload = function() {
       const imageUrls = xmlPackage.response;
-      imageContainerOne.setAttribute('src', imageUrls[0]);
-      imageContainerTwo.setAttribute('src', imageUrls[1]);
+      return <Tray />; 
     }
 
     xmlPackage.send(formData);
@@ -152,8 +146,7 @@ class AssetUpload extends React.Component {
         <div className="row">
           <div className="col-6">
               <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
-                <input type="file" name="img-1" id="img-1" ref={this.fileInputOne} />
-                <input type="file" name="img-2" id="img-2" ref={this.fileInputTwo} />
+                <input type="file" name="img-1" id="img-1" ref={this.fileInput} />
                 <button type="submit">Submit</button>
               </form>
           </div>
@@ -180,6 +173,11 @@ class MainPageArea extends React.Component {
     );
   }
 }
+
+ReactDOM.render(
+  <DynamicGreeting />,
+  document.getElementById('dynamic-greeting')
+  )
 
 ReactDOM.render(
   <MainPageArea assets={ASSETS}>
