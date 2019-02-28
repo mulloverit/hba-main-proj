@@ -28,19 +28,17 @@ def show_index():
 @app.route("/sign-in", methods=['POST'])
 def sign_in():
     """Log in an existing user"""
-    print("OK 1")
-    print(request.form)
+    
     message = user_sign_in(request.form['username'], request.form['password'])
 
     if "Success" in message:
         session['username'] = request.form['username']
 
     username = request.form['username']
-    print(username)
+
     flash (message)
 
-    return render_template("main.html", username=username)
-
+    return redirect('/main')
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
@@ -59,15 +57,14 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
-    print("OK 2")
-    print("WHAT TYPE IS IT", type(request.files))
-    print("WHAT IS IT", request.files)
+
     try:
         
         user_submitted_image_s3_locations = []
-        # session['request_image_uuids'] = []
-
-        for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
+        
+        # for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
+        for file in request.files:
+            user_submitted_image = request.files.get(file)
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
@@ -86,41 +83,36 @@ def upload_inputs():
             
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
-                                            )
-            
-            # session['request_image_uuids'].append(
-            #                     user_submitted_image_object.uuid,
-            #                     )
-            
-            print(user_submitted_image_object.s3_location)
-        
+                                            )    
+
         flash("Upload to S3 a success!")
-
-        # return render_template("index.html",
-        #             image_1=session['user_submitted_image_temporary_paths'][0],
-        #             image_2=session['user_submitted_image_temporary_paths'][1],
-        #             )
-
-
-        # return jsonify(image_1=session['user_submitted_image_temporary_paths'][0],
-        #                image_2=session['user_submitted_image_temporary_paths'][1],
-        #                )
-
-        # images = jsonify(image_locations=user_submitted_image_s3_locations)
-        
-        # return render_template("index.html", images=images)
-        return render_template("main.html", images=user_submitted_image_s3_locations)
-        # return jsonify(session['user_submitted_image_temporary_paths'])
-        # OR TRY TO JSONIFY THIS and return just json instead of a render_template    !!
-        # return      (image_1=session['user_submitted_image_temporary_paths'][0],
-        #             image_2=session['user_submitted_image_temporary_paths'][1],
-        #             )
+        print("SUCCESS:", user_submitted_image_s3_locations)
+        return jsonify(user_submitted_image_s3_locations)
+        #return render_template("main.html", images=user_submitted_image_s3_locations)
 
     except:
 
         flash("Please provide two valid files for upload.")
         # return render_template("index.html")
         return jsonify("hi - your upload failed")
+
+
+@app.route("/main")
+def main():
+
+    username, user_id = current_user()
+    user = UserClass(username)
+
+    if username != "guest":
+
+        images = user.all_image_urls()
+        for image in images:
+            print("##", image)
+            cleaned_image = image.strip("'")
+            print ("@@", image)
+        return render_template("main.html", images=images)
+
+    return render_template("main.html")
 
 
 @app.route("/submit-diff-request", methods=['POST'])

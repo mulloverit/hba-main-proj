@@ -129,6 +129,17 @@ class UserClass:
 
             return None
 
+    def all_image_urls(self):
+
+        all_image_urls = []
+        user = User.query.filter(User.username == self.username).first()
+        images = InputImage.query.filter(InputImage.image_user_id == user.user_id).all()
+
+        for image in images:
+            all_image_urls.append(image.image_s3_url)
+        
+        return(all_image_urls)
+
 class User(db.Model):
     """User model."""
 
