@@ -8,18 +8,24 @@
     padding: 10px;
 }
 
+.bounding-tray {
+    height: 100%;
+    width: 20%;
+    border: 5px solid #999;
+}
+
 .drag-image-rows {
     height: 120px;
     width: 120px;
 }
 
 .image-display-box {
-  background: #fff;
-  border: 10px solid #999;
-  border-radius: 3px;
-  width: 150px;
-  height: 150px;
-  margin: 10px;
-  padding: 10px;
-  float: left;
+    background: #fff;
+    border: 10px solid #999;
+    border-radius: 3px;
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+    padding: 10px;
+    float: left;
 }

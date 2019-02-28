@@ -16,7 +16,7 @@ class DynamicGreeting extends React.Component {
         <div className="row">
           <div className="col-6">
             <br />
-            <h1>Welcome, {UserName} !</h1>
+            <h1>Welcome, {UserName}</h1>
             <br />
           </div>
         </div>
@@ -84,7 +84,7 @@ class DraggableAssetContainer extends React.Component {
     const image = this.props.image;
   
     return (
-      <Draggable {...dragHandlers} >
+      <Draggable bounds="parent" {...dragHandlers} >
         <div className="drag-container-display">
           <img className="drag-image-rows" src={image} />
         </div>
@@ -93,6 +93,14 @@ class DraggableAssetContainer extends React.Component {
   }
 }
 
+// class PlayArea extends React.Component {
+//   render () {
+//     const rows = []
+//     const columns = []
+
+//   }
+// }
+
 class Tray extends React.Component {
   render () {
     const rows = [];
@@ -100,14 +108,17 @@ class Tray extends React.Component {
 
     UserImagesList.forEach((asset) => {
       rows.push(
-        <DraggableAssetContainer 
+        <DraggableAssetContainer
           image={asset.image}
           key={asset.image} />
       );
     });
     
     return (
-      <div id="tray-rows">{rows}</div>
+      <div className="bounding-tray">
+        <h2>Asset Tray</h2>
+        <div id="tray-rows">{rows}</div>
+      </div>
     );
   }
 }

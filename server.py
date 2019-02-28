@@ -39,7 +39,7 @@ def sign_in():
 
     flash (message)
 
-    return render_template('/main', username=username)
+    return render_template('main.html', username=username)
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
