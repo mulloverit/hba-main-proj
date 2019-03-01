@@ -25,16 +25,45 @@ class DynamicGreeting extends React.Component {
   }
 }
 
-let Draggable = window.ReactDraggable;
-let UserName = window.username;
-let UserImagesResponse = window.images;
-let UserImagesList = UserImagesResponse.substr(6).slice(0, -6).split("&#39;, &#39;");
+class DragDropTest extends React.Component {
+  onBeforeDragStart = () => {
+    /*...*/
+  };
 
-UserImagesList = UserImagesList.map(image => {
+  onDragStart = () => {
+    /*...*/
+  };
+  onDragUpdate = () => {
+    /*...*/
+  };
+  onDragEnd = () => {
+    // the only one that is required
+  };
+
+  render() {
+    return (
+      <DragDropContext
+        onBeforeDragStart={this.onBeforeDragStart}
+        onDragStart={this.onDragStart}
+        onDragUpdate={this.onDragUpdate}
+        onDragEnd={this.onDragEnd}
+      >
+        <div>Hello world</div>
+      </DragDropContext>)
+  }
+}
+
+const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
+let S_Draggable = window.ReactDraggable;
+let UserName = window.username;
+let UserAssetResponse = window.images;
+let UserAssetList = UserAssetResponse.substr(6).slice(0, -6).split("&#39;, &#39;");
+
+UserAssetList = UserAssetList.map(image => {
   return ({ image: image});
 })
 
-UserImagesList.forEach((image) => {
+UserAssetList.forEach((image) => {
   console.log(image);
 })
 
@@ -84,11 +113,11 @@ class DraggableAssetContainer extends React.Component {
     const image = this.props.image;
   
     return (
-      <Draggable bounds="parent" {...dragHandlers} >
+      <S_Draggable {...dragHandlers} >
         <div className="drag-container-display">
           <img className="drag-image-rows" src={image} />
         </div>
-      </Draggable>
+      </S_Draggable>
     );
   }
 }
@@ -104,9 +133,9 @@ class DraggableAssetContainer extends React.Component {
 class Tray extends React.Component {
   render () {
     const rows = [];
-    let lastAsset = null;
+    let UserAssetList = this.props.assets;
 
-    UserImagesList.forEach((asset) => {
+    UserAssetList.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer
           image={asset.image}
@@ -134,18 +163,17 @@ class AssetUpload extends React.Component {
     event.preventDefault();
 
     const imageContainerOne = document.getElementById('contained-image');
-    const imageContainerTwo = document.getElementById('contained-image-2');
     const formData = new FormData();
-    const fileOne = new File(this.fileInput.current.files, this.fileInput.current.files.name);
+    const file = new File(this.fileInput.current.files, this.fileInput.current.files.name);
     const postUrl = "/upload-inputs"
     const xmlPackage = new XMLHttpRequest();
 
-    formData.append('file1', fileOne);
+    formData.append('file', file);
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'json';
     xmlPackage.onload = function() {
       const imageUrls = xmlPackage.response;
-      return <Tray />; 
+        return <Tray />;
     }
 
     xmlPackage.send(formData);
@@ -167,19 +195,35 @@ class AssetUpload extends React.Component {
   }
 }
 
-const ASSETS = [
-  {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/3405a9fe-2bd2-49ab-b884-efb35b63f015_static/images/cmahon_undefined', text: "this is image one"},
-  {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/cdac03e0-6703-4d1e-926c-ee036a3134fe_static/images/cmahon_undefined', text: "this is from s3!"},
-  {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/720b2bed-fd81-4503-97cb-6c62c07fa462_static/images/cmahon_undefined', text: "derp"},
-  {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/6455288a-8bfe-4bfa-b5aa-012a50c9f852_static/images/cmahon_undefined', text: "deeeurp"}
-];
+// const ASSETS = [
+//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/3405a9fe-2bd2-49ab-b884-efb35b63f015_static/images/cmahon_undefined', text: "this is image one"},
+//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/cdac03e0-6703-4d1e-926c-ee036a3134fe_static/images/cmahon_undefined', text: "this is from s3!"},
+//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/720b2bed-fd81-4503-97cb-6c62c07fa462_static/images/cmahon_undefined', text: "derp"},
+//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/6455288a-8bfe-4bfa-b5aa-012a50c9f852_static/images/cmahon_undefined', text: "deeeurp"}
+// ];
 
 class MainPageArea extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      assets: UserAssetList,
+    };
+  }
+
+  handleAssetUpdate(assets) {
+    this.setState({
+      assets: assets
+    });
+  }
+
   render() {
     return (
       <div>
         <AssetUpload />
-        <Tray assets={this.props.assets} />
+        <Tray
+          assets={this.state.assets}
+          handleAssetUpdate={this.handleAssetUpdate}
+        />
       </div>
     );
   }
@@ -190,9 +234,12 @@ ReactDOM.render(
   document.getElementById('dynamic-greeting')
   )
 
+// ReactDOM.render(
+//   <DragDropTest />,
+//   document.getElementById('drag-drop-test')
+//   )
+
 ReactDOM.render(
-  <MainPageArea assets={ASSETS}>
-    <AssetUpload />
-  </MainPageArea>,
+  <MainPageArea />,
   document.getElementById('main-page-container')
 );

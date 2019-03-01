@@ -21,9 +21,15 @@ app.secret_key = "what"
 def show_index():
     """Index/homepage"""
 
-    session['username'] = 'tmp'
+    session['username'] = 'guest'
     return render_template("index.html")
 
+@app.route("/guest-continue", methods=['POST'])
+def guest_continue():
+    
+    session['username'] = 'guest'
+
+    return redirect('/main')
 
 @app.route("/sign-in", methods=['POST'])
 def sign_in():
@@ -39,7 +45,8 @@ def sign_in():
 
     flash (message)
 
-    return render_template('main.html', username=username)
+    return redirect('/main')
+    #return render_template('main.html', username=username)
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
@@ -50,7 +57,7 @@ def register_user():
     
     flash (message)
 
-    return render_template("main.html")
+    return redirect('/main')
 
 
 @app.route("/upload-inputs", methods=['POST'])
@@ -70,7 +77,7 @@ def upload_inputs():
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
-            print(user_submitted_image_temporary_path)
+            
             user_submitted_image.save(user_submitted_image_temporary_path)
             
             user_submitted_image_object = ImageClass(user_submitted_image,

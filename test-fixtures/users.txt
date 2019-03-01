@@ -1,4 +1,4 @@
-tmp|tmp@tmp.com|tmp|tmp|tmp
+guest|guest@guest.com|guest|guest|guest
 cmahon|cmahon@fakemail.com|!password!|camilla|mahon
 amahon|amahon@fakemail.com|@password@|andrew|mahon
 mcbrush|mcbrush@fakemail.com|#password#|marie clare|brush
