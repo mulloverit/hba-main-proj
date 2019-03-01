@@ -123,13 +123,18 @@ class AssetUpload extends React.Component {
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'json';
     xmlPackage.onload = function() {
-      return xmlPackage.response;
-      // return imageUrls;
+      imageUrls = xmlPackage.response;
+      return imageUrls;
+      
+      // return xmlPackage.response;
       // this.props.onUserAssetListUpdate(imageUrls);
       // imageUrls needs to be state or prop that can be "changed" and pass
       // that change up to mainpage so that Tray can be updated with new image
     }
-  
+    
+    xmlPackage.send(formData); // need to figure out how to return data from here
+    // so it can be passed up via props to tray
+    
     this.props.onUserAssetListUpdate(xmlPackage.send(formData));
 
   }
@@ -181,18 +186,12 @@ class MainPageArea extends React.Component {
     console.log(userAssetList); // this assetList is not coming through
   }
 
-  // handleOnSubmit(userAssetList) {
-  //   this.setState({
-  //     userAssetList: userAssetList
-  //   });}
-
   render() {
     return (
       <div>
         <AssetUpload 
           userAssetList={this.state.userAssetList}
           onUserAssetListUpdate={this.handleUserAssetListUpdate}
-          // onSubmit={this.handleOnSubmit}
           />
         <Tray
           userAssetList={this.state.userAssetList}
