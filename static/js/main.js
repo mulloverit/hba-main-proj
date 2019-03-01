@@ -84,7 +84,7 @@ class Tray extends React.Component {
   render () {
 
     const rows = [];
-    this.props.assets.forEach((asset) => {
+    this.props.userAssetList.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer
           image={asset.image}
@@ -106,16 +106,12 @@ class AssetUpload extends React.Component {
     super(props);
     this.fileInput = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
-
-    this.state = {
-      value: ''
-    }
   }
 
   handleSubmit(event) {
     event.preventDefault();
+    // this.props.onSubmit(event.target.value);
 
-    const imageContainerOne = document.getElementById('contained-image');
     const formData = new FormData();
     const file = new File(this.fileInput.current.files,
                           this.fileInput.current.files.name
@@ -127,13 +123,14 @@ class AssetUpload extends React.Component {
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'json';
     xmlPackage.onload = function() {
-      const imageUrls = xmlPackage.response;
-      console.log(imageUrls);
+      return xmlPackage.response;
+      // return imageUrls;
+      // this.props.onUserAssetListUpdate(imageUrls);
       // imageUrls needs to be state or prop that can be "changed" and pass
       // that change up to mainpage so that Tray can be updated with new image
     }
-
-    xmlPackage.send(formData);
+  
+    this.props.onUserAssetListUpdate(xmlPackage.send(formData));
 
   }
   render() {
@@ -143,7 +140,6 @@ class AssetUpload extends React.Component {
           <div className="col-6">
               <form
                 onSubmit={this.handleSubmit}
-                value={this.state.value}
                 method="POST"
                 encType="multipart/form-data">
                   <input
@@ -171,17 +167,35 @@ class MainPageArea extends React.Component {
     })
 
     this.state = {
-      assets: UserAssetList,
+      userAssetList: UserAssetList,
     };
+
+    this.handleUserAssetListUpdate = this.handleUserAssetListUpdate.bind(this)
   }
+
+  handleUserAssetListUpdate(userAssetList) {
+    this.setState({
+      userAssetList: userAssetList
+    });
+    console.log("HANDLEONSUBMISSION");
+    console.log(userAssetList); // this assetList is not coming through
+  }
+
+  // handleOnSubmit(userAssetList) {
+  //   this.setState({
+  //     userAssetList: userAssetList
+  //   });}
 
   render() {
     return (
       <div>
         <AssetUpload 
+          userAssetList={this.state.userAssetList}
+          onUserAssetListUpdate={this.handleUserAssetListUpdate}
+          // onSubmit={this.handleOnSubmit}
           />
         <Tray
-          assets={this.state.assets}
+          userAssetList={this.state.userAssetList}
         />
       </div>
     );

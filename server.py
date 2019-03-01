@@ -94,7 +94,7 @@ def upload_inputs():
         
         images = user.all_image_urls()
         
-        return jsonify(images)
+        return images
         #return jsonify(user_submitted_image_s3_locations)
         #return render_template("main.html", images=user_submitted_image_s3_locations)
 
