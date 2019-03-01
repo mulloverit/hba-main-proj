@@ -64,37 +64,38 @@ def upload_inputs():
     user_submitted_image_s3_locations = []
     
     try:
-
+    
         for file in request.files:
+            
             user_submitted_image = request.files.get(file)
+    
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
-            
+
             user_submitted_image.save(user_submitted_image_temporary_path)
-            
+        
             user_submitted_image_object = ImageClass(user_submitted_image,
                                             user_submitted_image_temporary_path,
                                             username,
                                             )
-            
+        
             user_submitted_image_object.upload_to_s3(S3_BUCKET)
-            
+        
             user_submitted_image_object.add_to_database(user_id)
-            
+        
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
                                             )    
-
+            
+        images = str(user.all_image_urls())
         flash("Upload to S3 a success!")
-
         print("UPLOAD SUCCESS!")
         print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
+        print("ALL USER IMAGES:", images)
         
-        images = user.all_image_urls()
-        
-        return jsonify(images)
+        return images
         #return jsonify(user_submitted_image_s3_locations)
         #return render_template("main.html", images=user_submitted_image_s3_locations)
 

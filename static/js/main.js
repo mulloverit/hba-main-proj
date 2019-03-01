@@ -106,38 +106,36 @@ class AssetUpload extends React.Component {
     super(props);
     this.fileInput = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.state = {
+      userAssets: this.props.userAssetList
+    }
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    // this.props.onSubmit(event.target.value);
-
+    
     const formData = new FormData();
     const file = new File(this.fileInput.current.files,
-                          this.fileInput.current.files.name
+                          this.fileInput.current.files[0].name
                           );
     const postUrl = "/upload-inputs"
     const xmlPackage = new XMLHttpRequest();
 
     formData.append('file', file);
     xmlPackage.open("POST", postUrl);
-    xmlPackage.responseType = 'json';
+    xmlPackage.responseType = 'text';
     xmlPackage.onload = function() {
-      imageUrls = xmlPackage.response;
-      return imageUrls;
-      
-      // return xmlPackage.response;
-      // this.props.onUserAssetListUpdate(imageUrls);
-      // imageUrls needs to be state or prop that can be "changed" and pass
-      // that change up to mainpage so that Tray can be updated with new image
+      const data = xmlPackage.data;
+      const assetList = xmlPackage.response;
+      console.log("ASSET LIST:", assetList);
+      console.log("TYPE:", xmlPackage.responseType);
+      return assetList;
     }
-    
-    xmlPackage.send(formData); // need to figure out how to return data from here
-    // so it can be passed up via props to tray
-    
-    this.props.onUserAssetListUpdate(xmlPackage.send(formData));
-
+    const assetList = xmlPackage.send(formData);
+    this.setState({userAssets: assetList});
+    this.props.onUserAssetListUpdate(this.state.userAssets);
   }
+
   render() {
     return (
       <div className="container">
@@ -178,12 +176,12 @@ class MainPageArea extends React.Component {
     this.handleUserAssetListUpdate = this.handleUserAssetListUpdate.bind(this)
   }
 
-  handleUserAssetListUpdate(userAssetList) {
+  handleUserAssetListUpdate(updatedUserAssetList) {
     this.setState({
-      userAssetList: userAssetList
+      userAssetList: updatedUserAssetList
     });
     console.log("HANDLEONSUBMISSION");
-    console.log(userAssetList); // this assetList is not coming through
+    console.log(updatedUserAssetList); // this assetList is not coming through
   }
 
   render() {
