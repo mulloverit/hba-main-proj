@@ -1,8 +1,10 @@
 "use strict";
 
+let S_Draggable = window.ReactDraggable;
 
 class DynamicGreeting extends React.Component {
   render() {
+    
     let UserName = window.username;
 
     return (
@@ -77,13 +79,18 @@ class DraggableAssetContainer extends React.Component {
 class Tray extends React.Component {
   constructor(props){
     super(props);
-    
   }
 
   render () {
-    const rows = [];
     
-    UserAssetList.forEach((asset) => {
+    // DEBUG STATEMENT
+    // this.props.assets.forEach((image) => {
+    //   console.log(image);
+    // })
+
+    const rows = [];
+
+    this.props.assets.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer
           image={asset.image}
@@ -104,17 +111,13 @@ class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
     this.fileInput = React.createRef();
-    this.handleAssetListUpdate = this.handleAssetListUpdate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   // my asset upload form should pass a prop to mainpagearea
   // that tells main page to update list of assets
-  // no state passing, all components should manage their own satate
-  // instead of "onAssetChange" maybe onSubimt or componentDidMount ??
-  handleAssetListUpdate(event) {
-    this.props.onAssetChange(event.target.value);
-  }
+  // no state passing, all components should manage their own state
+  // this may need a componentDidMount() for passing new assets to mainpage list
 
   handleSubmit(event) {
     event.preventDefault();
@@ -145,8 +148,6 @@ class AssetUpload extends React.Component {
                 <input
                   type="file"
                   ref={this.fileInput}
-                  value={this.props.newAsset}
-                  onChange={this.handleAssetListUpdate}
                 />
                 <button type="submit">Submit</button>
               </form>
@@ -161,7 +162,6 @@ class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
     
-    let S_Draggable = window.ReactDraggable;
     let UserAssets = window.images;
     let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
 
@@ -170,29 +170,21 @@ class MainPageArea extends React.Component {
     })
 
     this.state = {
-      newAsset: '',
       assets: UserAssetList,
     };
 
-    UserAssetList.forEach((image) => {
-      console.log(image);
-    })
-
-    this.handleAssetListUpdate = this.handleAssetListUpdate.bind(this);
-  }
-
-  handleAssetListUpdate(assets) {
-    this.setState({
-      assets: assets
-    });
   }
 
   render() {
+    
+    // DEBUG STATEMENT
+    // this.state.assets.forEach((image) => {
+    //   console.log(image);
+    // })
+
     return (
       <div>
         <AssetUpload 
-          newAsset={this.state.newAsset}
-          onAssetChange={this.handleAssetListUpdate}
           />
         <Tray
           assets={this.state.assets}
