@@ -60,6 +60,7 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
+    user = UserClass(username)
     user_submitted_image_s3_locations = []
     
     try:
@@ -87,8 +88,14 @@ def upload_inputs():
                                             )    
 
         flash("Upload to S3 a success!")
-        print("SUCCESS:", user_submitted_image_s3_locations)
-        return jsonify(user_submitted_image_s3_locations)
+
+        print("UPLOAD SUCCESS!")
+        print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
+        
+        images = user.all_image_urls()
+        
+        return jsonify(images)
+        #return jsonify(user_submitted_image_s3_locations)
         #return render_template("main.html", images=user_submitted_image_s3_locations)
 
     except:

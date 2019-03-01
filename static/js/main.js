@@ -4,7 +4,7 @@ let S_Draggable = window.ReactDraggable;
 
 class DynamicGreeting extends React.Component {
   render() {
-    
+
     let UserName = window.username;
 
     return (
@@ -112,6 +112,10 @@ class AssetUpload extends React.Component {
     super(props);
     this.fileInput = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.state = {
+      value: ''
+    }
   }
 
   // my asset upload form should pass a prop to mainpagearea
@@ -133,7 +137,9 @@ class AssetUpload extends React.Component {
     xmlPackage.responseType = 'json';
     xmlPackage.onload = function() {
       const imageUrls = xmlPackage.response;
-        return <Tray />;
+      console.log(imageUrls);
+      // imageUrls needs to be state or prop that can be "changed" and pass
+      // that change up to mainpage so that Tray can be updated with new image
     }
 
     xmlPackage.send(formData);
@@ -144,7 +150,7 @@ class AssetUpload extends React.Component {
       <div className="container">
         <div className="row">
           <div className="col-6">
-              <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
+              <form onSubmit={this.handleSubmit} value={this.state.value} method="POST" encType="multipart/form-data">
                 <input
                   type="file"
                   ref={this.fileInput}
