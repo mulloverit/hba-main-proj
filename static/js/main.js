@@ -56,8 +56,8 @@ class DragDropTest extends React.Component {
 const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
 let S_Draggable = window.ReactDraggable;
 let UserName = window.username;
-let UserAssetResponse = window.images;
-let UserAssetList = UserAssetResponse.substr(6).slice(0, -6).split("&#39;, &#39;");
+let UserAssets = window.images;
+let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
 
 UserAssetList = UserAssetList.map(image => {
   return ({ image: image});
@@ -156,7 +156,12 @@ class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
     this.fileInput = React.createRef();
+    this.handleAssetChange = this.handleAssetChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleAssetChange(event) {
+    this.props.onAssetChange(event.target.value);
   }
 
   handleSubmit(event) {
@@ -185,7 +190,7 @@ class AssetUpload extends React.Component {
         <div className="row">
           <div className="col-6">
               <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
-                <input type="file" name="img-1" id="img-1" ref={this.fileInput} />
+                <input type="file" name="img-1" id="img-1" ref={this.fileInput} onChange={this.handleAssetChange}/>
                 <button type="submit">Submit</button>
               </form>
           </div>
@@ -195,22 +200,17 @@ class AssetUpload extends React.Component {
   }
 }
 
-// const ASSETS = [
-//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/3405a9fe-2bd2-49ab-b884-efb35b63f015_static/images/cmahon_undefined', text: "this is image one"},
-//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/cdac03e0-6703-4d1e-926c-ee036a3134fe_static/images/cmahon_undefined', text: "this is from s3!"},
-//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/720b2bed-fd81-4503-97cb-6c62c07fa462_static/images/cmahon_undefined', text: "derp"},
-//   {image: 'http://hackbright-image-upload-test.s3.amazonaws.com/cmahon/6455288a-8bfe-4bfa-b5aa-012a50c9f852_static/images/cmahon_undefined', text: "deeeurp"}
-// ];
-
 class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       assets: UserAssetList,
     };
+
+    this.handleAssetChange = this.handleAssetChange.bind(this);
   }
 
-  handleAssetUpdate(assets) {
+  handleAssetChange(assets) {
     this.setState({
       assets: assets
     });
@@ -219,10 +219,12 @@ class MainPageArea extends React.Component {
   render() {
     return (
       <div>
-        <AssetUpload />
+        <AssetUpload 
+          assets={this.state.assets}
+          onAssetChange={this.handleAssetChange}
+          />
         <Tray
           assets={this.state.assets}
-          handleAssetUpdate={this.handleAssetUpdate}
         />
       </div>
     );

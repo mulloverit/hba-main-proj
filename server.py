@@ -21,7 +21,6 @@ app.secret_key = "what"
 def show_index():
     """Index/homepage"""
 
-    session['username'] = 'guest'
     return render_template("index.html")
 
 @app.route("/guest-continue", methods=['POST'])
@@ -40,13 +39,9 @@ def sign_in():
     if "Success" in message:
         session['username'] = request.form['username']
 
-    username = request.form['username']
-
-
     flash (message)
 
     return redirect('/main')
-    #return render_template('main.html', username=username)
 
 @app.route("/register-new", methods=['POST'])
 def register_user():
@@ -65,12 +60,10 @@ def upload_inputs():
     """Handle initial image upload [no login required]."""
 
     username, user_id = current_user()
+    user_submitted_image_s3_locations = []
     
     try:
-        
-        user_submitted_image_s3_locations = []
-        
-        # for user_submitted_image in [request.files['img-1'], request.files['img-2']]:
+
         for file in request.files:
             user_submitted_image = request.files.get(file)
             
@@ -110,15 +103,9 @@ def main():
 
     username, user_id = current_user()
     user = UserClass(username)
-    images = ""
+    images = user.all_image_urls()
 
-    if username != "guest":
-
-        images = user.all_image_urls()
-
-        return render_template("main.html", images=images, username=username)
-
-    return render_template("main.html", username=username)
+    return render_template("main.html", username=username, images=images)
 
 
 @app.route("/submit-diff-request", methods=['POST'])
