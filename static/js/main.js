@@ -82,14 +82,8 @@ class Tray extends React.Component {
   }
 
   render () {
-    
-    // DEBUG STATEMENT
-    // this.props.assets.forEach((image) => {
-    //   console.log(image);
-    // })
 
     const rows = [];
-
     this.props.assets.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer
@@ -118,17 +112,14 @@ class AssetUpload extends React.Component {
     }
   }
 
-  // my asset upload form should pass a prop to mainpagearea
-  // that tells main page to update list of assets
-  // no state passing, all components should manage their own state
-  // this may need a componentDidMount() for passing new assets to mainpage list
-
   handleSubmit(event) {
     event.preventDefault();
 
     const imageContainerOne = document.getElementById('contained-image');
     const formData = new FormData();
-    const file = new File(this.fileInput.current.files, this.fileInput.current.files.name);
+    const file = new File(this.fileInput.current.files,
+                          this.fileInput.current.files.name
+                          );
     const postUrl = "/upload-inputs"
     const xmlPackage = new XMLHttpRequest();
 
@@ -150,11 +141,15 @@ class AssetUpload extends React.Component {
       <div className="container">
         <div className="row">
           <div className="col-6">
-              <form onSubmit={this.handleSubmit} value={this.state.value} method="POST" encType="multipart/form-data">
-                <input
-                  type="file"
-                  ref={this.fileInput}
-                />
+              <form
+                onSubmit={this.handleSubmit}
+                value={this.state.value}
+                method="POST"
+                encType="multipart/form-data">
+                  <input
+                    type="file"
+                    ref={this.fileInput}
+                  />
                 <button type="submit">Submit</button>
               </form>
           </div>
@@ -178,16 +173,9 @@ class MainPageArea extends React.Component {
     this.state = {
       assets: UserAssetList,
     };
-
   }
 
   render() {
-    
-    // DEBUG STATEMENT
-    // this.state.assets.forEach((image) => {
-    //   console.log(image);
-    // })
-
     return (
       <div>
         <AssetUpload 
@@ -200,11 +188,10 @@ class MainPageArea extends React.Component {
   }
 }
 
-
 ReactDOM.render(
   <DynamicGreeting />,
   document.getElementById('dynamic-greeting')
-  )
+);
 
 ReactDOM.render(
   <MainPageArea />,
