@@ -2,15 +2,9 @@
 
 
 class DynamicGreeting extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      name: 'guest'
-    }
-  }
-
   render() {
+    let UserName = window.username;
+
     return (
       <div className="container">
         <div className="row">
@@ -24,48 +18,6 @@ class DynamicGreeting extends React.Component {
     );
   }
 }
-
-class DragDropTest extends React.Component {
-  onBeforeDragStart = () => {
-    /*...*/
-  };
-
-  onDragStart = () => {
-    /*...*/
-  };
-  onDragUpdate = () => {
-    /*...*/
-  };
-  onDragEnd = () => {
-    // the only one that is required
-  };
-
-  render() {
-    return (
-      <DragDropContext
-        onBeforeDragStart={this.onBeforeDragStart}
-        onDragStart={this.onDragStart}
-        onDragUpdate={this.onDragUpdate}
-        onDragEnd={this.onDragEnd}
-      >
-        <div>Hello world</div>
-      </DragDropContext>)
-  }
-}
-
-const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
-let S_Draggable = window.ReactDraggable;
-let UserName = window.username;
-let UserAssets = window.images;
-let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
-
-UserAssetList = UserAssetList.map(image => {
-  return ({ image: image});
-})
-
-UserAssetList.forEach((image) => {
-  console.log(image);
-})
 
 class DraggableAssetContainer extends React.Component {
   constructor(props) {
@@ -122,19 +74,15 @@ class DraggableAssetContainer extends React.Component {
   }
 }
 
-// class PlayArea extends React.Component {
-//   render () {
-//     const rows = []
-//     const columns = []
-
-//   }
-// }
-
 class Tray extends React.Component {
+  constructor(props){
+    super(props);
+    
+  }
+
   render () {
     const rows = [];
-    let UserAssetList = this.props.assets;
-
+    
     UserAssetList.forEach((asset) => {
       rows.push(
         <DraggableAssetContainer
@@ -156,11 +104,15 @@ class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
     this.fileInput = React.createRef();
-    this.handleAssetChange = this.handleAssetChange.bind(this);
+    this.handleAssetListUpdate = this.handleAssetListUpdate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleAssetChange(event) {
+  // my asset upload form should pass a prop to mainpagearea
+  // that tells main page to update list of assets
+  // no state passing, all components should manage their own satate
+  // instead of "onAssetChange" maybe onSubimt or componentDidMount ??
+  handleAssetListUpdate(event) {
     this.props.onAssetChange(event.target.value);
   }
 
@@ -190,7 +142,12 @@ class AssetUpload extends React.Component {
         <div className="row">
           <div className="col-6">
               <form onSubmit={this.handleSubmit} method="POST" encType="multipart/form-data">
-                <input type="file" name="img-1" id="img-1" ref={this.fileInput} onChange={this.handleAssetChange}/>
+                <input
+                  type="file"
+                  ref={this.fileInput}
+                  value={this.props.newAsset}
+                  onChange={this.handleAssetListUpdate}
+                />
                 <button type="submit">Submit</button>
               </form>
           </div>
@@ -203,14 +160,28 @@ class AssetUpload extends React.Component {
 class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
+    
+    let S_Draggable = window.ReactDraggable;
+    let UserAssets = window.images;
+    let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
+
+    UserAssetList = UserAssetList.map(image => {
+      return ({ image: image});
+    })
+
     this.state = {
+      newAsset: '',
       assets: UserAssetList,
     };
 
-    this.handleAssetChange = this.handleAssetChange.bind(this);
+    UserAssetList.forEach((image) => {
+      console.log(image);
+    })
+
+    this.handleAssetListUpdate = this.handleAssetListUpdate.bind(this);
   }
 
-  handleAssetChange(assets) {
+  handleAssetListUpdate(assets) {
     this.setState({
       assets: assets
     });
@@ -220,8 +191,8 @@ class MainPageArea extends React.Component {
     return (
       <div>
         <AssetUpload 
-          assets={this.state.assets}
-          onAssetChange={this.handleAssetChange}
+          newAsset={this.state.newAsset}
+          onAssetChange={this.handleAssetListUpdate}
           />
         <Tray
           assets={this.state.assets}
@@ -231,15 +202,11 @@ class MainPageArea extends React.Component {
   }
 }
 
+
 ReactDOM.render(
   <DynamicGreeting />,
   document.getElementById('dynamic-greeting')
   )
-
-// ReactDOM.render(
-//   <DragDropTest />,
-//   document.getElementById('drag-drop-test')
-//   )
 
 ReactDOM.render(
   <MainPageArea />,

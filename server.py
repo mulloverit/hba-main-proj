@@ -108,37 +108,37 @@ def main():
     return render_template("main.html", username=username, images=images)
 
 
-@app.route("/submit-diff-request", methods=['POST'])
-def diff_images():
-    """Diff images from local dir [no s3 and no login required]."""
+# @app.route("/submit-diff-request", methods=['POST'])
+# def diff_images():
+#     """Diff images from local dir [no s3 and no login required]."""
     
-    username, user_id = current_user()
+#     username, user_id = current_user()
 
-    try:
+#     try:
 
-        boolean_diff_path = create_boolean_diff(
-                                session['user_submitted_image_temporary_paths'][0],
-                                session['user_submitted_image_temporary_paths'][1],
-                                )
+#         boolean_diff_path = create_boolean_diff(
+#                                 session['user_submitted_image_temporary_paths'][0],
+#                                 session['user_submitted_image_temporary_paths'][1],
+#                                 )
         
-        difference_image = ImageClass(boolean_diff_path, boolean_diff_path,
-                                      username) # wants path not PIL object as 1st arg
+#         difference_image = ImageClass(boolean_diff_path, boolean_diff_path,
+#                                       username) # wants path not PIL object as 1st arg
 
-        difference_image.upload_to_s3(S3_BUCKET)
+#         difference_image.upload_to_s3(S3_BUCKET)
         
-        difference_image.add_to_database(user_id,
-                                input_image_uuids=session['request_image_uuids'])
+#         difference_image.add_to_database(user_id,
+#                                 input_image_uuids=session['request_image_uuids'])
 
-        flash("Diff succeeded.")
+#         flash("Diff succeeded.")
 
-    except:
+#     except:
 
-        flash("Diff failed :(")
+#         flash("Diff failed :(")
 
-    return render_template("main.html",
-                    image_1=session['user_submitted_image_temporary_paths'][0],
-                    image_2=session['user_submitted_image_temporary_paths'][1],
-                    difference_image=boolean_diff_path)
+#     return render_template("main.html",
+#                     image_1=session['user_submitted_image_temporary_paths'][0],
+#                     image_2=session['user_submitted_image_temporary_paths'][1],
+#                     difference_image=boolean_diff_path)
     
 
 if __name__ == "__main__":
