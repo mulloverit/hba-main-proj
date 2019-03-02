@@ -80,7 +80,7 @@ class Tray extends React.Component {
   constructor(props){
     super(props);
   }
-  
+
   render () {
 
     const rows = [];
@@ -88,7 +88,8 @@ class Tray extends React.Component {
       rows.push(
         <DraggableAssetContainer
           image={asset.image}
-          key={asset.image} />
+          key={asset.image}
+        />
       );
     });
     
@@ -142,26 +143,17 @@ class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleUserAssetListUpdate = this.handleUserAssetListUpdate.bind(this);
 
-    let UserAssets = window.images;
-    let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
+    let userAssets = window.images;
+    let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
 
-    UserAssetList = UserAssetList.map(image => {
+    userAssetList = userAssetList.map(image => {
       return ({ image: image});
     })
 
     this.state = {
-      userAssetList: UserAssetList,
+      userAssetList: userAssetList
     };
-  }
-
-  handleUserAssetListUpdate(updatedUserAssetList) {
-    this.setState({
-      userAssetList: updatedUserAssetList
-    });
-    console.log("HANDLEONSUBMISSION");
-    console.log(updatedUserAssetList); // this assetList is not coming through
   }
 
   handleSubmit(file) {
@@ -174,25 +166,29 @@ class MainPageArea extends React.Component {
     formData.append('file', file);
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'text';
-    xmlPackage.onload = function() {
-      const data = xmlPackage.data;
-      const assetList = xmlPackage.response;
-      console.log("ASSET LIST:", assetList);
-      return assetList;
-    }
-    const assetList = xmlPackage.send(formData);
-    this.setState({userAssets: assetList});
-    // this.props.onUserAssetListUpdate(this.state.userAssets);
-  }
+    xmlPackage.onload = () => {
+      let assetListString = xmlPackage.response
+      let userAssetList = assetListString.substring(2).slice(0, -2).split("', '");
+      console.log("MUNGED:", userAssetList);
 
+      userAssetList = userAssetList.map(image => {
+        return ({ image: image});
+        })
+
+      if (xmlPackage.status === 200) {
+        console.log("ASSET LIST:", userAssetList);
+        this.setState({userAssetList: userAssetList});
+        }
+    };
+
+    xmlPackage.send(formData);
+  }
 
   render() {
     return (
       <div>
         <AssetUpload 
-          userAssetList={this.state.userAssetList}
           onSubmit={this.handleSubmit}
-          // onUserAssetListUpdate={this.handleUserAssetListUpdate}
           />
         <Tray
           userAssetList={this.state.userAssetList}

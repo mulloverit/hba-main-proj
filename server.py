@@ -89,13 +89,14 @@ def upload_inputs():
                                             user_submitted_image_object.s3_location,
                                             )    
             
-        images = str(user.all_image_urls())
+        images = user.all_image_urls()
         flash("Upload to S3 a success!")
         print("UPLOAD SUCCESS!")
         print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
         print("ALL USER IMAGES:", images)
-        
-        return images
+        #normalize data to a dictionary here instead of in browser?
+    
+        return str(images)
         #return jsonify(user_submitted_image_s3_locations)
         #return render_template("main.html", images=user_submitted_image_s3_locations)
 
