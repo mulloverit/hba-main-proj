@@ -80,7 +80,7 @@ class Tray extends React.Component {
   constructor(props){
     super(props);
   }
-
+  
   render () {
 
     const rows = [];
@@ -104,36 +104,16 @@ class Tray extends React.Component {
 class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
-    this.fileInput = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.state = {
-      userAssets: this.props.userAssetList
-    }
+    this.fileInput = React.createRef();
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    
-    const formData = new FormData();
     const file = new File(this.fileInput.current.files,
                           this.fileInput.current.files[0].name
                           );
-    const postUrl = "/upload-inputs"
-    const xmlPackage = new XMLHttpRequest();
-
-    formData.append('file', file);
-    xmlPackage.open("POST", postUrl);
-    xmlPackage.responseType = 'text';
-    xmlPackage.onload = function() {
-      const data = xmlPackage.data;
-      const assetList = xmlPackage.response;
-      console.log("ASSET LIST:", assetList);
-      console.log("TYPE:", xmlPackage.responseType);
-      return assetList;
-    }
-    const assetList = xmlPackage.send(formData);
-    this.setState({userAssets: assetList});
-    this.props.onUserAssetListUpdate(this.state.userAssets);
+    this.props.onSubmit(file)
   }
 
   render() {
@@ -161,7 +141,9 @@ class AssetUpload extends React.Component {
 class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
-    
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleUserAssetListUpdate = this.handleUserAssetListUpdate.bind(this);
+
     let UserAssets = window.images;
     let UserAssetList = UserAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
 
@@ -172,8 +154,6 @@ class MainPageArea extends React.Component {
     this.state = {
       userAssetList: UserAssetList,
     };
-
-    this.handleUserAssetListUpdate = this.handleUserAssetListUpdate.bind(this)
   }
 
   handleUserAssetListUpdate(updatedUserAssetList) {
@@ -184,12 +164,35 @@ class MainPageArea extends React.Component {
     console.log(updatedUserAssetList); // this assetList is not coming through
   }
 
+  handleSubmit(file) {
+    event.preventDefault();
+    
+    const formData = new FormData();
+    const postUrl = "/upload-inputs"
+    const xmlPackage = new XMLHttpRequest();
+
+    formData.append('file', file);
+    xmlPackage.open("POST", postUrl);
+    xmlPackage.responseType = 'text';
+    xmlPackage.onload = function() {
+      const data = xmlPackage.data;
+      const assetList = xmlPackage.response;
+      console.log("ASSET LIST:", assetList);
+      return assetList;
+    }
+    const assetList = xmlPackage.send(formData);
+    this.setState({userAssets: assetList});
+    // this.props.onUserAssetListUpdate(this.state.userAssets);
+  }
+
+
   render() {
     return (
       <div>
         <AssetUpload 
           userAssetList={this.state.userAssetList}
-          onUserAssetListUpdate={this.handleUserAssetListUpdate}
+          onSubmit={this.handleSubmit}
+          // onUserAssetListUpdate={this.handleUserAssetListUpdate}
           />
         <Tray
           userAssetList={this.state.userAssetList}
