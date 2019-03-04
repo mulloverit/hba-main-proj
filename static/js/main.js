@@ -1,6 +1,44 @@
 "use strict";
 
 let S_Draggable = window.ReactDraggable;
+const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
+const grid = 8;
+
+const reorder = (list, startIndex, endIndex) => {
+  // create array from incoming list
+  // and an empty array to populate with removed items from list
+  // splice -> first arg is beginning of splice, 2nd arg is delete count
+  //           last arg is the items that will be inserted at the
+  //           beginning of splice
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const getItems = (count) => {
+  Array.from({ length: count }, (v, k) => k).map(k => ({
+    id: `item-${k}`,
+    content: `item ${k}`,
+  }));
+}
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+
+  userSelect: 'none',
+  padding: grid * 2,
+  margin: `0 0 ${grid}px 0`,
+  background: isDragging ? 'lightgreen' : 'grey',
+  ...draggableStyle,
+});
+
+const getListStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? 'lightblue' : 'pink',
+  padding: grid,
+  width: 250,
+}); 
+
 
 class DynamicGreeting extends React.Component {
   render() {
@@ -17,6 +55,76 @@ class DynamicGreeting extends React.Component {
           </div>
         </div>
       </div>
+    );
+  }
+}
+
+
+class DroppableComp extends React.Component {
+  constructor(props){
+    super(props);
+  }
+  
+  render() {
+    console.log(this.props.userAssetList);
+
+    return (
+      <Droppable
+        droppableId={this.props.droppableId}
+        userAssetList={this.props.userAssetList}
+      >
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+
+            {this.props.userAssetList.map((item, index) => (
+              <Draggable 
+                key={item.image}
+                draggableId={item.image}
+                index={index}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                  >
+                    {item.content}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+
+            {provided.placeholder}
+
+          </div>
+        )}
+      </Droppable>
+    );
+  }
+}
+
+
+class DragDropContextComp extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <DragDropContext
+        onDragEnd={this.props.onDragEnd} >
+          <DroppableComp
+            droppableId="droppable"
+            userAssetList={this.props.userAssetList}
+           />
+      </DragDropContext>
     );
   }
 }
@@ -143,6 +251,7 @@ class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.onDragEnd = this.onDragEnd.bind(this);
 
     let userAssets = window.images;
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
@@ -154,6 +263,29 @@ class MainPageArea extends React.Component {
     this.state = {
       userAssetList: userAssetList
     };
+  }
+
+
+  onDragEnd(validDropped) {
+    // if dropped otuside valid dropzone, do nothing
+    if (!validDropped.destination) {
+      return;
+    }
+
+    // of dropped in valid zone, reorder items accordingly
+    // this.state.items is incoming list
+    // source index is items being moved ("removed" in reorder func)
+    // destination index is where the moved items will be inserted
+    const userAssetList = reorder(
+      this.state.userAssetList,
+      validDropped.source.index,
+      validDropped.destination.index
+    );
+
+    // and refresh state with new ordered list  
+    this.setState({
+      userAssetList,
+    });
   }
 
   handleSubmit(file) {
@@ -190,9 +322,13 @@ class MainPageArea extends React.Component {
         <AssetUpload 
           onSubmit={this.handleSubmit}
           />
-        <Tray
-          userAssetList={this.state.userAssetList}
-        />
+        
+        <div>
+          <DragDropContextComp 
+            onDragEnd={this.onDragEnd}
+            userAssetList={this.state.userAssetList}
+          />
+        </div>
       </div>
     );
   }
