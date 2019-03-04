@@ -9,7 +9,6 @@ from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from config import *
-from diff_logic import *
 from model import User, InputImage, DiffImage, ImageClass, UserClass
 from utils import *
 
