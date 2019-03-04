@@ -44,7 +44,7 @@ class ImageClass:
 
             self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
             self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
-            
+
             # Halleluja, get past "ValueError: Fileobj must implement read"
             # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
             with open(self.tmp_path, 'rb') as data:
@@ -71,7 +71,7 @@ class ImageClass:
 
 
         if input_image_uuids == None:
-
+            
             image_record = InputImage(image_user_id=user_id, 
                     image_size_x=self.size[0],
                     image_size_y=self.size[1],
@@ -128,6 +128,17 @@ class UserClass:
         except:
 
             return None
+
+    def all_image_urls(self):
+
+        all_image_urls = []
+        user = User.query.filter(User.username == self.username).first()
+        images = InputImage.query.filter(InputImage.image_user_id == user.user_id).all()
+
+        for image in images:
+            all_image_urls.append(image.image_s3_url)
+        
+        return(all_image_urls)
 
 class User(db.Model):
     """User model."""

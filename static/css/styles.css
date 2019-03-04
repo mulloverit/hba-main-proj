@@ -1,17 +1,31 @@
-.imageContainer {
-    background-color: grey;
-    height: 100px;
-    width: 100%;
+
+.drag-container-display {
+    background-color: #bf120f;
+    border-style: dashed;
+    height: 150px;
+    width: 150px;
+    margin: 10px;
+    padding: 10px;
 }
 
-.input-image {
-    height: 50px;
-    width: 50px;
+.bounding-tray {
+    height: 100%;
+    width: 20%;
+    border: 5px solid #999;
 }
 
-.hidden {
-    height: 200px;
-    width: 200px;
-    visibility: visible;
-    background-color: grey;
+.drag-image-rows {
+    height: 120px;
+    width: 120px;
+}
+
+.image-display-box {
+    background: #fff;
+    border: 10px solid #999;
+    border-radius: 3px;
+    width: 150px;
+    height: 150px;
+    margin: 10px;
+    padding: 10px;
+    float: left;
 }
