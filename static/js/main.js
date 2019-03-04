@@ -95,7 +95,7 @@ class DroppableComp extends React.Component {
                       provided.draggableProps.style
                     )}
                   >
-                    {item.content}
+                    <img src={item.image} height="100" width="100"/>
                   </div>
                 )}
               </Draggable>
@@ -322,13 +322,10 @@ class MainPageArea extends React.Component {
         <AssetUpload 
           onSubmit={this.handleSubmit}
           />
-        
-        <div>
-          <DragDropContextComp 
-            onDragEnd={this.onDragEnd}
-            userAssetList={this.state.userAssetList}
-          />
-        </div>
+        <DragDropContextComp 
+          onDragEnd={this.onDragEnd}
+          userAssetList={this.state.userAssetList}
+        />
       </div>
     );
   }
