@@ -61,8 +61,7 @@ class DynamicGreeting extends React.Component {
   }
 }
 
-
-class DroppableComp extends React.Component {
+class AssetTray extends React.Component {
   constructor(props){
     super(props);
   }
@@ -72,13 +71,13 @@ class DroppableComp extends React.Component {
       <Droppable
         droppableId={this.props.droppableId}
         userAssetList={this.props.userAssetList}
+        userChapterBoardList={this.props.userChapterBoardList}
       >
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
           >
-
             {this.props.userAssetList.map((item, index) => (
               <Draggable 
                 key={item.image}
@@ -100,9 +99,52 @@ class DroppableComp extends React.Component {
                 )}
               </Draggable>
             ))}
-
             {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    );
+  }
+}
 
+class ChapterBoard extends React.Component {
+  constructor(props){
+    super(props);
+  }
+  
+  render() {
+    return (
+      <Droppable
+        droppableId={this.props.droppableId}
+        userChapterBoardList={this.props.userChapterBoardList}
+      >
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            style={getListStyle(snapshot.isDraggingOver)}
+          >
+            {this.props.userChapterBoardList.map((item, index) => (
+              <Draggable 
+                key="test"
+                draggableId="test"
+                index={index}
+              >
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    style={getItemStyle(
+                      snapshot.isDragging,
+                      provided.draggableProps.style
+                    )}
+                  >
+                    <img src={item.image} height="100" width="100"/>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
         )}
       </Droppable>
@@ -118,13 +160,26 @@ class DragDropContextComp extends React.Component {
 
   render() {
     return (
-      <DragDropContext
-        onDragEnd={this.props.onDragEnd} >
-          <DroppableComp
-            droppableId="droppable"
-            userAssetList={this.props.userAssetList}
-           />
-      </DragDropContext>
+      
+        <DragDropContext
+          onDragEnd={this.props.onDragEnd} >
+          <div className="container">
+            <div className="row">
+              <div className="col-6">
+                <AssetTray
+                  droppableId="droppable"
+                  userAssetList={this.props.userAssetList}
+                 />
+              </div>
+              <div className="col-6">
+                <ChapterBoard
+                  droppableId="chapterBoard"
+                  userChapterBoardList={this.props.userChapterBoardList}
+                />
+              </div>
+            </div>
+          </div>
+        </DragDropContext>
     );
   }
 }
@@ -168,14 +223,39 @@ class AssetUpload extends React.Component {
   }
 }
 
+class NewChapterBoard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    this.props.onNewBoardClick(event);
+  }
+
+  render() {
+    return (
+      <form
+        onClick={this.handleClick}>
+        <button type="submit">New chapter board</button>
+      </form>
+    );
+  }
+}
+
 class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.handleAssetUpload = this.handleAssetUpload.bind(this);
+    this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
 
     let userAssets = window.images;
+    let userChapters = window.chapters;
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
+    let userChapterBoardList = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;");
+
 
     // provide default image if user has no assets
     if ( userAssetList[0] === "" ) {
@@ -186,8 +266,17 @@ class MainPageArea extends React.Component {
       return ({ image: image});
     })
 
+    if ( userChapterBoardList[0] === "" ) {
+      userChapterBoardList.splice(0, 1, "static/images/smiling-ready.png");
+    }
+    
+    userChapterBoardList = userChapterBoardList.map(board => {
+      return ({ board: board});
+    })
+
     this.state = {
-      userAssetList: userAssetList
+      userAssetList: userAssetList,
+      userChapterBoardList: userChapterBoardList,
     };
   }
 
@@ -208,7 +297,7 @@ class MainPageArea extends React.Component {
     });
   }
 
-  handleSubmit(file) {
+  handleAssetUpload(file) {
     event.preventDefault();
     
     const formData = new FormData();
@@ -241,15 +330,22 @@ class MainPageArea extends React.Component {
     xmlPackage.send(formData);
   }
 
+  handleNewBoardClick() {
+    userChapterBoardList.push("new");
+  }
+
   render() {
     return (
       <div>
+        <NewChapterBoard 
+          onClick={this.handleNewBoardClick}/>
         <AssetUpload 
-          onSubmit={this.handleSubmit}
+          onSubmit={this.handleAssetUpload}
           />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
           userAssetList={this.state.userAssetList}
+          userChapterBoardList={this.state.userChapterBoardList}
         />
       </div>
     );
