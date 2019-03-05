@@ -24,6 +24,9 @@ def user_sign_in(submitted_username, submitted_password):
 
         return "Username does not exist. Please register or continue as guest."
 
+def user_sign_out():
+    # TO DO
+    return "Successfully signed out"
 
 def user_registration_new(submitted_username, submitted_password,
                           submitted_email, submitted_first_name,

@@ -42,6 +42,16 @@ def sign_in():
 
     return redirect('/main')
 
+@app.route("/sign-out", methods=['POST'])
+def sign_out():
+    """Log in an existing user"""
+
+    session['username'] = "guest"
+    message = user_sign_out()
+    flash(message)
+    return redirect('/')
+
+
 @app.route("/register-new", methods=['POST'])
 def register_user():
     """Add a new user to database"""

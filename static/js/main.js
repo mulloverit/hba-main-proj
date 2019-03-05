@@ -36,8 +36,8 @@ const getListStyle = (isDraggingOver) => ({
 
 
 class DynamicGreeting extends React.Component {
-  render() {
 
+  render() {
     let UserName = window.username;
 
     return (
@@ -46,6 +46,13 @@ class DynamicGreeting extends React.Component {
           <div className="col-6">
             <br />
             <h1>Welcome, {UserName}</h1>
+            <br />
+          </div>
+          <div className="col-6">
+            <br />
+            <form action="/sign-out" method="POST">
+              <button type="submit" name="sign-out">sign-out</button>
+            </form>
             <br />
           </div>
         </div>
@@ -134,7 +141,8 @@ class AssetUpload extends React.Component {
     const file = new File(this.fileInput.current.files,
                           this.fileInput.current.files[0].name
                           );
-    this.props.onSubmit(file)
+    this.props.onSubmit(file);
+    document.getElementById('file-input').value = "";
   }
 
   render() {
@@ -149,6 +157,7 @@ class AssetUpload extends React.Component {
                   <input
                     type="file"
                     ref={this.fileInput}
+                    id="file-input"
                   />
                 <button type="submit">Submit</button>
               </form>
