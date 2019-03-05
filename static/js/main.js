@@ -71,7 +71,6 @@ class AssetTray extends React.Component {
       <Droppable
         droppableId={this.props.droppableId}
         userAssetList={this.props.userAssetList}
-        userChapterBoardList={this.props.userChapterBoardList}
       >
         {(provided, snapshot) => (
           <div
@@ -116,17 +115,17 @@ class ChapterBoard extends React.Component {
     return (
       <Droppable
         droppableId={this.props.droppableId}
-        userChapterBoardList={this.props.userChapterBoardList}
+        userChapterBoardAssets={this.props.userChapterBoardAssets}
       >
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
           >
-            {this.props.userChapterBoardList.map((item, index) => (
+            {this.props.userChapterBoardAssets.map((item, index) => (
               <Draggable 
-                key="test"
-                draggableId="test"
+                key={item.asset}
+                draggableId={item.asset}
                 index={index}
               >
                 {(provided, snapshot) => (
@@ -139,7 +138,7 @@ class ChapterBoard extends React.Component {
                       provided.draggableProps.style
                     )}
                   >
-                    <img src={item.image} height="100" width="100"/>
+                    <img src={item.asset} height="100" width="100"/>
                   </div>
                 )}
               </Draggable>
@@ -156,6 +155,10 @@ class ChapterBoard extends React.Component {
 class DragDropContextComp extends React.Component {
   constructor(props) {
     super(props);
+
+  // CREATE CHPATERBOARDS & THEIR ASSETS FROM DICT HERE
+  //userChapterBoardList={this.props.userChapterBoardList}
+  //userChapterBoardDict={this.props.userChapterBoardDict}
   }
 
   render() {
@@ -167,14 +170,14 @@ class DragDropContextComp extends React.Component {
             <div className="row">
               <div className="col-6">
                 <AssetTray
-                  droppableId="droppable"
+                  droppableId="assetTray"
                   userAssetList={this.props.userAssetList}
                  />
               </div>
               <div className="col-6">
                 <ChapterBoard
                   droppableId="chapterBoard"
-                  userChapterBoardList={this.props.userChapterBoardList}
+                  userChapterBoardAssets={this.props.userChapterBoardAssets}
                 />
               </div>
             </div>
@@ -252,9 +255,12 @@ class MainPageArea extends React.Component {
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
 
     let userAssets = window.images;
-    let userChapters = window.chapters;
+    let userChapters = window.chapters; // TO DO FIX THIS
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
-    let userChapterBoardList = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;");
+    let userChapterBoardList = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
+    let userChapterBoardAssets = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
+    // COMBINE BOARDLIST WITH BOARD ASSETS AS DICT - ASSETS ARE VALUES TO BOARD KEY
+    // DO THIS ON THE BACKEND
 
 
     // provide default image if user has no assets
@@ -266,17 +272,19 @@ class MainPageArea extends React.Component {
       return ({ image: image});
     })
 
-    if ( userChapterBoardList[0] === "" ) {
-      userChapterBoardList.splice(0, 1, "static/images/smiling-ready.png");
+    if ( userChapterBoardAssets[0] === "" ) {
+      userChapterBoardAssets.splice(0, 1, "static/images/smiling-ready.png");
     }
     
-    userChapterBoardList = userChapterBoardList.map(board => {
-      return ({ board: board});
+    userChapterBoardAssets = userChapterBoardAssets.map(asset => {
+      return ({ asset: asset});
+    // TO DO --> FOR BOARD IN CHAPTERBOARDLIST, CREATE BOARD & POPULATE W ASSETS
+    // SET STATE FOR EACH BOARD THAT EXISTS?
     })
 
     this.state = {
       userAssetList: userAssetList,
-      userChapterBoardList: userChapterBoardList,
+      userChapterBoardAssets: userChapterBoardAssets,
     };
   }
 
@@ -286,15 +294,46 @@ class MainPageArea extends React.Component {
       return;
     }
 
-    const userAssetList = reorder(
-      this.state.userAssetList,
-      validDropped.source.index,
-      validDropped.destination.index
-    );
+    if (validDropped.source.droppableId === "assetTray" &&
+      validDropped.destination.droppableId === "assetTray") {
+        
+        const userAssetList = reorder(
+          this.state.userAssetList,
+          validDropped.source.index,
+          validDropped.destination.index
+        );  
 
-    this.setState({
-      userAssetList: userAssetList,
-    });
+        this.setState({
+        userAssetList: userAssetList,
+        });
+
+    } 
+
+    else if (validDropped.source.droppableId === "assetTray" && 
+      validDropped.destination.droppableId === "chapterBoard") {
+        
+        validDropped.asset = validDropped.draggableId;
+        validDropped.draggableId = "test";
+        validDropped.source.droppableId = "chapterBoard";
+        console.log(validDropped);
+        this.state.userChapterBoardAssets.splice(validDropped.destination.index,
+          0, validDropped);
+    }
+
+    else if (validDropped.source.droppableId === "chapterBoard" &&
+      validDropped.destination.droppableId === "chapterBoard") {
+
+        console.log(validDropped);
+        const userChapterBoardAssets = reorder(
+          this.state.userChapterBoardAssets,
+          validDropped.source.index,
+          validDropped.destination.index
+        );  
+
+        this.setState({
+          userChapterBoardAssets: userChapterBoardAssets,
+        });
+    } 
   }
 
   handleAssetUpload(file) {
@@ -331,6 +370,7 @@ class MainPageArea extends React.Component {
   }
 
   handleNewBoardClick() {
+    // THIS FUNCTION IS TO DO //
     userChapterBoardList.push("new");
   }
 
@@ -346,6 +386,7 @@ class MainPageArea extends React.Component {
           onDragEnd={this.onDragEnd}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
+          userChapterBoardAssets={this.state.userChapterBoardAssets}
         />
       </div>
     );
