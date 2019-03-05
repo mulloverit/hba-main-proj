@@ -15,4 +15,4 @@ Aside from using [Issues](https://github.com/mulloverit/hba-main-proj/issues) an
 
 ## current status: seriously wip ^_^
 
-![wip](https://user-images.githubusercontent.com/42949710/53758514-cbecd300-3e72-11e9-8675-03892ea70d1d.gif)
+![wip2](https://user-images.githubusercontent.com/42949710/53774891-269f2280-3ea5-11e9-9119-cebbd6c2c6cc.gif)
