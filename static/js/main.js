@@ -1,17 +1,12 @@
 "use strict";
 
-let S_Draggable = window.ReactDraggable;
 const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
 const grid = 8;
 
 const reorder = (list, startIndex, endIndex) => {
-  // create array from incoming list
-  // and an empty array to populate with removed items from list
-  // splice -> first arg is beginning of splice, 2nd arg is delete count
-  //           last arg is the items that will be inserted at the
-  //           beginning of splice
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
+  
   result.splice(endIndex, 0, removed);
 
   return result;
@@ -66,8 +61,6 @@ class DroppableComp extends React.Component {
   }
   
   render() {
-    console.log(this.props.userAssetList);
-
     return (
       <Droppable
         droppableId={this.props.droppableId}
@@ -129,87 +122,6 @@ class DragDropContextComp extends React.Component {
   }
 }
 
-class DraggableAssetContainer extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleDrag = this.handleDrag.bind(this);
-    this.onStart = this.onStart.bind(this);
-    this.onStop = this.onStop.bind(this);
-    
-    this.state = {
-      activeDrags: 0,
-      deltaPosition: {
-        x: 0, y: 0
-      },
-      controlledPosition: {
-        x: -400, y: 200
-      }
-    }
-  }
-
-  handleDrag(event, ui) {
-    const {x, y} = this.state.deltaPosition;
-    this.setState({
-      deltaPosition: {
-        x: x + ui.deltaX,
-        y: y + ui.deltaY
-      }
-    });
-  }
-
-  onStart() {
-    this.setState({
-      activeDrags: ++this.state.activeDrags
-    });
-  }
-
-  onStop() {
-    this.setState({
-      activeDrags: --this.state.activeDrags
-    });
-  }
-
-  render() {
-    const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
-    const {deltaPosition, controlledPosition} = this.state;
-    const image = this.props.image;
-  
-    return (
-      <S_Draggable {...dragHandlers} >
-        <div className="drag-container-display">
-          <img className="drag-image-rows" src={image} />
-        </div>
-      </S_Draggable>
-    );
-  }
-}
-
-class Tray extends React.Component {
-  constructor(props){
-    super(props);
-  }
-
-  render () {
-
-    const rows = [];
-    this.props.userAssetList.forEach((asset) => {
-      rows.push(
-        <DraggableAssetContainer
-          image={asset.image}
-          key={asset.image}
-        />
-      );
-    });
-    
-    return (
-      <div className="bounding-tray">
-        <h2>Asset Tray</h2>
-        <div id="tray-rows">{rows}</div>
-      </div>
-    );
-  }
-}
-
 class AssetUpload extends React.Component {
   constructor(props) {
     super(props);
@@ -256,6 +168,11 @@ class MainPageArea extends React.Component {
     let userAssets = window.images;
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
 
+    // provide default image if user has no assets
+    if ( userAssetList[0] === "" ) {
+      userAssetList.splice(0, 1, "static/images/smiling-ready.png");
+    }
+
     userAssetList = userAssetList.map(image => {
       return ({ image: image});
     })
@@ -265,26 +182,20 @@ class MainPageArea extends React.Component {
     };
   }
 
-
   onDragEnd(validDropped) {
-    // if dropped otuside valid dropzone, do nothing
+
     if (!validDropped.destination) {
       return;
     }
 
-    // of dropped in valid zone, reorder items accordingly
-    // this.state.items is incoming list
-    // source index is items being moved ("removed" in reorder func)
-    // destination index is where the moved items will be inserted
     const userAssetList = reorder(
       this.state.userAssetList,
       validDropped.source.index,
       validDropped.destination.index
     );
 
-    // and refresh state with new ordered list  
     this.setState({
-      userAssetList,
+      userAssetList: userAssetList,
     });
   }
 
@@ -301,7 +212,7 @@ class MainPageArea extends React.Component {
     xmlPackage.onload = () => {
       let assetListString = xmlPackage.response
       let userAssetList = assetListString.substring(2).slice(0, -2).split("', '");
-      console.log("MUNGED:", userAssetList);
+      console.log("RESPONSE:", userAssetList);
 
       userAssetList = userAssetList.map(image => {
         return ({ image: image});
@@ -309,6 +220,11 @@ class MainPageArea extends React.Component {
 
       if (xmlPackage.status === 200) {
         console.log("ASSET LIST:", userAssetList);
+
+        if ( userAssetList[0] === "static/images/smiling-ready.png" ) {
+          userAssetList.splice(0, 1);
+        }
+
         this.setState({userAssetList: userAssetList});
         }
     };

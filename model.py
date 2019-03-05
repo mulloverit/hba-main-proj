@@ -40,6 +40,9 @@ class ImageClass:
         import boto3, botocore
         from config import s3, s3_dl
 
+        if S3_BUCKET is None:
+            return("No S3_BUCKET var set. Check your environment variables!")
+
         try:
 
             self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -69,7 +72,6 @@ class ImageClass:
     def add_to_database(self, user_id, input_image_uuids=None):
         """Create database record for an image. Handles input images & diffs."""
 
-
         if input_image_uuids == None:
             
             image_record = InputImage(image_user_id=user_id, 
@@ -83,7 +85,7 @@ class ImageClass:
                     image_uuid=self.uuid)
 
         else:
-    
+
             input_uuid_1 = input_image_uuids[0]
             input_uuid_2 = input_image_uuids[1]
 
@@ -101,7 +103,7 @@ class ImageClass:
                                  diff_upload_begin_datetime=self.upload_begin_datetime,
                                  diff_upload_complete_datetime=self.upload_complete_datetime,
                                  diff_uuid=self.uuid)
-
+        
         db.session.add(image_record)
         db.session.commit()
 

@@ -67,7 +67,6 @@ def upload_inputs():
         for file in request.files:
             
             user_submitted_image = request.files.get(file)
-    
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
@@ -79,11 +78,11 @@ def upload_inputs():
                                             user_submitted_image_temporary_path,
                                             username,
                                             )
-        
-            user_submitted_image_object.upload_to_s3(S3_BUCKET)
-        
+            
+            print(user_submitted_image_object.upload_to_s3(S3_BUCKET))
+
             user_submitted_image_object.add_to_database(user_id)
-        
+            
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
                                             )    
