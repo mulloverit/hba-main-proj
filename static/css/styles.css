@@ -1,4 +1,10 @@
 
+.remove-chapterboard-asset {
+    position: relative;
+    top: 0;
+    right: 0;
+}
+
 .drag-container-display {
     background-color: #bf120f;
     border-style: dashed;

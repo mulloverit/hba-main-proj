@@ -62,10 +62,6 @@ class DynamicGreeting extends React.Component {
 }
 
 class AssetTray extends React.Component {
-  constructor(props){
-    super(props);
-  }
-  
   render() {
     return (
       <Droppable
@@ -107,9 +103,6 @@ class AssetTray extends React.Component {
 }
 
 class ChapterBoard extends React.Component {
-  constructor(props){
-    super(props);
-  }
   render() {
     return (
       <Droppable
@@ -129,6 +122,7 @@ class ChapterBoard extends React.Component {
               >
                 {(provided, snapshot) => (
                   <div
+                    className="chapterBoardAsset"
                     ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -137,6 +131,13 @@ class ChapterBoard extends React.Component {
                       provided.draggableProps.style
                     )}
                   >
+                    <button 
+                      type="submit"
+                      id="remove-chapterboard-asset"
+                      className="remove-chapterboard-asset"
+                      onRemoveButtonClick={this.props.onRemoveButtonClick}>
+                      x
+                    </button>
                     <img src={item.asset} height="100" width="100"/>
                   </div>
                 )}
