@@ -70,17 +70,17 @@ class AssetTray extends React.Component {
     return (
       <Droppable
         droppableId={this.props.droppableId}
-        userAssetList={this.props.userAssetList}
-      >
+        userAssetList={this.props.userAssetList} >
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)}
           >
             {this.props.userAssetList.map((item, index) => (
-              <Draggable 
-                key={item.image}
-                draggableId={item.image}
+              <Draggable
+                image={item.image}
+                key={item.draggableId}
+                draggableId={item.draggableId}
                 index={index}
               >
                 {(provided, snapshot) => (
@@ -110,13 +110,11 @@ class ChapterBoard extends React.Component {
   constructor(props){
     super(props);
   }
-  
   render() {
     return (
       <Droppable
         droppableId={this.props.droppableId}
-        userChapterBoardAssets={this.props.userChapterBoardAssets}
-      >
+        userChapterBoardAssets={this.props.userChapterBoardAssets} >
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
@@ -124,8 +122,9 @@ class ChapterBoard extends React.Component {
           >
             {this.props.userChapterBoardAssets.map((item, index) => (
               <Draggable 
-                key={item.asset}
-                draggableId={item.asset}
+                image={item.asset}
+                key={item.draggableId}
+                draggableId={item.draggableId}
                 index={index}
               >
                 {(provided, snapshot) => (
@@ -165,7 +164,8 @@ class DragDropContextComp extends React.Component {
     return (
       
         <DragDropContext
-          onDragEnd={this.props.onDragEnd} >
+          onDragEnd={this.props.onDragEnd}
+          onDragStart={this.props.onDragStart} >
           <div className="container">
             <div className="row">
               <div className="col-6">
@@ -251,6 +251,7 @@ class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
     this.onDragEnd = this.onDragEnd.bind(this);
+    this.onDragStart = this.onDragStart.bind(this);
     this.handleAssetUpload = this.handleAssetUpload.bind(this);
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
 
@@ -262,14 +263,15 @@ class MainPageArea extends React.Component {
     // COMBINE BOARDLIST WITH BOARD ASSETS AS DICT - ASSETS ARE VALUES TO BOARD KEY
     // DO THIS ON THE BACKEND
 
-
     // provide default image if user has no assets
     if ( userAssetList[0] === "" ) {
       userAssetList.splice(0, 1, "static/images/smiling-ready.png");
     }
 
     userAssetList = userAssetList.map(image => {
-      return ({ image: image});
+      return ({ image: image,
+                draggableId: Math.random().toString(36).substr(2, 9),
+              });
     })
 
     if ( userChapterBoardAssets[0] === "" ) {
@@ -277,7 +279,9 @@ class MainPageArea extends React.Component {
     }
     
     userChapterBoardAssets = userChapterBoardAssets.map(asset => {
-      return ({ asset: asset});
+      return ({ asset: asset,
+                draggableId: Math.random().toString(36).substr(2, 9),
+              });
     // TO DO --> FOR BOARD IN CHAPTERBOARDLIST, CREATE BOARD & POPULATE W ASSETS
     // SET STATE FOR EACH BOARD THAT EXISTS?
     })
@@ -288,7 +292,12 @@ class MainPageArea extends React.Component {
     };
   }
 
+  onDragStart(validDragged) {
+    console.log("START", validDragged);
+  }
+
   onDragEnd(validDropped) {
+    console.log("OGSRC", validDropped);
 
     if (!validDropped.destination) {
       return;
@@ -307,23 +316,38 @@ class MainPageArea extends React.Component {
         userAssetList: userAssetList,
         });
 
-    } 
+    }
 
     else if (validDropped.source.droppableId === "assetTray" && 
       validDropped.destination.droppableId === "chapterBoard") {
+  
+        const sourceId = validDropped.draggableId;
+        const validDroppedClone = new Object();
+
+        validDroppedClone.asset = this.state.userAssetList[
+                                    validDropped.source.index].image;
+        validDroppedClone.draggableId =  Math.random().toString(36).substr(2, 9);
+        validDroppedClone.key =  Math.random().toString(36).substr(2, 9);
+        validDropped.destination.droppableId = "assetTray";
         
-        validDropped.asset = validDropped.draggableId;
-        validDropped.draggableId = "test";
-        validDropped.source.droppableId = "chapterBoard";
-        console.log(validDropped);
+        console.log("CLONE", validDroppedClone);
+        
         this.state.userChapterBoardAssets.splice(validDropped.destination.index,
-          0, validDropped);
+          0, validDroppedClone);
+
+        console.log("SPLICE", this.state.userChapterBoardAssets);
+        
+        this.setState({
+          userChapterBoardAssets: this.state.userChapterBoardAssets,
+        });
+        
+        console.log("STATE", this.state.userChapterBoardAssets);
     }
 
     else if (validDropped.source.droppableId === "chapterBoard" &&
       validDropped.destination.droppableId === "chapterBoard") {
 
-        console.log(validDropped);
+        console.log("CHTOCHDRP", validDropped);
         const userChapterBoardAssets = reorder(
           this.state.userChapterBoardAssets,
           validDropped.source.index,
@@ -333,6 +357,7 @@ class MainPageArea extends React.Component {
         this.setState({
           userChapterBoardAssets: userChapterBoardAssets,
         });
+        console.log("CHTOCHSTATE", this.state.userChapterBoardAssets);
     } 
   }
 
@@ -352,7 +377,9 @@ class MainPageArea extends React.Component {
       console.log("RESPONSE:", userAssetList);
 
       userAssetList = userAssetList.map(image => {
-        return ({ image: image});
+        return ({ image: image,
+                  draggableId: Math.random().toString(36).substr(2, 9)
+                });
         })
 
       if (xmlPackage.status === 200) {
@@ -384,6 +411,7 @@ class MainPageArea extends React.Component {
           />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
+          onDragStart={this.onDragStart}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
           userChapterBoardAssets={this.state.userChapterBoardAssets}
