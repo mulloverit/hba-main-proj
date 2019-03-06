@@ -103,6 +103,17 @@ class AssetTray extends React.Component {
 }
 
 class ChapterBoard extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
+  }
+
+  onRemoveAssetClick(event) {
+    event.preventDefault();
+    console.log("CLICKED Base");
+    this.props.handleRemoveAssetClick(event);
+  }
+
   render() {
     return (
       <Droppable
@@ -131,13 +142,14 @@ class ChapterBoard extends React.Component {
                       provided.draggableProps.style
                     )}
                   >
-                    <button 
-                      type="submit"
-                      id="remove-chapterboard-asset"
-                      className="remove-chapterboard-asset"
-                      onRemoveButtonClick={this.props.onRemoveButtonClick}>
-                      x
-                    </button>
+                    <form onSubmit={this.onRemoveAssetClick}>
+                      <button
+                        type="submit"
+                        id="remove-chapterboard-asset"
+                        className="remove-chapterboard-asset">
+                        x
+                      </button>
+                    </form>
                     <img src={item.asset} height="100" width="100"/>
                   </div>
                 )}
@@ -159,6 +171,13 @@ class DragDropContextComp extends React.Component {
   // CREATE CHPATERBOARDS & THEIR ASSETS FROM DICT HERE
   //userChapterBoardList={this.props.userChapterBoardList}
   //userChapterBoardDict={this.props.userChapterBoardDict}
+  this.handleRemoveAssetClick = this.handleRemoveAssetClick.bind(this);
+  }
+
+  handleRemoveAssetClick(event) {
+    event.preventDefault();
+    console.log("CLICKED Context");
+    this.props.onRemoveAssetClick(event);
   }
 
   render() {
@@ -178,6 +197,7 @@ class DragDropContextComp extends React.Component {
                 <ChapterBoard
                   droppableId="chapterBoard"
                   userChapterBoardAssets={this.props.userChapterBoardAssets}
+                  handleRemoveAssetClick={this.handleRemoveAssetClick}
                 />
               </div>
             </div>
@@ -232,6 +252,7 @@ class NewChapterBoard extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
+  // can this just be {this.props.onNewBoardClick(event)} in form?
   handleClick(event) {
     event.preventDefault();
     this.props.onNewBoardClick(event);
@@ -253,6 +274,7 @@ class MainPageArea extends React.Component {
     this.onDragEnd = this.onDragEnd.bind(this);
     this.handleAssetUpload = this.handleAssetUpload.bind(this);
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
+    this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
 
     let userAssets = window.images;
     let userChapters = window.chapters; // TO DO FIX THIS
@@ -385,6 +407,18 @@ class MainPageArea extends React.Component {
     userChapterBoardList.push("new");
   }
 
+  onRemoveAssetClick(event) {
+    event.preventDefault();
+    console.log("CLICKED Main");
+    // this.state.userChapterBoardAssets.splice(validDropped.destination.index,
+    //   0, validDroppedClone);
+    
+    // this.setState({
+    //   userChapterBoardAssets: this.state.userChapterBoardAssets,
+    // });
+
+  }
+
   render() {
     return (
       <div>
@@ -395,6 +429,7 @@ class MainPageArea extends React.Component {
           />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
+          onRemoveAssetClick={this.onRemoveAssetClick}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
           userChapterBoardAssets={this.state.userChapterBoardAssets}
