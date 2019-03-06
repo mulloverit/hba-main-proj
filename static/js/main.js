@@ -146,7 +146,8 @@ class ChapterBoard extends React.Component {
                       <button
                         type="submit"
                         id="remove-chapterboard-asset"
-                        className="remove-chapterboard-asset">
+                        className="remove-chapterboard-asset"
+                        value={item.draggableId}>
                         x
                       </button>
                     </form>
@@ -299,6 +300,7 @@ class MainPageArea extends React.Component {
       userChapterBoardAssets.splice(0, 1, "static/images/smiling-ready.png");
     }
     
+    // this should be a helper function
     userChapterBoardAssets = userChapterBoardAssets.map(asset => {
       return ({ asset: asset,
                 draggableId: Math.random().toString(36).substr(2, 9),
@@ -410,13 +412,34 @@ class MainPageArea extends React.Component {
   onRemoveAssetClick(event) {
     event.preventDefault();
     console.log("CLICKED Main");
-    // this.state.userChapterBoardAssets.splice(validDropped.destination.index,
-    //   0, validDroppedClone);
-    
-    // this.setState({
-    //   userChapterBoardAssets: this.state.userChapterBoardAssets,
-    // });
+    console.log(event.target[0].getAttribute("value"));
+    console.log(this.state.userChapterBoardAssets);
 
+    const chapterBoardAssets = this.state.userChapterBoardAssets
+    const removeItem = event.target[0].getAttribute("value");
+    const result = chapterBoardAssets.filter(asset => 
+      asset.draggableId === removeItem);
+    const idx = chapterBoardAssets.findIndex(asset => 
+      asset.draggableId === removeItem);
+
+    console.log("RESULT", result);
+    console.log("IDX", idx);
+
+    chapterBoardAssets.splice(idx, 1);
+
+    console.log("AFTER RM", chapterBoardAssets[0])
+
+    if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
+      
+      chapterBoardAssets.splice(0, 1, {
+        asset: "static/images/smiling-ready.png",
+        draggableId: Math.random().toString(36).substr(2, 9),
+      });
+    }
+    
+    this.setState({
+      userChapterBoardAssets: this.state.userChapterBoardAssets,
+    });
   }
 
   render() {
