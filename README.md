@@ -6,7 +6,7 @@ This app is built with a Flask/Python backend, and a React front-end.
 ## about me
 I'm Camilla. I'm a full-time software engineering student at Hackbright Academy. This is my main project for the course.
 
-I'm coming to Hackbright from 5 years as a developer, team lead and product manager at Mapbox. I'm heading back towards engineering because I love building things. I have a decent amount of experience on the backend (Python, Bash, AWS), and am using this time to stretch my muslces and brain on a data-driven front-end.
+I'm coming to Hackbright from 5 years as a developer, team lead and product manager at Mapbox. I'm heading back towards engineering because I love building things. I have some experience on the backend (Python, Bash, AWS), and am using this time to stretch my muslces and brain on a data-driven front-end.
 
 Wish me luck! 🤘 
 
