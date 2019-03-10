@@ -117,46 +117,32 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <Droppable
-        droppableId={this.props.droppableId}
+        droppableId="chapterBoardContainer"
         userChapterBoardAssets={this.props.userChapterBoardAssets} >
-        {(provided, snapshot) => (
+         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
-          >
-            {this.props.userChapterBoardAssets.map((item, index) => (
+            style={getListStyle(snapshot.isDraggingOver)} >
+            {this.props.userChapterBoardAssets.map((board, index) => (
               <Draggable 
-                image={item.asset}
-                key={item.draggableId}
-                draggableId={item.draggableId}
-                index={index}
-              >
+                board={board.boardId}
+                key={board.key}
+                draggableId={board.draggableId} 
+                index={index}>
                 {(provided, snapshot) => (
                   <div
-                    className="chapterBoardAsset"
+                    className="chapterBoard"
                     ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     style={getItemStyle(
                       snapshot.isDragging,
                       provided.draggableProps.style
-                    )}
-                  >
-                    <form onSubmit={this.onRemoveAssetClick}>
-                      <button
-                        type="submit"
-                        id="remove-chapterboard-asset"
-                        className="remove-chapterboard-asset"
-                        value={item.draggableId}>
-                        x
-                      </button>
-                    </form>
-                    <img src={item.asset} height="100" width="100"/>
-                  </div>
+                    )} >
+                </div>
                 )}
               </Draggable>
             ))}
-            {provided.placeholder}
           </div>
         )}
       </Droppable>
@@ -183,7 +169,6 @@ class DragDropContextComp extends React.Component {
 
   render() {
     return (
-      
         <DragDropContext
           onDragEnd={this.props.onDragEnd} >
           <div className="container">
@@ -195,11 +180,53 @@ class DragDropContextComp extends React.Component {
                  />
               </div>
               <div className="col-6">
-                <ChapterBoard
-                  droppableId="chapterBoard"
-                  userChapterBoardAssets={this.props.userChapterBoardAssets}
-                  handleRemoveAssetClick={this.handleRemoveAssetClick}
-                />
+              <Droppable
+                droppableId="chapterBoardContainer" >
+                  {(provided, snapshot) => (
+                    <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)} >
+                      {this.props.userChapterBoardList.map((board, index) => (
+                        <Draggable 
+                          board={board.boardId}
+                          key={board.key}
+                          draggableId={board.draggableId} 
+                          index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              className="chapterBoard"
+                              ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )} >
+                                <ChapterBoard
+                                  droppableId="chapterBoard"
+                                  board={board.boardId}
+                                  key={board.boardId}
+                                  draggableId={board.draggableId}
+                                  index={index}
+                                  userChapterBoardAssets={board.assetList}
+                                  handleRemoveAssetClick={this.handleRemoveAssetClick} >
+                                    <form onSubmit={this.onRemoveBoardClick} >
+                                      <button
+                                        type="submit"
+                                        id="remove-chapterboard"
+                                        className="remove-chapterboard"
+                                        value={board.boardId}>
+                                        x
+                                      </button>
+                                    </form>
+                              </ChapterBoard>
+                          </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </div>
+                  )}
+                </Droppable>
               </div>
             </div>
           </div>
@@ -277,41 +304,56 @@ class MainPageArea extends React.Component {
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
 
-    let userAssets = window.images;
+    // let userAssets = window.images;
+    let userAssetList = ["https://s3.amazonaws.com/hackbright-image-upload-test/cmahon/173440d7-9111-4aa8-8ecd-f13ae916aee3_static/images/cmahon_IMG_4625.JPG"];
     let userChapters = window.chapters; // TO DO FIX THIS
-    let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
+    // let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
     let userChapterBoardList = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
     let userChapterBoardAssets = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
     // COMBINE BOARDLIST WITH BOARD ASSETS AS DICT - ASSETS ARE VALUES TO BOARD KEY
     // DO THIS ON THE BACKEND
-
-    // provide default image if user has no assets
-    if ( userAssetList[0] === "" ) {
-      userAssetList.splice(0, 1, "static/images/smiling-ready.png");
-    }
-
+    console.log("FRESH LIST", userAssetList);
     userAssetList = userAssetList.map(image => {
-      return ({ image: image,
-                draggableId: Math.random().toString(36).substr(2, 9),
-              });
+        return ({ image: image,
+                  draggableId: Math.random().toString(36).substr(2, 9),
+                  key: Math.random().toString(36).substr(2, 9)
+                });
     })
+    console.log("FORMATTED LIST", userAssetList);
 
-    if ( userChapterBoardAssets[0] === "" ) {
-      userChapterBoardAssets.splice(0, 1, "static/images/smiling-ready.png");
-    }
-    
-    // this should be a helper function
-    userChapterBoardAssets = userChapterBoardAssets.map(asset => {
-      return ({ asset: asset,
-                draggableId: Math.random().toString(36).substr(2, 9),
-              });
-    // TO DO --> FOR BOARD IN CHAPTERBOARDLIST, CREATE BOARD & POPULATE W ASSETS
-    // SET STATE FOR EACH BOARD THAT EXISTS?
+    let exampleBoardList = new Array();
+    let exampleBoardOne = new Object();
+    let exampleBoardTwo = new Object();
+    exampleBoardList.splice(0, 0, exampleBoardOne);
+    exampleBoardList.splice(0, 0, exampleBoardTwo);
+
+    console.log("POPULATED BOARD LIST", exampleBoardList);
+
+    userChapterBoardList = exampleBoardList.map(board => {
+      board.boardId = Math.random().toString(36).substr(2, 9);
+      board.key = Math.random().toString(36).substr(2, 9);
+      board.draggableId = Math.random().toString(36).substr(2, 9);
+      board.assetList = userAssetList;
     })
+    
+    // exampleBoardOne.boardId = Math.random().toString(36).substr(2, 9);
+    // exampleBoardOne.key = Math.random().toString(36).substr(2, 9);
+    // exampleBoardOne.draggableId = Math.random().toString(36).substr(2, 9);
+    // exampleBoardTwo.boardId = Math.random().toString(36).substr(2, 9);
+    // exampleBoardOne.assetList = userAssetList;
+    // exampleBoardTwo.assetList = userAssetList;
+
+    userChapterBoardList = exampleBoardList;
+    console.log("Test BOARD LIST:", userChapterBoardList);
+
+    userChapterBoardList.map((board, index) => (
+      console.log("board.list", board.assetList)))
+   
 
     this.state = {
       userAssetList: userAssetList,
-      userChapterBoardAssets: userChapterBoardAssets,
+      userChapterBoardList: userChapterBoardList,
+      // userChapterBoardAssets: userChapterBoardAssets,
     };
   }
 
@@ -455,7 +497,7 @@ class MainPageArea extends React.Component {
           onRemoveAssetClick={this.onRemoveAssetClick}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
-          userChapterBoardAssets={this.state.userChapterBoardAssets}
+          // userChapterBoardAssets={this.state.userChapterBoardAssets}
         />
       </div>
     );
