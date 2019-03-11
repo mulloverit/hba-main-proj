@@ -19,17 +19,21 @@ const getItems = (count) => {
   }));
 }
 
+const itemColorStatic = '#FFFFFF';
+const itemColorDragging = '#B3EFB2';
+const boardColorStatic = '#D8E2DC';
+
 const getItemStyle = (isDragging, draggableStyle) => ({
 
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
-  background: isDragging ? 'lightgreen' : 'grey',
+  background: isDragging ? itemColorDragging : itemColorStatic,
   ...draggableStyle,
 });
 
 const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? 'lightblue' : 'pink',
+  background: isDraggingOver ? boardColorStatic : boardColorStatic,
   padding: grid,
   width: 250,
 });
@@ -124,6 +128,8 @@ class ChapterBoard extends React.Component {
 
   render() {
     return (
+      <div className="col-6" id="individual-board">
+      <p> HI </p>
       <Droppable
         droppableId={this.props.board} >
          {(provided, snapshot) => (
@@ -165,6 +171,7 @@ class ChapterBoard extends React.Component {
           </div>
         )}
       </Droppable>
+      </div>
     );
   }
 }
@@ -194,6 +201,7 @@ class DragDropContextComp extends React.Component {
                  />
               </div>
               <div className="col-6">
+              <div className="row">
                 {this.props.userChapterBoardList.map((board, index) => (
                   <ChapterBoard
                     droppableId="chapterBoard"
@@ -205,6 +213,7 @@ class DragDropContextComp extends React.Component {
                     handleRemoveAssetClick={this.handleRemoveAssetClick} >
                   </ChapterBoard>
                 ))}
+              </div>
               </div>
               </div>
             </div>
