@@ -169,12 +169,13 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <div className="col-3" id="individual-board" style={getChapterBoardContainerStyle()}>
-      <div contentEditable="true"><p>Board</p></div>
+      <div><p>Board</p></div>
       <form onSubmit={this.onRemoveBoardClick} >
         <button
           type="submit"
           id="remove-chapterboard"
-          className="remove-chapterboard" >
+          className="remove-chapterboard"
+          value={this.props.boardKey} >
           x
         </button>
       </form>
@@ -260,6 +261,7 @@ class DragDropContextComp extends React.Component {
                   <ChapterBoard
                     droppableId="chapterBoard"
                     board={board.boardName}
+                    boardKey={board.key}
                     key={board.key}
                     draggableId={board.draggableId}
                     index={index}
@@ -507,7 +509,8 @@ class MainPageArea extends React.Component {
     event.preventDefault();
 
     const boardId = event.target[0].getAttribute("board");
-    const boardKeyForRemoval = event.target[0].getAttribute("value")
+    const boardKeyForRemoval = event.target[0].getAttribute("value");
+    console.log("boardkeyrm", boardKeyForRemoval);
 
     let chapterBoardList = this.state.userChapterBoardList;
     // get board object from boardName
@@ -518,9 +521,11 @@ class MainPageArea extends React.Component {
     });
 
     let index = chapterBoardList.findIndex(board => {
+      console.log("boardkey", board.key);
       return (board.key === boardKeyForRemoval)}
     );
 
+    console.log("rm board index", index);
     chapterBoardList.splice(index, 1);
     
     this.setState({
