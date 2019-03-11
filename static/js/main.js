@@ -292,8 +292,6 @@ class MainPageArea extends React.Component {
     console.log("userAssets", userAssetList);
 
     let userChapters = window.chapters;
-    console.log("userChapters window", userChapters);
-    console.log(typeof userChapters);
     userChapters.map(chapter => {
       chapter.key = Math.random().toString(36).substr(2, 9)
       chapter.draggableId = Math.random().toString(36).substr(2, 9)
@@ -337,8 +335,9 @@ class MainPageArea extends React.Component {
       validDropped.destination.droppableId.includes("board")) {
 
         let targetBoard = this.state.userChapterBoardList.find(function(board) {
-          board.boardName === validDropped.destination.droppableId;
-          return board
+          if (board.boardName === validDropped.destination.droppableId) {
+            return board  
+          }
         });
 
         if ( targetBoard.boardAssets[0].asset === "static/images/smiling-ready.png" ) {
@@ -355,7 +354,7 @@ class MainPageArea extends React.Component {
           userChapterBoardList: this.state.userChapterBoardList,
         });
     }
-    
+
     else if (validDropped.source.droppableId === 
             validDropped.destination.droppableId) {
 
