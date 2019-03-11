@@ -44,37 +44,6 @@ const cloneDropObject = (inputDropObject) => {
 
   return validDroppedClone
 };
-  
-// const convertWindowChapters = (userChapters) => {
-  
-//   console.log("Incoming", userChapters);
-//   let regex = /&#39;/gi;
-//   // let regex2 = /\'/gi; 
-//   // let regex3 = /\[/gi;
-//   // let regex4 = /\]/gi;
-//   let userChapterBoards = [];
-//   let userChapterBoardList = userChapters.replace(regex, "").substr(1).slice(0, -1); // STRING
-//   userChapterBoardList = userChapterBoardList.text()
-//   JSON.parse(userChapterBoardList);
-//   console.log("before mapping", userChapterBoardList);
-
-
-  // let userChapterBoardList = userChapters.replace(regex, "'").replace(
-  //                             regex2, "").substr(1).slice(0, -1).split(
-  //                             "],"); // STRING
-  // userChapterBoardList.map(board => {
-  //   board = board.replace(regex3, "").replace(regex4, "").split(": ")
-  //   board.boardName = board[0].replace(" ", "")
-  //   board.boardAssets = board[1].split(", ")
-  //   board.boardId = Math.random().toString(36).substr(2, 9);
-  //   board.key = Math.random().toString(36).substr(2, 9);
-  //   board.draggableId = Math.random().toString(36).substr(2, 9);
-  //   userChapterBoards.splice(0, 0, board);
-  // })
-
-  // return userChapterBoards;
-// }
-
 
 class DynamicGreeting extends React.Component {
 
@@ -128,8 +97,7 @@ class AssetTray extends React.Component {
                     style={getItemStyle(
                       snapshot.isDragging,
                       provided.draggableProps.style
-                    )}
-                  >
+                    )} >
                     <img src={item.image} height="100" width="100"/>
                   </div>
                 )}
@@ -158,21 +126,20 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <Droppable
-        droppableId="chapterBoardContainer"
-        userChapterBoardAssets={this.props.userChapterBoardAssets} >
+        droppableId="chapterBoardContainer" >
          {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             style={getListStyle(snapshot.isDraggingOver)} >
-            {this.props.userChapterBoardAssets.map((board, index) => (
-              <Draggable 
-                board={board.boardId}
-                key={board.key}
-                draggableId={board.draggableId} 
-                index={index}>
+            {this.props.userChapterBoardAssets.map((asset, index) => (
+              <Draggable
+                key={asset.key}
+                draggableId={asset.draggableId} 
+                boardId={this.props.board}
+                index={index} >
                 {(provided, snapshot) => (
                   <div
-                    className="chapterBoard"
+                    className="chapterBoardAsset"
                     ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -180,17 +147,28 @@ class ChapterBoard extends React.Component {
                       snapshot.isDragging,
                       provided.draggableProps.style
                     )} >
-                </div>
+                    <form onSubmit={this.onRemoveAssetClick} >
+                      <button
+                        type="submit"
+                        id="remove-chapterboard"
+                        className="remove-chapterboard"
+                        value={asset.key}
+                        board-id={this.props.board}>
+                        x
+                      </button>
+                      <img src={asset.asset} height="100" width="100"/>
+                    </form>
+                  </div>
                 )}
               </Draggable>
             ))}
+            {provided.placeholder}
           </div>
         )}
       </Droppable>
     );
   }
 }
-
 
 class DragDropContextComp extends React.Component {
   constructor(props) {
@@ -218,56 +196,20 @@ class DragDropContextComp extends React.Component {
                  />
               </div>
               <div className="col-6">
-              <Droppable
-                droppableId="chapterBoardContainer" >
-                  {(provided, snapshot) => (
-                    <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)} >
-                      {this.props.userChapterBoardList.map((board, index) => (
-                        <Draggable 
-                          board={board.boardId}
-                          key={board.key}
-                          draggableId={board.draggableId} 
-                          index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              className="chapterBoard"
-                              ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )} >
-                                <ChapterBoard
-                                  droppableId="chapterBoard"
-                                  board={board.boardId}
-                                  key={board.key}
-                                  draggableId={board.draggableId}
-                                  index={index}
-                                  userChapterBoardAssets={board.boardAssets}
-                                  handleRemoveAssetClick={this.handleRemoveAssetClick} >
-                                    <form onSubmit={this.onRemoveBoardClick} >
-                                      <button
-                                        type="submit"
-                                        id="remove-chapterboard"
-                                        className="remove-chapterboard"
-                                        value={board.boardId}>
-                                        x
-                                      </button>
-                                    </form>
-                              </ChapterBoard>
-                          </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    </div>
-                  )}
-                </Droppable>
+                {this.props.userChapterBoardList.map((board, index) => (
+                  <ChapterBoard
+                    droppableId="chapterBoard"
+                    board={board.chapterId}
+                    key={board.key}
+                    draggableId={board.draggableId}
+                    index={index}
+                    userChapterBoardAssets={board.boardAssets}
+                    handleRemoveAssetClick={this.handleRemoveAssetClick} >
+                  </ChapterBoard>
+                ))}
+              </div>
               </div>
             </div>
-          </div>
         </DragDropContext>
     );
   }
@@ -318,7 +260,6 @@ class NewChapterBoard extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
 
-  // can this just be {this.props.onNewBoardClick(event)} in form?
   handleClick(event) {
     event.preventDefault();
     this.props.onNewBoardClick(event);
@@ -468,21 +409,35 @@ class MainPageArea extends React.Component {
     event.preventDefault();
     console.log("CLICKED Main");
     console.log(event.target[0].getAttribute("value"));
-    console.log(this.state.userChapterBoardAssets);
+    console.log(event.target[0].getAttribute("board-id"));
 
-    const chapterBoardAssets = this.state.userChapterBoardAssets
-    const removeItem = event.target[0].getAttribute("value");
-    const result = chapterBoardAssets.filter(asset => 
-      asset.draggableId === removeItem);
-    const idx = chapterBoardAssets.findIndex(asset => 
-      asset.draggableId === removeItem);
+    const boardId = event.target[0].getAttribute("board-id");
+    const assetForRemoval = event.target[0].getAttribute("value")
 
-    console.log("RESULT", result);
-    console.log("IDX", idx);
+    let board = this.state.userChapterBoardList.find(function(boarditem) {
+      if (boarditem.chapterId === boardId) {
+        return boarditem.chapterId
+        };
+    });
+    console.log("looking for this board", board);
 
-    chapterBoardAssets.splice(idx, 1);
+    let chapterBoardAssets = board.boardAssets;
 
-    console.log("AFTER RM", chapterBoardAssets[0])
+    let assetToRemove = chapterBoardAssets.find(function(asset) {
+      if (asset.key === assetForRemoval) {
+        return asset.key
+      }
+    });
+
+    let idxToRemove = chapterBoardAssets.findIndex(asset =>
+      asset.draggableId === assetToRemove)
+
+    console.log("remove item", assetToRemove);
+    console.log("remove idx", idxToRemove);
+
+    console.log("BEFORE RM", chapterBoardAssets);
+    chapterBoardAssets.splice(idxToRemove, 1);
+    console.log("AFTER RM", chapterBoardAssets);
 
     if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
       

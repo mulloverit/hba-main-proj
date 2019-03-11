@@ -5,7 +5,7 @@ args="$@"
 env_and_db()
 {
     source secrets.sh && echo "environment variables set"
-    python3 seed_db.py && echo "database successfully seeded"
+    # python3 seed_db.py && echo "database successfully seeded"
 
 }
 
