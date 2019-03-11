@@ -1,5 +1,6 @@
 "use strict";
 
+let SimpleDraggable = window.ReactDraggable;
 const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
 const grid = 8;
 
@@ -64,6 +65,61 @@ const cloneDropObject = (inputDropObject, userAssetList) => {
 
   return validDroppedClone
 };
+
+class DraggableAssetContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleDrag = this.handleDrag.bind(this);
+    this.onStart = this.onStart.bind(this);
+    this.onStop = this.onStop.bind(this);
+    
+    this.state = {
+      activeDrags: 0,
+      deltaPosition: {
+        x: 0, y: 0
+      },
+      controlledPosition: {
+        x: -400, y: 200
+      }
+    }
+  }
+
+  handleDrag(event, ui) {
+    const {x, y} = this.state.deltaPosition;
+    this.setState({
+      deltaPosition: {
+        x: x + ui.deltaX,
+        y: y + ui.deltaY
+      }
+    });
+  }
+
+  onStart() {
+    this.setState({
+      activeDrags: ++this.state.activeDrags
+    });
+  }
+
+  onStop() {
+    this.setState({
+      activeDrags: --this.state.activeDrags
+    });
+  }
+
+  render() {
+    const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+    const {deltaPosition, controlledPosition} = this.state;
+  
+    return (
+      <SimpleDraggable bounds="parent" {...dragHandlers} >
+        <div className="drag-container-display">
+        <ChapterBoard />
+        </div>
+      </SimpleDraggable>
+    );
+  }
+}
+
 
 class DynamicGreeting extends React.Component {
 
