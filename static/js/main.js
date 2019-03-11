@@ -440,8 +440,7 @@ class MainPageArea extends React.Component {
     event.preventDefault();
 
     const boardId = event.target[0].getAttribute("board");
-    const assetForRemoval = event.target[0].getAttribute("value")
-    console.log(boardId, assetForRemoval);
+    const assetKeyForRemoval = event.target[0].getAttribute("value")
 
     // get board object from boardName
     let board = this.state.userChapterBoardList.find(function(boarditem) {
@@ -452,13 +451,10 @@ class MainPageArea extends React.Component {
 
     // get list of assets associated with board
     let chapterBoardAssets = board.boardAssets;
-    
-    // remove item from list of assets
-    let index = chapterBoardAssets.find(function(asset) {
-      if (asset.key === assetForRemoval) {
-        return chapterBoardAssets.indexOf(asset)
-      };
-    });
+
+    let index = chapterBoardAssets.findIndex(asset => {
+      return (asset.key === assetKeyForRemoval)}
+    );
 
     chapterBoardAssets.splice(index, 1);
 
