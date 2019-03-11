@@ -119,7 +119,6 @@ class ChapterBoard extends React.Component {
 
   onRemoveAssetClick(event) {
     event.preventDefault();
-    console.log("CLICKED Base");
     this.props.handleRemoveAssetClick(event);
   }
 
@@ -179,7 +178,6 @@ class DragDropContextComp extends React.Component {
 
   handleRemoveAssetClick(event) {
     event.preventDefault();
-    console.log("CLICKED Context");
     this.props.onRemoveAssetClick(event);
   }
 
@@ -337,17 +335,19 @@ class MainPageArea extends React.Component {
 
     else if (validDropped.source.droppableId === "assetTray" && 
       validDropped.destination.droppableId.includes("board")) {
-  
-        console.log("DEST", validDropped.destination.droppableId)
 
         let targetBoard = this.state.userChapterBoardList.find(function(board) {
           board.boardName === validDropped.destination.droppableId;
           return board
-        })
+        });
+
+        if ( targetBoard.boardAssets[0].asset === "static/images/smiling-ready.png" ) {
+          targetBoard.boardAssets.splice(0, 1);
+        }
 
         let validDroppedClone = cloneDropObject(validDropped, this.state.userAssetList);
         validDropped.destination.droppableId = "assetTray";
-        
+
         targetBoard.boardAssets.splice(validDropped.destination.index,
           0, validDroppedClone);
         
@@ -355,9 +355,7 @@ class MainPageArea extends React.Component {
           userChapterBoardList: this.state.userChapterBoardList,
         });
     }
-
-    // else if (validDropped.source.DroppableableId === "chapterBoard" &&
-    //   validDropped.destination.droppableId === "chapterBoard") {
+    
     else if (validDropped.source.droppableId === 
             validDropped.destination.droppableId) {
 
@@ -429,32 +427,31 @@ class MainPageArea extends React.Component {
 
   onRemoveAssetClick(event) {
     event.preventDefault();
-    console.log("CLICKED Main");
-    console.log(event.target[0].getAttribute("value"));
-    console.log(event.target[0].getAttribute("board"));
 
     const boardId = event.target[0].getAttribute("board");
     const assetForRemoval = event.target[0].getAttribute("value")
+    console.log(boardId, assetForRemoval);
 
+    // get board object from boardName
     let board = this.state.userChapterBoardList.find(function(boarditem) {
       if (boarditem.boardName === boardId) {
         return boarditem.chapterId
         };
     });
 
+    // get list of assets associated with board
     let chapterBoardAssets = board.boardAssets;
-    let assetToRemove = chapterBoardAssets.find(function(asset) {
+    
+    // remove item from list of assets
+    let index = chapterBoardAssets.find(function(asset) {
       if (asset.key === assetForRemoval) {
-        return asset.key
-      }
+        return chapterBoardAssets.indexOf(asset)
+      };
     });
 
-    let idxToRemove = chapterBoardAssets.findIndex(asset =>
-      asset.draggableId === assetToRemove)
-    chapterBoardAssets.splice(idxToRemove, 1);
+    chapterBoardAssets.splice(index, 1);
 
     if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
-      
       chapterBoardAssets.splice(0, 1, {
         asset: "static/images/smiling-ready.png",
         draggableId: Math.random().toString(36).substr(2, 9),
@@ -463,7 +460,7 @@ class MainPageArea extends React.Component {
     }
     
     this.setState({
-      userChapterBoardAssets: this.state.userChapterBoardAssets,
+      userChapterBoardList: this.state.userChapterBoardList,
     });
   }
 
