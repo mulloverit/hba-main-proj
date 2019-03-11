@@ -431,19 +431,14 @@ class MainPageArea extends React.Component {
 
     let idxToRemove = chapterBoardAssets.findIndex(asset =>
       asset.draggableId === assetToRemove)
-
-    console.log("remove item", assetToRemove);
-    console.log("remove idx", idxToRemove);
-
-    console.log("BEFORE RM", chapterBoardAssets);
     chapterBoardAssets.splice(idxToRemove, 1);
-    console.log("AFTER RM", chapterBoardAssets);
 
     if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
       
       chapterBoardAssets.splice(0, 1, {
         asset: "static/images/smiling-ready.png",
         draggableId: Math.random().toString(36).substr(2, 9),
+        key: Math.random().toString(36).substr(2, 9),
       });
     }
     
