@@ -2,7 +2,147 @@ from datetime import datetime
 from flask import session
 
 from config import connect_to_db, db, app
-from model import User, InputImage, DiffImage, ImageClass, UserClass 
+from model import User, InputImage, DiffImage
+
+#------------------------------------------------------------------------------#
+## CLASS DEFINITIONS ##
+
+### Class establishments ###
+# QUESTION:
+    # how to handle instance methods that can only be valid
+    # once another instance method has been called? ie can't add to db
+    # without a valide s3 url -- need an exception?
+
+class ImageClass:
+
+    def __init__(self, image_object, tmp_path, owner):
+        """Instantiate an image object"""
+
+        import uuid
+        
+        self.owner = owner # username
+        self.tmp_path = tmp_path
+        self.image_object = image_object
+        self.uuid = str(uuid.uuid4())
+    
+        from PIL import Image
+
+        image = Image.open(self.image_object)
+        self.size = image.size
+        self.format = image.format
+        self.mode = image.mode
+        self.mimetype = Image.MIME[image.format]
+        #image.close()
+
+    def upload_to_s3(self, S3_BUCKET):
+        """ Uploads an image file to s3, creating instance attributes:
+            upload_begin_datetime, s3_key, upload_complete_datetime, s3_location
+        """
+
+        import boto3, botocore
+        from config import s3, s3_dl
+
+        if S3_BUCKET is None:
+            return("No S3_BUCKET var set. Check your environment variables!")
+
+        try:
+
+            self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
+
+            # Halleluja, get past "ValueError: Fileobj must implement read"
+            # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
+            with open(self.tmp_path, 'rb') as data:
+                s3.upload_fileobj(
+                        data,
+                        S3_BUCKET,
+                        self.s3_key,
+                        ExtraArgs={
+                            'ContentType': self.mimetype,
+                            'ACL': 'public-read',
+                            })
+
+            self.upload_complete_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+            self.s3_location = "http://{}.s3.amazonaws.com/{}".format(S3_BUCKET, self.s3_key)
+
+            return "Success"
+
+        except:
+
+            return "Failed"
+
+    def add_to_database(self, user_id, input_image_uuids=None):
+        """Create database record for an image. Handles input images & diffs."""
+
+        if input_image_uuids == None:
+            
+            image_record = InputImage(image_user_id=user_id, 
+                    image_size_x=self.size[0],
+                    image_size_y=self.size[1],
+                    image_format=self.format,
+                    image_mode=self.mode,
+                    image_s3_url=self.s3_location,
+                    image_upload_begin_datetime=self.upload_begin_datetime,
+                    image_upload_complete_datetime=self.upload_complete_datetime,
+                    image_uuid=self.uuid)
+
+        else:
+
+            input_uuid_1 = input_image_uuids[0]
+            input_uuid_2 = input_image_uuids[1]
+
+            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
+            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+
+            image_record = DiffImage(diff_user_id=user_id,
+                                 im_1_id=input_1_record.image_id,
+                                 im_2_id=input_2_record.image_id,
+                                 diff_size_x=self.size[0],
+                                 diff_size_y=self.size[1],
+                                 diff_format=self.format,
+                                 diff_mode=self.mode,
+                                 diff_s3_url=self.s3_location,
+                                 diff_upload_begin_datetime=self.upload_begin_datetime,
+                                 diff_upload_complete_datetime=self.upload_complete_datetime,
+                                 diff_uuid=self.uuid)
+        
+        db.session.add(image_record)
+        db.session.commit()
+
+class UserClass:
+    """Keeps track of metadata about user on site."""
+
+    def __init__(self, username, password=None, email=None,
+                 first_name=None, last_name=None):
+
+                 self.username = username
+                 self.password = password
+                 self.email = email
+                 self.first_name = first_name
+                 self.last_name = last_name
+
+    def find_by_username(self):
+        """Search for a user record in database based on username. If user 
+            does not exist, return None."""
+        try:
+
+            self.user_record = User.query.filter(User.username == self.username).first()
+            return self.user_record
+    
+        except:
+
+            return None
+
+    def all_image_urls(self):
+
+        all_image_urls = []
+        user = User.query.filter(User.username == self.username).first()
+        images = InputImage.query.filter(InputImage.image_user_id == user.user_id).all()
+
+        for image in images:
+            all_image_urls.append(image.image_s3_url)
+        
+        return(all_image_urls)
 
 # ---------------------------------------------------------------------------- #
 
@@ -24,6 +164,9 @@ def user_sign_in(submitted_username, submitted_password):
 
         return "Username does not exist. Please register or continue as guest."
 
+def user_sign_out():
+    # TO DO
+    return "Successfully signed out"
 
 def user_registration_new(submitted_username, submitted_password,
                           submitted_email, submitted_first_name,

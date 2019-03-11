@@ -1,7 +1,7 @@
 """Flask server for image differencing application"""
 from io import StringIO, BytesIO
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template, flash, redirect, session
+from flask import Flask, request, json, jsonify, make_response, render_template, flash, redirect, session
 import os
 from PIL import Image
 import uuid
@@ -9,8 +9,7 @@ from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from config import *
-from diff_logic import *
-from model import User, InputImage, DiffImage, ImageClass, UserClass
+from model import User, InputImage, DiffImage
 from utils import *
 
 
@@ -43,6 +42,16 @@ def sign_in():
 
     return redirect('/main')
 
+@app.route("/sign-out", methods=['POST'])
+def sign_out():
+    """Log in an existing user"""
+
+    session['username'] = "guest"
+    message = user_sign_out()
+    flash(message)
+    return redirect('/')
+
+
 @app.route("/register-new", methods=['POST'])
 def register_user():
     """Add a new user to database"""
@@ -68,7 +77,6 @@ def upload_inputs():
         for file in request.files:
             
             user_submitted_image = request.files.get(file)
-    
             
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
@@ -80,11 +88,11 @@ def upload_inputs():
                                             user_submitted_image_temporary_path,
                                             username,
                                             )
-        
-            user_submitted_image_object.upload_to_s3(S3_BUCKET)
-        
+            
+            print(user_submitted_image_object.upload_to_s3(S3_BUCKET))
+
             user_submitted_image_object.add_to_database(user_id)
-        
+            
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
                                             )    
@@ -94,8 +102,8 @@ def upload_inputs():
         print("UPLOAD SUCCESS!")
         print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
         print("ALL USER IMAGES:", images)
-        #normalize data to a dictionary here instead of in browser?
-    
+        
+        #normalize data to a dictionary and Json.dumps similar to boards below
         return str(images)
         #return jsonify(user_submitted_image_s3_locations)
         #return render_template("main.html", images=user_submitted_image_s3_locations)
@@ -103,7 +111,6 @@ def upload_inputs():
     except:
 
         flash("Please provide two valid files for upload.")
-        # return render_template("index.html")
         return jsonify("hi - your upload failed")
 
 
@@ -113,8 +120,17 @@ def main():
     username, user_id = current_user()
     user = UserClass(username)
     images = user.all_image_urls()
+    chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
+    chapters = json.dumps(chapters)
+    chapters = json.loads(chapters)
+    
+    print ("IMAGES:", images)
+    print ("CHAPTERS:", chapters)
 
-    return render_template("main.html", username=username, images=images)
+    return render_template("main.html",
+                            username=username,
+                            images=images,
+                            chapters=chapters)
 
 
 # @app.route("/submit-diff-request", methods=['POST'])
