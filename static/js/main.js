@@ -1,6 +1,5 @@
 "use strict";
 
-let SimpleDraggable = window.ReactDraggable;
 const { DragDropContext, Draggable, Droppable } = window.ReactBeautifulDnd;
 const grid = 8;
 
@@ -30,29 +29,46 @@ const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
+  borderRadius: 10, 
   background: isDragging ? assetTrayItemColorDragging : assetTrayItemColorStatic,
   ...draggableStyle,
+});
+
+const getAssetTrayStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? boardColorStatic : boardColorStatic,
+  borderStyle: `dashed`,
+  borderColor: `gray`,
+  borderRadius: 25,
+  height: 1525,
+  overflow: `auto`,
+  padding: grid,
+  width: 250,
 });
 
 const getChapterBoardItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
+  borderRadius: 10, 
   background: isDragging ? chapterBoardItemColorDragging : chapterBoardItemColorStatic,
   ...draggableStyle,
 });
 
-
 const getChapterBoardStyle = (isDraggingOver) => ({
   background: isDraggingOver ? boardColorStatic : boardColorStatic,
   padding: grid,
-  width: 200,
+  height: 300,
+  overflow: `auto`,
 });
 
-const getAssetTrayStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? boardColorStatic : boardColorStatic,
+const getChapterBoardContainerStyle = () => ({
+  borderStyle: `dashed`,
+  borderColor: `gray`,
+  borderRadius: 25,
   padding: grid,
-  width: 250,
+  backgroundColor: boardColorStatic,
+  margin: 10,
+  padding: 10,
 });
 
 const cloneDropObject = (inputDropObject, userAssetList) => {
@@ -65,61 +81,6 @@ const cloneDropObject = (inputDropObject, userAssetList) => {
 
   return validDroppedClone
 };
-
-class DraggableAssetContainer extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleDrag = this.handleDrag.bind(this);
-    this.onStart = this.onStart.bind(this);
-    this.onStop = this.onStop.bind(this);
-    
-    this.state = {
-      activeDrags: 0,
-      deltaPosition: {
-        x: 0, y: 0
-      },
-      controlledPosition: {
-        x: -400, y: 200
-      }
-    }
-  }
-
-  handleDrag(event, ui) {
-    const {x, y} = this.state.deltaPosition;
-    this.setState({
-      deltaPosition: {
-        x: x + ui.deltaX,
-        y: y + ui.deltaY
-      }
-    });
-  }
-
-  onStart() {
-    this.setState({
-      activeDrags: ++this.state.activeDrags
-    });
-  }
-
-  onStop() {
-    this.setState({
-      activeDrags: --this.state.activeDrags
-    });
-  }
-
-  render() {
-    const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
-    const {deltaPosition, controlledPosition} = this.state;
-  
-    return (
-      <SimpleDraggable bounds="parent" {...dragHandlers} >
-        <div className="drag-container-display">
-        <ChapterBoard />
-        </div>
-      </SimpleDraggable>
-    );
-  }
-}
-
 
 class DynamicGreeting extends React.Component {
 
@@ -191,6 +152,8 @@ class ChapterBoard extends React.Component {
   constructor(props) {
     super(props);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
+
   }
 
   onRemoveAssetClick(event) {
@@ -198,10 +161,24 @@ class ChapterBoard extends React.Component {
     this.props.handleRemoveAssetClick(event);
   }
 
+  onRemoveBoardClick(event) {
+    event.preventDefault();
+    this.props.handleRemoveBoardClick(event);
+  }
+
   render() {
     return (
-      <div className="col-6" id="individual-board">
-      <p> Board </p>
+      <div className="col-3" id="individual-board" style={getChapterBoardContainerStyle()}>
+      <div contentEditable="true"><p>Board</p></div>
+      <form onSubmit={this.onRemoveBoardClick} >
+        <button
+          type="submit"
+          id="remove-chapterboard"
+          className="remove-chapterboard" >
+          x
+        </button>
+      </form>
+
       <Droppable
         droppableId={this.props.board} >
          {(provided, snapshot) => (
@@ -227,8 +204,8 @@ class ChapterBoard extends React.Component {
                     <form onSubmit={this.onRemoveAssetClick} >
                       <button
                         type="submit"
-                        id="remove-chapterboard"
-                        className="remove-chapterboard"
+                        id="remove-chapterboard-asset"
+                        className="remove-chapterboard-asset"
                         value={asset.key}
                         board={this.props.board}>
                         x
@@ -253,6 +230,7 @@ class DragDropContextComp extends React.Component {
     super(props);
 
   this.handleRemoveAssetClick = this.handleRemoveAssetClick.bind(this);
+  this.handleRemoveBoardClick = this.handleRemoveBoardClick.bind(this);
   }
 
   handleRemoveAssetClick(event) {
@@ -260,18 +238,23 @@ class DragDropContextComp extends React.Component {
     this.props.onRemoveAssetClick(event);
   }
 
+  handleRemoveBoardClick(event) {
+    event.preventDefault();
+    this.props.onRemoveBoardClick(event);
+  }
+
   render() {
     return (
         <DragDropContext
           onDragEnd={this.props.onDragEnd} >
             <div className="row">
-              <div className="col-6">
+              <div className="col-3">
                 <AssetTray
                   droppableId="assetTray"
                   userAssetList={this.props.userAssetList}
                  />
               </div>
-              <div className="col-6">
+              <div className="col-9">
               <div className="row">
                 {this.props.userChapterBoardList.map((board, index) => (
                   <ChapterBoard
@@ -281,7 +264,8 @@ class DragDropContextComp extends React.Component {
                     draggableId={board.draggableId}
                     index={index}
                     userChapterBoardAssets={board.boardAssets}
-                    handleRemoveAssetClick={this.handleRemoveAssetClick} >
+                    handleRemoveAssetClick={this.handleRemoveAssetClick}
+                    handleRemoveBoardClick={this.handleRemoveBoardClick} >
                   </ChapterBoard>
                 ))}
               </div>
@@ -310,7 +294,7 @@ class AssetUpload extends React.Component {
 
   render() {
     return (
-      <div id="upload-assets-form">
+      <div id="asset-upload-form">
         <form
           onSubmit={this.handleSubmit}
           method="POST"
@@ -322,10 +306,12 @@ class AssetUpload extends React.Component {
                   ref={this.fileInput}
                   id="file-input-field" />
               </div>
-              <div className="col-6">
-                <button type="submit" id="file-upload-button">Submit</button>
               </div>
-          </div>
+              <div className="row">
+                <div className="col-6">
+                <button type="submit" id="file-upload-button">Submit</button>
+                </div>
+              </div>
         </form>
         </div>
     );
@@ -360,6 +346,7 @@ class MainPageArea extends React.Component {
     this.handleAssetUpload = this.handleAssetUpload.bind(this);
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
 
     let userAssets = window.images;
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
@@ -516,6 +503,32 @@ class MainPageArea extends React.Component {
 
   }
 
+  onRemoveBoardClick(event) {
+    event.preventDefault();
+
+    const boardId = event.target[0].getAttribute("board");
+    const boardKeyForRemoval = event.target[0].getAttribute("value")
+
+    let chapterBoardList = this.state.userChapterBoardList;
+    // get board object from boardName
+    let board = chapterBoardList.find(function(boarditem) {
+      if (boarditem.boardName === boardId) {
+        return boarditem.chapterId
+        };
+    });
+
+    let index = chapterBoardList.findIndex(board => {
+      return (board.key === boardKeyForRemoval)}
+    );
+
+    chapterBoardList.splice(index, 1);
+    
+    this.setState({
+      userChapterBoardList: this.state.userChapterBoardList,
+    });
+
+  }
+
   onRemoveAssetClick(event) {
     event.preventDefault();
 
@@ -528,7 +541,6 @@ class MainPageArea extends React.Component {
         return boarditem.chapterId
         };
     });
-
     // get list of assets associated with board
     let chapterBoardAssets = board.boardAssets;
 
@@ -556,17 +568,18 @@ class MainPageArea extends React.Component {
       <div>
         <div className="row">
         <div className="col-3">
-        <NewChapterBoard 
-          onClick={this.handleNewBoardClick} />
-        </div>
-        <div className="col-3">
         <AssetUpload 
           onSubmit={this.handleAssetUpload} />
+        </div>
+        <div className="col-3">
+        <NewChapterBoard 
+          onClick={this.handleNewBoardClick} />
         </div>
         </div>
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
           onRemoveAssetClick={this.onRemoveAssetClick}
+          onRemoveBoardClick={this.onRemoveBoardClick}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
         />
