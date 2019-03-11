@@ -8,3 +8,19 @@ body {
     margin: 10px;
     padding: 10px;
 }
+
+#file-input-field, #new-chapter-board-button {
+    background-color: #D8E2DC;
+    position: relative;
+    left: 20px;
+    margin: 10px;
+    padding: 10px;
+}
+
+#file-upload-button {
+    background-color: #D8E2DC;
+    position: relative;
+    left: 220px;
+    margin: 11px;
+    padding: 10px;
+}

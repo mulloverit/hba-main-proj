@@ -19,20 +19,36 @@ const getItems = (count) => {
   }));
 }
 
-const itemColorStatic = '#FFFFFF';
-const itemColorDragging = '#B3EFB2';
+const assetTrayItemColorStatic = '#FFFFFF';
+const assetTrayItemColorDragging = '#B3EFB2';
+const chapterBoardItemColorStatic = '#FFFFFF';
+const chapterBoardItemColorDragging = '#B3EFB2';
 const boardColorStatic = '#D8E2DC';
 
-const getItemStyle = (isDragging, draggableStyle) => ({
-
+const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
-  background: isDragging ? itemColorDragging : itemColorStatic,
+  background: isDragging ? assetTrayItemColorDragging : assetTrayItemColorStatic,
   ...draggableStyle,
 });
 
-const getListStyle = (isDraggingOver) => ({
+const getChapterBoardItemStyle = (isDragging, draggableStyle) => ({
+  userSelect: 'none',
+  padding: grid * 2,
+  margin: `0 0 ${grid}px 0`,
+  background: isDragging ? chapterBoardItemColorDragging : chapterBoardItemColorStatic,
+  ...draggableStyle,
+});
+
+
+const getChapterBoardStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? boardColorStatic : boardColorStatic,
+  padding: grid,
+  width: 200,
+});
+
+const getAssetTrayStyle = (isDraggingOver) => ({
   background: isDraggingOver ? boardColorStatic : boardColorStatic,
   padding: grid,
   width: 250,
@@ -84,7 +100,7 @@ class AssetTray extends React.Component {
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
+            style={getAssetTrayStyle(snapshot.isDraggingOver)}
           >
             {this.props.userAssetList.map((item, index) => (
               <Draggable
@@ -98,7 +114,7 @@ class AssetTray extends React.Component {
                     ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                    style={getItemStyle(
+                    style={getAssetTrayItemStyle(
                       snapshot.isDragging,
                       provided.draggableProps.style
                     )} >
@@ -129,13 +145,13 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <div className="col-6" id="individual-board">
-      <p> HI </p>
+      <p> Board </p>
       <Droppable
         droppableId={this.props.board} >
          {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)} >
+            style={getChapterBoardStyle(snapshot.isDraggingOver)} >
             {this.props.userChapterBoardAssets.map((asset, index) => (
               <Draggable
                 key={asset.key}
@@ -148,7 +164,7 @@ class ChapterBoard extends React.Component {
                     ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                    style={getItemStyle(
+                    style={getChapterBoardItemStyle(
                       snapshot.isDragging,
                       provided.draggableProps.style
                     )} >
@@ -192,7 +208,6 @@ class DragDropContextComp extends React.Component {
     return (
         <DragDropContext
           onDragEnd={this.props.onDragEnd} >
-          <div className="container">
             <div className="row">
               <div className="col-6">
                 <AssetTray
@@ -216,7 +231,6 @@ class DragDropContextComp extends React.Component {
               </div>
               </div>
               </div>
-            </div>
         </DragDropContext>
     );
   }
@@ -240,23 +254,24 @@ class AssetUpload extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col-6">
-              <form
-                onSubmit={this.handleSubmit}
-                method="POST"
-                encType="multipart/form-data">
-                  <input
-                    type="file"
-                    ref={this.fileInput}
-                    id="file-input"
-                  />
-                <button type="submit">Submit</button>
-              </form>
+      <div id="upload-assets-form">
+        <form
+          onSubmit={this.handleSubmit}
+          method="POST"
+          encType="multipart/form-data">
+            <div className="row">
+              <div className="col-6">
+                <input
+                  type="file"
+                  ref={this.fileInput}
+                  id="file-input-field" />
+              </div>
+              <div className="col-6">
+                <button type="submit" id="file-upload-button">Submit</button>
+              </div>
           </div>
+        </form>
         </div>
-      </div>
     );
   }
 }
@@ -276,7 +291,7 @@ class NewChapterBoard extends React.Component {
     return (
       <form
         onClick={this.handleClick}>
-        <button type="submit">New chapter board</button>
+        <button type="submit" id="new-chapter-board-button">New chapter board</button>
       </form>
     );
   }
@@ -483,11 +498,16 @@ class MainPageArea extends React.Component {
   render() {
     return (
       <div>
+        <div className="row">
+        <div className="col-3">
         <NewChapterBoard 
-          onClick={this.handleNewBoardClick}/>
+          onClick={this.handleNewBoardClick} />
+        </div>
+        <div className="col-3">
         <AssetUpload 
-          onSubmit={this.handleAssetUpload}
-          />
+          onSubmit={this.handleAssetUpload} />
+        </div>
+        </div>
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
           onRemoveAssetClick={this.onRemoveAssetClick}
