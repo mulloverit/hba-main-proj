@@ -34,11 +34,11 @@ const getListStyle = (isDraggingOver) => ({
   width: 250,
 });
 
-const cloneDropObject = (inputDropObject) => {
+const cloneDropObject = (inputDropObject, userAssetList) => {
   let validDroppedClone = new Object();
 
-  validDroppedClone.asset = this.state.userAssetList[
-                              inputDropObject.source.index].image;
+  validDroppedClone.asset = userAssetList[
+                              inputDropObject.source.index].image;  
   validDroppedClone.draggableId =  Math.random().toString(36).substr(2, 9);
   validDroppedClone.key =  validDroppedClone.draggableId;
 
@@ -126,7 +126,7 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <Droppable
-        droppableId="chapterBoardContainer" >
+        droppableId={this.props.board} >
          {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
@@ -135,7 +135,7 @@ class ChapterBoard extends React.Component {
               <Draggable
                 key={asset.key}
                 draggableId={asset.draggableId} 
-                boardId={this.props.board}
+                board={this.props.board}
                 index={index} >
                 {(provided, snapshot) => (
                   <div
@@ -153,7 +153,7 @@ class ChapterBoard extends React.Component {
                         id="remove-chapterboard"
                         className="remove-chapterboard"
                         value={asset.key}
-                        board-id={this.props.board}>
+                        board={this.props.board}>
                         x
                       </button>
                       <img src={asset.asset} height="100" width="100"/>
@@ -199,7 +199,7 @@ class DragDropContextComp extends React.Component {
                 {this.props.userChapterBoardList.map((board, index) => (
                   <ChapterBoard
                     droppableId="chapterBoard"
-                    board={board.chapterId}
+                    board={board.boardName}
                     key={board.key}
                     draggableId={board.draggableId}
                     index={index}
@@ -336,31 +336,53 @@ class MainPageArea extends React.Component {
     }
 
     else if (validDropped.source.droppableId === "assetTray" && 
-      validDropped.destination.droppableId === "chapterBoard") {
+      validDropped.destination.droppableId.includes("board")) {
   
+        console.log("DEST", validDropped.destination.droppableId)
 
-        let validDroppedClone = cloneDropObject(validDropped);
+        let targetBoard = this.state.userChapterBoardList.find(function(board) {
+          board.boardName === validDropped.destination.droppableId;
+          return board
+        })
+
+        let validDroppedClone = cloneDropObject(validDropped, this.state.userAssetList);
         validDropped.destination.droppableId = "assetTray";
         
-        this.state.userChapterBoardAssets.splice(validDropped.destination.index,
+        targetBoard.boardAssets.splice(validDropped.destination.index,
           0, validDroppedClone);
         
         this.setState({
-          userChapterBoardAssets: this.state.userChapterBoardAssets,
+          userChapterBoardList: this.state.userChapterBoardList,
         });
     }
 
-    else if (validDropped.source.droppableId === "chapterBoard" &&
-      validDropped.destination.droppableId === "chapterBoard") {
+    // else if (validDropped.source.DroppableableId === "chapterBoard" &&
+    //   validDropped.destination.droppableId === "chapterBoard") {
+    else if (validDropped.source.droppableId === 
+            validDropped.destination.droppableId) {
 
-        const userChapterBoardAssets = reorder(
-          this.state.userChapterBoardAssets,
+        let board = this.state.userChapterBoardList.find(function(board) {
+          let foundAsset = board.boardAssets.find(function(asset) {
+            if (validDropped.draggableId === asset.draggableId) {
+              return asset
+            }
+          })
+
+          if (foundAsset) {
+            return board
+          }
+        })
+
+        let assetOrder = reorder(
+          board.boardAssets,
           validDropped.source.index,
           validDropped.destination.index
         );  
 
+        board.boardAssets = assetOrder;
+
         this.setState({
-          userChapterBoardAssets: userChapterBoardAssets,
+          userChapterBoardList: this.state.userChapterBoardList,
         });
     } 
   }
@@ -409,20 +431,18 @@ class MainPageArea extends React.Component {
     event.preventDefault();
     console.log("CLICKED Main");
     console.log(event.target[0].getAttribute("value"));
-    console.log(event.target[0].getAttribute("board-id"));
+    console.log(event.target[0].getAttribute("board"));
 
-    const boardId = event.target[0].getAttribute("board-id");
+    const boardId = event.target[0].getAttribute("board");
     const assetForRemoval = event.target[0].getAttribute("value")
 
     let board = this.state.userChapterBoardList.find(function(boarditem) {
-      if (boarditem.chapterId === boardId) {
+      if (boarditem.boardName === boardId) {
         return boarditem.chapterId
         };
     });
-    console.log("looking for this board", board);
 
     let chapterBoardAssets = board.boardAssets;
-
     let assetToRemove = chapterBoardAssets.find(function(asset) {
       if (asset.key === assetForRemoval) {
         return asset.key
