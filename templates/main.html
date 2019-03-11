@@ -11,7 +11,7 @@
 <br>
 <script>
     window.images="{{images}}"
-    window.chapters="{{chapters}}"
+    window.chapters={{chapters|tojson|safe}}
     window.username="{{username}}"
 </script>
 

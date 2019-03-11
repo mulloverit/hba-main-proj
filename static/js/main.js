@@ -32,7 +32,48 @@ const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'pink',
   padding: grid,
   width: 250,
-}); 
+});
+
+const cloneDropObject = (inputDropObject) => {
+  let validDroppedClone = new Object();
+
+  validDroppedClone.asset = this.state.userAssetList[
+                              inputDropObject.source.index].image;
+  validDroppedClone.draggableId =  Math.random().toString(36).substr(2, 9);
+  validDroppedClone.key =  validDroppedClone.draggableId;
+
+  return validDroppedClone
+};
+  
+// const convertWindowChapters = (userChapters) => {
+  
+//   console.log("Incoming", userChapters);
+//   let regex = /&#39;/gi;
+//   // let regex2 = /\'/gi; 
+//   // let regex3 = /\[/gi;
+//   // let regex4 = /\]/gi;
+//   let userChapterBoards = [];
+//   let userChapterBoardList = userChapters.replace(regex, "").substr(1).slice(0, -1); // STRING
+//   userChapterBoardList = userChapterBoardList.text()
+//   JSON.parse(userChapterBoardList);
+//   console.log("before mapping", userChapterBoardList);
+
+
+  // let userChapterBoardList = userChapters.replace(regex, "'").replace(
+  //                             regex2, "").substr(1).slice(0, -1).split(
+  //                             "],"); // STRING
+  // userChapterBoardList.map(board => {
+  //   board = board.replace(regex3, "").replace(regex4, "").split(": ")
+  //   board.boardName = board[0].replace(" ", "")
+  //   board.boardAssets = board[1].split(", ")
+  //   board.boardId = Math.random().toString(36).substr(2, 9);
+  //   board.key = Math.random().toString(36).substr(2, 9);
+  //   board.draggableId = Math.random().toString(36).substr(2, 9);
+  //   userChapterBoards.splice(0, 0, board);
+  // })
+
+  // return userChapterBoards;
+// }
 
 
 class DynamicGreeting extends React.Component {
@@ -155,9 +196,6 @@ class DragDropContextComp extends React.Component {
   constructor(props) {
     super(props);
 
-  // CREATE CHPATERBOARDS & THEIR ASSETS FROM DICT HERE
-  //userChapterBoardList={this.props.userChapterBoardList}
-  //userChapterBoardDict={this.props.userChapterBoardDict}
   this.handleRemoveAssetClick = this.handleRemoveAssetClick.bind(this);
   }
 
@@ -205,10 +243,10 @@ class DragDropContextComp extends React.Component {
                                 <ChapterBoard
                                   droppableId="chapterBoard"
                                   board={board.boardId}
-                                  key={board.boardId}
+                                  key={board.key}
                                   draggableId={board.draggableId}
                                   index={index}
-                                  userChapterBoardAssets={board.assetList}
+                                  userChapterBoardAssets={board.boardAssets}
                                   handleRemoveAssetClick={this.handleRemoveAssetClick} >
                                     <form onSubmit={this.onRemoveBoardClick} >
                                       <button
@@ -304,56 +342,35 @@ class MainPageArea extends React.Component {
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
 
-    // let userAssets = window.images;
-    let userAssetList = ["https://s3.amazonaws.com/hackbright-image-upload-test/cmahon/173440d7-9111-4aa8-8ecd-f13ae916aee3_static/images/cmahon_IMG_4625.JPG"];
-    let userChapters = window.chapters; // TO DO FIX THIS
-    // let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
-    let userChapterBoardList = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
-    let userChapterBoardAssets = userChapters.substr(6).slice(0, -6).split("&#39;, &#39;"); // TO DO FIX THIS
-    // COMBINE BOARDLIST WITH BOARD ASSETS AS DICT - ASSETS ARE VALUES TO BOARD KEY
-    // DO THIS ON THE BACKEND
-    console.log("FRESH LIST", userAssetList);
+    let userAssets = window.images;
+    let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
     userAssetList = userAssetList.map(image => {
         return ({ image: image,
                   draggableId: Math.random().toString(36).substr(2, 9),
                   key: Math.random().toString(36).substr(2, 9)
                 });
     })
-    console.log("FORMATTED LIST", userAssetList);
+    console.log("userAssets", userAssetList);
 
-    let exampleBoardList = new Array();
-    let exampleBoardOne = new Object();
-    let exampleBoardTwo = new Object();
-    exampleBoardList.splice(0, 0, exampleBoardOne);
-    exampleBoardList.splice(0, 0, exampleBoardTwo);
-
-    console.log("POPULATED BOARD LIST", exampleBoardList);
-
-    userChapterBoardList = exampleBoardList.map(board => {
-      board.boardId = Math.random().toString(36).substr(2, 9);
-      board.key = Math.random().toString(36).substr(2, 9);
-      board.draggableId = Math.random().toString(36).substr(2, 9);
-      board.assetList = userAssetList;
+    let userChapters = window.chapters;
+    console.log("userChapters window", userChapters);
+    console.log(typeof userChapters);
+    userChapters.map(chapter => {
+      chapter.key = Math.random().toString(36).substr(2, 9)
+      chapter.draggableId = Math.random().toString(36).substr(2, 9)
+      chapter.chapterId = Math.random().toString(36).substr(2, 9)
+      chapter.boardAssets = chapter.boardAssets.map(asset => {
+        asset = { asset: asset }
+        asset.key = Math.random().toString(36).substr(2, 9)
+        asset.draggableId = Math.random().toString(36).substr(2, 9)
+        return asset
+      })
     })
-    
-    // exampleBoardOne.boardId = Math.random().toString(36).substr(2, 9);
-    // exampleBoardOne.key = Math.random().toString(36).substr(2, 9);
-    // exampleBoardOne.draggableId = Math.random().toString(36).substr(2, 9);
-    // exampleBoardTwo.boardId = Math.random().toString(36).substr(2, 9);
-    // exampleBoardOne.assetList = userAssetList;
-    // exampleBoardTwo.assetList = userAssetList;
-
-    userChapterBoardList = exampleBoardList;
-    console.log("Test BOARD LIST:", userChapterBoardList);
-
-    userChapterBoardList.map((board, index) => (
-      console.log("board.list", board.assetList)))
-   
+    console.log("userChapterBoards:", userChapters);
 
     this.state = {
       userAssetList: userAssetList,
-      userChapterBoardList: userChapterBoardList,
-      // userChapterBoardAssets: userChapterBoardAssets,
+      userChapterBoardList: userChapters,
     };
   }
 
@@ -380,12 +397,8 @@ class MainPageArea extends React.Component {
     else if (validDropped.source.droppableId === "assetTray" && 
       validDropped.destination.droppableId === "chapterBoard") {
   
-        const validDroppedClone = new Object();
 
-        validDroppedClone.asset = this.state.userAssetList[
-                                    validDropped.source.index].image;
-        validDroppedClone.draggableId =  Math.random().toString(36).substr(2, 9);
-        validDroppedClone.key =  validDroppedClone.draggableId;
+        let validDroppedClone = cloneDropObject(validDropped);
         validDropped.destination.droppableId = "assetTray";
         
         this.state.userChapterBoardAssets.splice(validDropped.destination.index,
@@ -497,7 +510,6 @@ class MainPageArea extends React.Component {
           onRemoveAssetClick={this.onRemoveAssetClick}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
-          // userChapterBoardAssets={this.state.userChapterBoardAssets}
         />
       </div>
     );
