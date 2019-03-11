@@ -260,7 +260,7 @@ class NewChapterBoard extends React.Component {
 
   handleClick(event) {
     event.preventDefault();
-    this.props.onNewBoardClick(event);
+    this.props.onClick(event);
   }
 
   render() {
@@ -420,8 +420,20 @@ class MainPageArea extends React.Component {
   }
 
   handleNewBoardClick() {
-    // THIS FUNCTION IS TO DO //
-    userChapterBoardList.push("new");
+    this.state.userChapterBoardList.push({
+      boardAssets: [{ asset: "static/images/smiling-ready.png",
+                     draggableId: Math.random().toString(36).substr(2, 9),
+                     key: Math.random().toString(36).substr(2, 9) }],
+      boardName: "board_" + Math.random().toString(36).substr(2, 9),
+      chapterId: Math.random().toString(36).substr(2, 9),
+      draggableId: Math.random().toString(36).substr(2, 9),
+      key: Math.random().toString(36).substr(2, 9),
+    });
+
+    this.setState({
+      userChapterBoardList: this.state.userChapterBoardList,
+    });
+
   }
 
   onRemoveAssetClick(event) {
