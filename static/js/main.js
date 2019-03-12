@@ -169,7 +169,7 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <div className="col-3" id="individual-board" style={getChapterBoardContainerStyle()}>
-      <div><p>Board</p></div>
+      <div contentEditable="true"><p>Board</p></div>
       <form onSubmit={this.onRemoveBoardClick} >
         <button
           type="submit"
@@ -179,7 +179,6 @@ class ChapterBoard extends React.Component {
           x
         </button>
       </form>
-
       <Droppable
         droppableId={this.props.board} >
          {(provided, snapshot) => (
@@ -302,7 +301,7 @@ class AssetUpload extends React.Component {
           method="POST"
           encType="multipart/form-data">
             <div className="row">
-              <div className="col-6">
+              <div className="col">
                 <input
                   type="file"
                   ref={this.fileInput}
@@ -310,8 +309,8 @@ class AssetUpload extends React.Component {
               </div>
               </div>
               <div className="row">
-                <div className="col-6">
-                <button type="submit" id="file-upload-button">Submit</button>
+                <div className="col">
+                <button type="submit" id="file-upload-button">upload</button>
                 </div>
               </div>
         </form>
@@ -340,6 +339,32 @@ class NewChapterBoard extends React.Component {
     );
   }
 }
+
+class SaveAs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+
+    let userChapterBoards = this.props.userChapterBoardList;
+    this.props.handleSaveAs(userChapterBoards);
+  }
+
+  render() {
+    return (
+      <form
+        onClick={this.handleClick}
+        userChapterBoardList={this.props.userChapterBoardList}>
+        <button type="submit" id="save-as">SaveBoards</button>
+      </form>
+    );
+  }
+}
+
+
 
 class MainPageArea extends React.Component {
   constructor(props) {
@@ -505,12 +530,31 @@ class MainPageArea extends React.Component {
 
   }
 
+  handleSaveAs(userChapterBoards) {
+    event.preventDefault();
+    
+    const formData = new FormData();
+    const postUrl = "/save-as"
+    const xmlPackage = new XMLHttpRequest();
+    let userChapterBoardsJSON = JSON.stringify(userChapterBoards);
+
+    formData.append("userChapterBoards", userChapterBoardsJSON);
+    xmlPackage.open("POST", postUrl);
+    xmlPackage.responseType = 'text';
+    xmlPackage.onload = () => {
+
+      if (xmlPackage.status === 200) {
+        console.log("Successfully saved.");
+      }
+    };
+    xmlPackage.send(formData);
+  }
+
   onRemoveBoardClick(event) {
     event.preventDefault();
 
     const boardId = event.target[0].getAttribute("board");
     const boardKeyForRemoval = event.target[0].getAttribute("value");
-    console.log("boardkeyrm", boardKeyForRemoval);
 
     let chapterBoardList = this.state.userChapterBoardList;
     // get board object from boardName
@@ -521,11 +565,9 @@ class MainPageArea extends React.Component {
     });
 
     let index = chapterBoardList.findIndex(board => {
-      console.log("boardkey", board.key);
       return (board.key === boardKeyForRemoval)}
     );
 
-    console.log("rm board index", index);
     chapterBoardList.splice(index, 1);
     
     this.setState({
@@ -579,6 +621,11 @@ class MainPageArea extends React.Component {
         <div className="col-3">
         <NewChapterBoard 
           onClick={this.handleNewBoardClick} />
+        </div>
+        <div className="col-3">
+        <SaveAs 
+          handleSaveAs={this.handleSaveAs}
+          userChapterBoardList={this.state.userChapterBoardList} />
         </div>
         </div>
         <DragDropContextComp 

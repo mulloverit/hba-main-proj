@@ -105,14 +105,22 @@ def upload_inputs():
         
         #normalize data to a dictionary and Json.dumps similar to boards below
         return str(images)
-        #return jsonify(user_submitted_image_s3_locations)
-        #return render_template("main.html", images=user_submitted_image_s3_locations)
 
     except:
 
         flash("Please provide two valid files for upload.")
         return jsonify("hi - your upload failed")
 
+@app.route("/save-as", methods=['POST'])
+def save_as():
+
+    jayson = json.loads(request.form.get('userChapterBoards'))
+
+    for item in jayson:
+        # print("JSON ITEM", item)
+        print(item.get('boardAssets'))
+    
+    return "hello"
 
 @app.route("/main")
 def main():
@@ -123,48 +131,11 @@ def main():
     chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
     chapters = json.dumps(chapters)
     chapters = json.loads(chapters)
-    
-    print ("IMAGES:", images)
-    print ("CHAPTERS:", chapters)
 
     return render_template("main.html",
                             username=username,
                             images=images,
                             chapters=chapters)
-
-
-# @app.route("/submit-diff-request", methods=['POST'])
-# def diff_images():
-#     """Diff images from local dir [no s3 and no login required]."""
-    
-#     username, user_id = current_user()
-
-#     try:
-
-#         boolean_diff_path = create_boolean_diff(
-#                                 session['user_submitted_image_temporary_paths'][0],
-#                                 session['user_submitted_image_temporary_paths'][1],
-#                                 )
-        
-#         difference_image = ImageClass(boolean_diff_path, boolean_diff_path,
-#                                       username) # wants path not PIL object as 1st arg
-
-#         difference_image.upload_to_s3(S3_BUCKET)
-        
-#         difference_image.add_to_database(user_id,
-#                                 input_image_uuids=session['request_image_uuids'])
-
-#         flash("Diff succeeded.")
-
-#     except:
-
-#         flash("Diff failed :(")
-
-#     return render_template("main.html",
-#                     image_1=session['user_submitted_image_temporary_paths'][0],
-#                     image_2=session['user_submitted_image_temporary_paths'][1],
-#                     difference_image=boolean_diff_path)
-    
 
 if __name__ == "__main__":
     app.run(debug=True)

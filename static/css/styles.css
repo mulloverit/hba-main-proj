@@ -26,7 +26,11 @@ button, input {
     width: 200px;
 }
 
-#new-chapter-board-button {
+#file-input-field {
+    color:transparent;
+}
+
+#new-chapter-board-button, #save-as  {
     background-color: #D8E2DC;
     position: relative;
     left: 20px;
