@@ -7,6 +7,43 @@ button, input {
     border-radius: 10px;
 }
 
+h2 {
+    text-align: center;
+}
+
+#bungee-outline { 
+    font-family: 'Bungee Outline', cursive;
+}
+
+#bungee-shade { 
+    font-family: 'Bungee Shade', cursive;
+}
+
+#fredoka-one, #welcome-user { 
+    font-family: 'Fredoka One', cursive;
+}
+
+.container {
+    display: inline-block;
+}
+
+.registration .sign-in {
+    text-align: center;
+}
+
+.registration input {
+    width: 100%;
+    float: right;
+    clear: left;
+}
+
+.sign-in input {
+    width: 100%;
+    float: right;
+    clear: left;
+}
+
+
 #asset-upload-form {
     position: relative;
     right: 10px;

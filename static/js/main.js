@@ -92,7 +92,7 @@ class DynamicGreeting extends React.Component {
         <div className="row">
           <div className="col-6">
             <br />
-            <h1>Welcome, {UserName}</h1>
+            <h1 id="welcome-user">Welcome, {UserName}</h1>
             <br />
           </div>
           <div className="col-6">
@@ -349,7 +349,7 @@ class SaveAs extends React.Component {
   handleClick(event) {
     event.preventDefault();
 
-    let userChapterBoards = this.props.userChapterBoardList;
+    let userChapterBoards = this.props.userchapterboardlist;
     this.props.handleSaveAs(userChapterBoards);
   }
 
@@ -357,7 +357,7 @@ class SaveAs extends React.Component {
     return (
       <form
         onClick={this.handleClick}
-        userChapterBoardList={this.props.userChapterBoardList}>
+        userchapterboardlist={this.props.userChapterBoardList}>
         <button type="submit" id="save-as">SaveBoards</button>
       </form>
     );

@@ -38,7 +38,6 @@ def sign_in():
     if "Success" in message:
         session['username'] = request.form['username']
 
-    flash (message)
 
     return redirect('/main')
 
@@ -48,7 +47,6 @@ def sign_out():
 
     session['username'] = "guest"
     message = user_sign_out()
-    flash(message)
     return redirect('/')
 
 
@@ -98,7 +96,7 @@ def upload_inputs():
                                             )    
             
         images = user.all_image_urls()
-        flash("Upload to S3 a success!")
+
         print("UPLOAD SUCCESS!")
         print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
         print("ALL USER IMAGES:", images)
@@ -108,7 +106,7 @@ def upload_inputs():
 
     except:
 
-        flash("Please provide two valid files for upload.")
+
         return jsonify("hi - your upload failed")
 
 @app.route("/save-as", methods=['POST'])
