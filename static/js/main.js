@@ -36,8 +36,7 @@ const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
 
 const getAssetTrayStyle = (isDraggingOver) => ({
   background: isDraggingOver ? boardColorStatic : boardColorStatic,
-  borderStyle: `dashed`,
-  borderColor: `gray`,
+  borderStyle: `ridge`,
   borderRadius: 25,
   height: 1525,
   overflow: `auto`,
@@ -62,8 +61,7 @@ const getChapterBoardStyle = (isDraggingOver) => ({
 });
 
 const getChapterBoardContainerStyle = () => ({
-  borderStyle: `dashed`,
-  borderColor: `gray`,
+  borderStyle: `ridge`,
   borderRadius: 25,
   padding: grid,
   backgroundColor: boardColorStatic,
@@ -90,16 +88,20 @@ class DynamicGreeting extends React.Component {
     return (
       <div className="container">
         <div className="row">
-          <div className="col-6">
-            <br />
-            <h1 id="welcome-user">Welcome, {UserName}</h1>
-            <br />
-          </div>
-          <div className="col-6">
-            <br />
+            <div className="col-6">
+              <h3 id="bungee-shade" class="main-page-title">StoryBored</h3>
+            </div>
+            <div className="col-6">
             <form action="/sign-out" method="POST">
-              <button type="submit" name="sign-out">sign-out</button>
+              <button type="submit" name="sign-out" id="sign-out-button">sign-out</button>
             </form>
+          </div>
+        </div>
+        <hr />
+        <div className="row">
+          <div className="col-6">
+            <br />
+            <h3 id="welcome-user">Welcome, {UserName}</h3>
             <br />
           </div>
         </div>
@@ -358,7 +360,7 @@ class SaveAs extends React.Component {
       <form
         onClick={this.handleClick}
         userchapterboardlist={this.props.userChapterBoardList}>
-        <button type="submit" id="save-as">SaveBoards</button>
+        <button type="submit" id="save-as-button">SaveBoards</button>
       </form>
     );
   }
