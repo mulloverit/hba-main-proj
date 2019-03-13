@@ -23,7 +23,7 @@ const assetTrayItemColorStatic = '#FFFFFF';
 const assetTrayItemColorDragging = '#B3EFB2';
 const chapterBoardItemColorStatic = '#FFFFFF';
 const chapterBoardItemColorDragging = '#B3EFB2';
-const boardColorStatic = '#D8E2DC';
+const boardColorStatic = '#f7f7f7';
 
 const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
