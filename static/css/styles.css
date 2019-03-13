@@ -11,6 +11,10 @@ h2, h5 {
     text-align: center;
 }
 
+.sign-in-title {
+    float: left;
+}
+
 #guest-button #user-signin-button #new-reg-button {
     background-color: #E2E7FF;
     position: relative;
@@ -86,7 +90,17 @@ h2, h5 {
 }
 
 #main-page-title {
-    float: left;
+    padding-top: 50px;
+    left: 20px;
+}
+
+h3#bungee-shade.get-started-page-title {
+    text-align: center;
+}
+
+#dummy-board {
+    border-radius: 25px;
+    border-style: ridge;
 }
 
 #sign-out-button {
@@ -96,9 +110,8 @@ h2, h5 {
     outline: none;
 }
 
-#new-chapter-board-button, #save-as-button, #new-registration-button,
-#user-sign-in-button, #guest-sign-in-button  {
-    background-color: #d7ffd3;
+#new-chapter-board-button, #save-as-button  {
+    background-color: #f7f7f7;
     position: relative;
     margin: 10px;
     left: 10px;
@@ -106,7 +119,28 @@ h2, h5 {
     outline: none;
 }
 
-#new-chapter-board-button, #save-as-button, #sign-out-button,
-#file-input-field, #file-upload-button  {
-    background-color: #f7f7f7;
+.get-started {
+    text-align: center;
 }
+
+#get-started-button, #new-registration-button,
+#user-sign-in-button, #guest-sign-in-button  {
+    background-color: #025ae8;
+    color: white;
+    font-family: 'Bungee Hairline', cursive;
+}
+
+#sign-in-boop {
+    background-color: #025ae8;
+    color: white;
+    font-family: 'Bungee Hairline', cursive;
+    height: 75px;
+    width: 75px;
+
+}
+
+
+/*#B4FFEC - pastel turquoise
+#66FFD9 - brighter turq
+#F7196F bright pink
+#C6BEFF - pastel purple*/

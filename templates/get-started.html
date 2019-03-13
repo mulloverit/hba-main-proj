@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+<br>
+<br>
+<div class="container" id="index-page-title">
+    <div class="row row-centered">
+        <div class="col-12 col-centered">
+            <h1 id="bungee-shade" class="index-page-title">StoryBored</h1>
+        </div>
+    </div>
+    <br>
+    <div class="row row-centered">
+        <div class="col-12 col-centered">
+            <h3 id="bungee-hairline" class="index-page-title-subscript">
+                Simple storyboarding for your creative mind
+            </h3>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-2" id="dummy-board">
+        <p>Characters</p>
+        <img id="index-page-character-drawing" src="static/images/wtf-lady.png"></img>
+        <img id="index-page-character-drawing" src="static/images/lizard-face.JPG"></img>
+    </div>
+    <div class="col-2" id="dummy-board">
+        <p>Landscapes</p>
+        <img id="index-page-character-drawing" src="static/images/mtn-sketch.png"></img>
+        <img id="index-page-character-drawing" src="static/images/night-sky-paint-sample.png"></img>
+    </div>
+    <div class="col-6">
+        <h5 id="fredoka-one" class="sign-in-title">Sign In</h5>
+        <div class="sign-in">
+            <form action="/sign-in" method="POST" class="registration-inputs">
+                <div class="row">
+                    <div class="col-6">
+                        <input type="text" name="username" placeholder="Username"><br><br>
+                        <input type="password" name="password" placeholder="Password"><br><br> 
+                    </div>
+                    <div class="col-2">
+                        <input type="submit" name="sign-in-boop" value="boop" id="sign-in-boop">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<hr>
+<div class="row row-centered">
+    <div class="col-4">
+        <div class="sign-in">
+            <br>
+            <form action="/guest-continue" method="POST" class="guest-continue">
+                <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Continue as guest">
+            </form>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="sign-in">
+            <br>
+            <form action="/sign-in" method="POST" class="registration-inputs">
+                <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
+            </form>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="registration">
+            <br>
+            <form action="/register-new" method="POST" class="registration-inputs">
+                <input type="submit" name="register" value="Register" id="new-registration-button">
+            </form>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="second">
+    <div class="col-4">
+        <div class="sign-in">
+            <h5 id="fredoka-one" class="sign-in-title">Sign In</h5>
+            <br>
+            <form action="/sign-in" method="POST" class="registration-inputs">
+                <input type="text" name="username" placeholder="Username"><br><br>
+                <input type="password" name="password" placeholder="Password"><br><br> 
+                <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    $("button").click(function() {
+    $('html,body').animate({
+        scrollTop: $(".second").offset().top},
+        'slow');
+});
+</script>
+{% endblock %}

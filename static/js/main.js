@@ -89,6 +89,7 @@ class DynamicGreeting extends React.Component {
       <div className="container">
         <div className="row">
             <div className="col-6">
+              <br
               <h3 id="bungee-shade" class="main-page-title">StoryBored</h3>
             </div>
             <div className="col-6">

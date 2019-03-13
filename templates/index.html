@@ -50,56 +50,15 @@
             </h5>
         </div>
     </div>
-    <hr>
-    <!-- <div class="row">
-        <div class="col-4">
-            <input type="submit" name="guest-sign-in" value="Continue as guest" id="guest-button">
-        </div>
-        <div class="col-4">
-            <input type="submit" name="sign-in" value="Sign In" id="user-signin-button">
-        </div>
-        <div class="col-4">
-            <input type="submit" name="register" value="Register" id="new-reg-button">
-        </div>
-    </div> -->
-    <div class="row">
-        <div class="col-4">
-            <div class="sign-in">
-                <h5 id="fredoka-one">Guest</h5>
-                <br>
-                <form action="/guest-continue" method="POST" class="guest-continue">
-                    <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Continue as guest">
-                </form>
-            </div>
-        </div>
-
-        <div class="col-4">
-            <div class="sign-in">
-                <h5 id="fredoka-one">Sign In</h5>
-                <br>
-                <form action="/sign-in" method="POST" class="registration-inputs">
-                    <input type="text" name="username" placeholder="Username"><br><br>
-                    <input type="password" name="password" placeholder="Password"><br><br> 
-                    <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
-                </form>
-            </div>
-        </div>
-
-        <div class="col-4">
-            <div class="registration">
-                <h5 id="fredoka-one">Register</h5>
-                <br>
-                <form action="/register-new" method="POST" class="registration-inputs">
-                    <input type="text" name="fname" placeholder="First name"><br><br>
-                    <input type="text" name="lname" placeholder="Last name"><br><br>
-                    <input type="text" name="email" placeholder="Email"><br><br>
-                    <input type="text" name="username" placeholder="Username"><br><br>
-                    <input type="password" name="password" placeholder="Password"><br><br> 
-                    <input type="submit" name="register" value="Register" id="new-registration-button">
-                </form>
-            </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-12">
+        <div class="get-started">
+            <form action="/get-started" method="POST" class="get-started-form">
+                <input type="submit" name="get-started" id="get-started-button" value="Let's go!">
+            </form>
         </div>
     </div>
-</div>
+    
 {% endblock %}
-<!-- <div>Icons made by <a href="https://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/"              title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/"              title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div> -->

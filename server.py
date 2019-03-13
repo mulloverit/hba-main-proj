@@ -22,6 +22,13 @@ def show_index():
 
     return render_template("index.html")
 
+@app.route("/get-started", methods=['POST'])
+def get_started():
+    """Sign-in and registration page"""
+
+    return render_template("get-started.html")
+
+
 @app.route("/guest-continue", methods=['POST'])
 def guest_continue():
     
