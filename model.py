@@ -98,9 +98,10 @@ class ImageAsset(db.Model):
 
 class AssetsToBoardsRelationship(db.Model):
 
-    __tablename__ = "boards_to_assets"
+    __tablename__ = "assets_to_boards"
 
     relationship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     board_id = db.Column(db.Integer, db.ForeignKey('chapter_boards.board_id'))
     asset_id = db.Column(db.Integer, db.ForeignKey('image_assets.image_id'))
     active = db.Column(db.String(5), nullable=False) # yes / no
@@ -110,6 +111,7 @@ class AssetsToBoardsRelationship(db.Model):
 
         return (f"""<AssetsToBoardsRelationship:
                     relationship_id={self.relationship_id},
+                    user_id={self.user_id},
                     board_id={self.board_id},
                     asset_id={self.asset_id},
                     active={self.active}""")

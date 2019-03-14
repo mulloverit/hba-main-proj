@@ -4,7 +4,7 @@ import os
 from sqlalchemy import func
 
 from config import connect_to_db
-from model import User, ImageAsset, DiffImage, Project, ChapterBoard, db
+from model import User, ImageAsset, AssetsToBoardsRelationship, DiffImage, Project, ChapterBoard, db
 from server import app
 
 CURRENT_DATETIME = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -95,6 +95,23 @@ def load_image_assets():
         db.session.add(input_img)
     db.session.commit()
 
+def load_assets_to_boards_rel():
+
+    print("Assets to boards relationships")
+
+    for row in open("test-fixtures/assets_to_boards.txt"):
+        row = row.rstrip()
+        user_id, board_id, asset_id, active = row.split("|")
+
+        asset_to_board_rel = AssetsToBoardsRelationship(user_id=user_id,
+                                board_id=board_id,
+                                asset_id=asset_id,
+                                active=active)
+
+        db.session.add(asset_to_board_rel)
+    db.session.commit()
+
+
 def load_diff_images():
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
     print("Diff images")
@@ -134,4 +151,5 @@ if __name__ == "__main__":
     load_image_assets()
     load_projects()
     load_chapter_boards()
+    load_assets_to_boards_rel()
     # # load_diff_images()

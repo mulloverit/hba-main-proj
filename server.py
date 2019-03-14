@@ -131,7 +131,54 @@ def main():
     user = UserClass(username)
     images = user.all_image_urls()
     all_user_items = user.all_user_items()
-    chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
+
+    user_record = all_user_items[0]
+    projects_records = all_user_items[1]
+    chapter_board_records = all_user_items[2]
+    image_asset_records = all_user_items[3]
+    assets_to_boards_rel = all_user_items[4]
+
+    chapters = {}
+    active_boards_by_id = set()
+
+    for item in chapter_board_records:
+        print("chapter board", item)
+        if item['active'] == 'yes':
+            active_boards_by_id.add(item['board_id'])
+
+    board_with_assets = {}
+    # for a given board id
+    for board in active_boards_by_id:
+        # go through all board rels
+        for item in assets_to_boards_rel:
+            # if board id matches a bord rel record
+            if item['board_id'] == board:
+                # give me the asset id of that item so i can get the url later
+                if board_with_assets.get(board, None):
+                    board_with_assets[board].append(item['asset_id'])
+                else:
+                    board_with_assets[board] = [item['asset_id']]
+
+    board_with_urls = {}
+    for board, assets in board_with_assets.items():
+        asset_urls = []
+        for asset in assets:
+            for asset_record in image_asset_records:
+                if asset_record['image_id'] == asset:
+                    asset_urls.append(asset_record['image_s3_url'])
+
+        board_with_urls[board] = asset_urls
+
+    chapter_boards_with_asset_urls = {}
+    count = 0 
+    for board, asset_urls in board_with_urls.items():
+        chapter_boards_with_asset_urls[count] = {"boardName": board,
+                                                 "boardAssets": asset_urls}
+        count += 1
+    print("formatted", chapter_boards_with_asset_urls)
+
+    chapters = chapter_boards_with_asset_urls
+    # chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
     chapters = json.dumps(chapters)
     chapters = json.loads(chapters)
 

@@ -159,7 +159,7 @@ class ChapterBoard extends React.Component {
   constructor(props) {
     super(props);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
-    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);x
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
   }
 
   onRemoveAssetClick(event) {
@@ -389,7 +389,9 @@ class MainPageArea extends React.Component {
     })
     console.log("userAssets", userAssetList);
 
-    let userChapters = window.chapters;
+    let userChapters = Object.values(window.chapters);
+    // console.log(Object.values(userChapters));
+    
     userChapters.map(chapter => {
       chapter.key = Math.random().toString(36).substr(2, 9)
       chapter.draggableId = Math.random().toString(36).substr(2, 9)

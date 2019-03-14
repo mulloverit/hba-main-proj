@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import session
 
 from config import connect_to_db, db, app
-from model import User, Project, ChapterBoard, ImageAsset, DiffImage
+from model import User, Project, ChapterBoard, ImageAsset, AssetsToBoardsRelationship, DiffImage
 
 #------------------------------------------------------------------------------#
 ## CLASS DEFINITIONS ##
@@ -180,13 +180,15 @@ class UserClass:
         projects = Project.query.filter(Project.user_id == user.user_id).all()
         chapter_boards = ChapterBoard.query.filter(ChapterBoard.user_id == user.user_id).all()
         image_assets = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
+        assets_to_boards = AssetsToBoardsRelationship.query.filter(AssetsToBoardsRelationship.user_id == user.user_id).all()
         
         user_formatted = format_db_results([user])
         projects_formatted = format_db_results(projects)
         chapters_formatted = format_db_results(chapter_boards)
         image_assets_formatted = format_db_results(image_assets)
+        assets_to_boards_formatted = format_db_results(assets_to_boards)
 
-        all_user_items_list.extend([user_formatted, projects_formatted, chapters_formatted, image_assets_formatted])
+        all_user_items_list.extend([user_formatted, projects_formatted, chapters_formatted, image_assets_formatted, assets_to_boards_formatted])
 
         return all_user_items_list
 
@@ -215,12 +217,12 @@ def format_db_results(query_results, results_as_dict={}, count=0):
     all_formatted_results = []
     for result in query_results:
         formatted_results = {}
-        formatted_result = str(result).rstrip().split(":", 1)[1:]
+        formatted_result = str(result).strip('\n').split(":", 1)[1:]
         split_on_line = formatted_result[0].split(",")
 
         for item in split_on_line:
-            key = item.split("=")[0].lstrip()
-            value = item.split("=")[1].lstrip()
+            key = item.split("=")[0].lstrip().rstrip().strip('\n')
+            value = item.split("=")[1].lstrip().rstrip().strip('\n')
             formatted_results[key] = value
         all_formatted_results.append(formatted_results)
 
