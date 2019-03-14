@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import session
 
 from config import connect_to_db, db, app
-from model import User, InputImage, DiffImage
+from model import User, Project, ChapterBoard, ImageAsset, DiffImage
 
 #------------------------------------------------------------------------------#
 ## CLASS DEFINITIONS ##
@@ -15,12 +15,12 @@ from model import User, InputImage, DiffImage
 
 class ImageClass:
 
-    def __init__(self, image_object, tmp_path, owner):
+    def __init__(self, image_object, tmp_path, user_id):
         """Instantiate an image object"""
 
         import uuid
         
-        self.owner = owner # username
+        self.user_id = user_id # username
         self.tmp_path = tmp_path
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
@@ -38,7 +38,6 @@ class ImageClass:
         """ Uploads an image file to s3, creating instance attributes:
             upload_begin_datetime, s3_key, upload_complete_datetime, s3_location
         """
-
         import boto3, botocore
         from config import s3, s3_dl
 
@@ -76,7 +75,7 @@ class ImageClass:
 
         if input_image_uuids == None:
             
-            image_record = InputImage(image_user_id=user_id, 
+            image_record = ImageAsset(user_id=user_id, 
                     image_size_x=self.size[0],
                     image_size_y=self.size[1],
                     image_format=self.format,
@@ -91,8 +90,8 @@ class ImageClass:
             input_uuid_1 = input_image_uuids[0]
             input_uuid_2 = input_image_uuids[1]
 
-            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
-            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+            input_1_record = ImageAsset.query.filter(ImageAsset.image_uuid == input_uuid_1).first()
+            input_2_record = ImageAsset.query.filter(ImageAsset.image_uuid == input_uuid_2).first()
 
             image_record = DiffImage(diff_user_id=user_id,
                                  im_1_id=input_1_record.image_id,
@@ -107,6 +106,47 @@ class ImageClass:
                                  diff_uuid=self.uuid)
         
         db.session.add(image_record)
+        db.session.commit()
+
+class ProjectClass:
+
+    def __init__(self, project_object, user_id):
+        """Instantiate an image object"""
+        
+        self.user_id = user_id # username
+        self.project_object = project_object
+
+    def add_to_database(self, user_id):
+        """Create database record for an image. Handles input images & diffs."""
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        project_record = Project(user_id=user_id, 
+                project_id=self.project_id,
+                saved_datetime=current_datetime,
+                active="yes")
+        
+        db.session.add(project_record)
+        db.session.commit()
+
+class ChapterBoardClass:
+
+    def __init__(self, chapter_object, user_id):
+        """Instantiate an image object"""
+        
+        self.user_id = user_id # username
+        self.chapter_object = chapter_object
+
+    def add_to_database(self, user_id, project_id):
+        """Create database record for an image. Handles input images & diffs."""
+        
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        chapter_board_record = ChapterBoard(user_id=user_id, 
+                project_id=self.project_id,
+                saved_datetime=current_datetime,
+                active="yes")
+        
+        db.session.add(chapter_board_record)
         db.session.commit()
 
 class UserClass:
@@ -133,75 +173,96 @@ class UserClass:
 
             return None
 
+
+    def all_user_items(self):
+
+        all_image_urls = []
+        user = User.query.filter(User.username == self.username).first()
+        images = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
+        chapter_boards = ChapterBoard.query.filter(ChapterBoard.user_id == user.user_id).all()
+        projects = Project.query.filter(Project.user_id == user.user_id).all()
+
+        for image in images:
+            all_image_urls.append(image.image_s3_url)
+        
+        for cb in chapter_boards:
+            all_chapter_boards.append(cb.WHATINFOHERE)
+        
+        for project in projects:
+            all_projects.append({"title": project.title,
+                                 "description": project.description})
+        
+        return(all_image_urls)
+
     def all_image_urls(self):
 
         all_image_urls = []
         user = User.query.filter(User.username == self.username).first()
-        images = InputImage.query.filter(InputImage.image_user_id == user.user_id).all()
+        images = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
 
         for image in images:
             all_image_urls.append(image.image_s3_url)
         
         return(all_image_urls)
 
-# ---------------------------------------------------------------------------- #
+    # ---------------------------------------------------------------------------- #
 
-def user_sign_in(submitted_username, submitted_password):
-    
-
-    user = UserClass(submitted_username)
-    user_record = user.find_by_username()
-
-    if user_record and (user_record.password == submitted_password):
+    def user_sign_in(submitted_username, submitted_password):
         
-        return "Successfully logged in."
 
-    elif user_record:
+        user = UserClass(submitted_username)
+        user_record = user.find_by_username()
 
-        return "Username and password do not match."
+        if user_record and (user_record.password == submitted_password):
+            
+            return "Successfully logged in."
 
-    else:
+        elif user_record:
 
-        return "Username does not exist. Please register or continue as guest."
+            return "Username and password do not match."
 
-def user_sign_out():
-    # TO DO
-    return "Successfully signed out"
+        else:
 
-def user_registration_new(submitted_username, submitted_password,
-                          submitted_email, submitted_first_name,
-                          submitted_last_name):
+            return "Username does not exist. Please register or continue as guest."
 
-    user = UserClass(submitted_username, submitted_password,
-                     submitted_email, submitted_first_name, submitted_last_name)
+    def user_sign_out():
+        # TO DO
+        return "Successfully signed out"
 
-    if not user.find_by_username():
+    def user_registration_new(submitted_username, submitted_password,
+                              submitted_email, submitted_first_name,
+                              submitted_last_name):
 
-        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        user = UserClass(submitted_username, submitted_password,
+                         submitted_email, submitted_first_name, submitted_last_name)
 
-        user_record = User(username=submitted_username, 
-                            password=submitted_password,
-                            email=submitted_email,
-                            fname=submitted_first_name, 
-                            lname=submitted_last_name,
-                            sign_up_datetime=current_datetime)
+        if not user.find_by_username():
 
-        db.session.add(user_record)
-        db.session.commit()
+            current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-        return "Successfully registered. Please sign in."
-    
-    else:
+            user_record = User(username=submitted_username, 
+                                password=submitted_password,
+                                email=submitted_email,
+                                fname=submitted_first_name, 
+                                lname=submitted_last_name,
+                                sign_up_datetime=current_datetime)
 
-        return "Already a user. Please pick a unique username or sign in."
+            db.session.add(user_record)
+            db.session.commit()
+
+            return "Successfully registered. Please sign in."
+        
+        else:
+
+            return "Already a user. Please pick a unique username or sign in."
 
 
-def current_user():
+    def current_user():
 
-    user_record = User.query.filter(User.username == session['username']).one()
-    user_id = user_record.user_id
+        user_record = User.query.filter(User.username == session['username']).one()
+        user_id = user_record.user_id
 
-    return session['username'], user_id
+        return session['username'], user_id
 
 
 # ---------------------------------------------------------------------------- #

@@ -30,6 +30,22 @@ class Project(db.Model):
 
     __tablename__ = "projects"
 
+    project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    project_name = db.Column(db.String(100), nullable=False)
+    project_description = db.Column(db.String(1000), nullable=False)
+    active = db.Column(db.String(5), nullable=False) # yes / no
+
+    def __repr__(self):
+        """Formatted output when chapter board is returned"""
+
+        return (f"""<Project:
+                    project_id={self.project_id},
+                    user_id={self.user_id},
+                    project_name={self.saved_datetime},
+                    project_description={self.project_description},
+                    active={self.active}""")
+
 
 class ChapterBoard(db.Model):
     """User saved asset groups"""
@@ -37,43 +53,25 @@ class ChapterBoard(db.Model):
     __tablename__ = "chapter_boards"
 
     board_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    board_uuid = db.Column(db.String(500), nullable=False)
-    board_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    board_asset_list = db.Column(db.String,nullable=False)
-    saved_datetime = db.Column(db.String(50), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    project_id = db.Column(db.Integer, db.ForeignKey('projects.project_id'))
+    active = db.Column(db.String(5), nullable=False) # yes / no
 
     def __repr__(self):
         """Formatted output when chapter board is returned"""
 
         return (f"""<ChapterBoard:
                     board_id={self.board_id},
-                    board_uuid={self.board_uuid},
-                    board_user_id={self.board_user_id},
-                    board_asset_list={self.board_asset_list},
-                    saved_datetime={self.saved_datetime}""")
+                    user_id={self.user_id},
+                    active={self.active}""")
 
-class ProjectToBoardRelationship(db.Model):
-
-    __tablename__ = "project_to_boards"
-
-class BoardToAssetRelationship(db.Model):
-
-    __tablename__ = "boards_to_assets"
-
-    relationship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    board_id = db.Column(db.Integer, db.ForeignKey('chapter_boards.board_id'))
-    asset_id = db.Column(db.Integer, db.ForeignKey('input_images.image_id'))
-    active = db.Column(db.String(5), nullable=False) # yes / no
-
-
-
-class InputImage(db.Model):
+class ImageAsset(db.Model):
     """Input image model."""
 
     __tablename__ = "input_images"
 
     image_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    image_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     image_upload_begin_datetime = db.Column(db.String(50), nullable=False)
     image_upload_complete_datetime = db.Column(db.String(50), nullable=False)
     image_size_x = db.Column(db.Integer, nullable=False)
@@ -83,11 +81,10 @@ class InputImage(db.Model):
     image_s3_url = db.Column(db.String(1000), nullable=False)
     image_uuid = db.Column(db.String(500), nullable=False)
 
-
     def __repr__(self):
         """Formatted output when class obj is returned. Does not return password."""
 
-        return (f"""<InputImage:
+        return (f"""<ImageAsset:
                     image_id={self.image_id}, 
                     image_user_id={self.image_user_id}), 
                     image_upload_begin_datetime={self.image_upload_begin_datetime},
@@ -99,6 +96,23 @@ class InputImage(db.Model):
                     image_s3_url={self.image_s3_url},
                     image_uuid={self.image_uuid}""")
 
+class AssetsToBoardsRelationship(db.Model):
+
+    __tablename__ = "boards_to_assets"
+
+    relationship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    board_id = db.Column(db.Integer, db.ForeignKey('chapter_boards.board_id'))
+    asset_id = db.Column(db.Integer, db.ForeignKey('input_images.image_id'))
+    active = db.Column(db.String(5), nullable=False) # yes / no
+
+    def __repr__(self):
+        """Formatted output when chapter board is returned"""
+
+        return (f"""<AssetsToBoardsRelationship:
+                    relationship_id={self.relationship_id},
+                    board_id={self.board_id},
+                    asset_id={self.asset_id},
+                    active={self.active}""")
 
 class DiffImage(db.Model):
     """Input image model."""

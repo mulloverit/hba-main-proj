@@ -4,7 +4,7 @@ import os
 from sqlalchemy import func
 
 from config import connect_to_db
-from model import User, InputImage, DiffImage, db
+from model import User, ImageAsset, DiffImage, Project, ChapterBoard, db
 from server import app
 
 CURRENT_DATETIME = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -33,18 +33,53 @@ def load_users():
 
     db.session.commit()
 
-def load_input_imgs():
+def load_projects():
     """Load fake input img data from test-fixtures/input-imgs.txt"""
-    print("Input images")
+    print("Projects")
 
     # clean out any existing records from table
-    InputImage.query.delete()
+    Project.query.delete()
 
-    for row in open("test-fixtures/input-images.txt"):
+    for row in open("test-fixtures/projects.txt"):
+        row = row.rstrip()
+        user_id, project_name, project_description, active = row.split("|")
+
+        project = Project(user_id=user_id,
+                          project_name=project_name,
+                          project_description=project_description,
+                          active=active)
+
+        db.session.add(project)
+
+    db.session.commit()
+
+
+def load_chapter_boards():
+
+    print("Chapter boards")
+
+    ChapterBoard.query.delete()
+
+    for row in open("test-fixtures/chapter_boards.txt"):
+        row = row.rstrip()
+        user_id, project_id, active = row.split("|")
+
+        chapter_board = ChapterBoard(user_id=user_id, 
+                                     project_id=project_id,
+                                     active=active)
+
+def load_image_assets():
+    """Load fake input img data from test-fixtures/input-imgs.txt"""
+    print("Image assets")
+
+    # clean out any existing records from table
+    ImageAsset.query.delete()
+
+    for row in open("test-fixtures/image_assets.txt"):
         row = row.rstrip()
         im_user_id, im_size_x, im_size_y, im_format, im_mode, im_s3_url, img_uuid = row.split("|")
 
-        input_img = InputImage(image_user_id=im_user_id,
+        input_img = ImageAsset(user_id=im_user_id,
                                image_size_x=im_size_x,
                                image_size_y=im_size_y,
                                image_format=im_format,
@@ -58,7 +93,7 @@ def load_input_imgs():
 
     db.session.commit()
 
-def load_diff_imgs():
+def load_diff_images():
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
     print("Diff images")
 
@@ -94,5 +129,6 @@ if __name__ == "__main__":
     db.create_all()
 
     load_users()
-    # load_input_imgs()
-    # load_diff_imgs()
+    load_image_assets()
+    load_projects()
+    # load_diff_images()

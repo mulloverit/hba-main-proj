@@ -9,12 +9,9 @@ from werkzeug import secure_filename
 from werkzeug.datastructures import FileStorage
 
 from config import *
-from model import User, InputImage, DiffImage
 from utils import *
 
-
 app.secret_key = "what"
-
 
 @app.route("/")
 def show_index():
