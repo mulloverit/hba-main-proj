@@ -173,26 +173,22 @@ class UserClass:
 
             return None
 
-
     def all_user_items(self):
 
-        all_image_urls = []
+        all_user_items_list = []
         user = User.query.filter(User.username == self.username).first()
-        images = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
-        chapter_boards = ChapterBoard.query.filter(ChapterBoard.user_id == user.user_id).all()
         projects = Project.query.filter(Project.user_id == user.user_id).all()
+        chapter_boards = ChapterBoard.query.filter(ChapterBoard.user_id == user.user_id).all()
+        image_assets = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
+        
+        user_formatted = format_db_results([user])
+        projects_formatted = format_db_results(projects)
+        chapters_formatted = format_db_results(chapter_boards)
+        image_assets_formatted = format_db_results(image_assets)
 
-        for image in images:
-            all_image_urls.append(image.image_s3_url)
-        
-        for cb in chapter_boards:
-            all_chapter_boards.append(cb.WHATINFOHERE)
-        
-        for project in projects:
-            all_projects.append({"title": project.title,
-                                 "description": project.description})
-        
-        return(all_image_urls)
+        all_user_items_list.extend([user_formatted, projects_formatted, chapters_formatted, image_assets_formatted])
+
+        return all_user_items_list
 
     def all_image_urls(self):
 
@@ -205,64 +201,88 @@ class UserClass:
         
         return(all_image_urls)
 
-    # ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+###############NON CLASS SPECIFIC HELPER FUNCTIONS BELOW HERE###################
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
 
-    def user_sign_in(submitted_username, submitted_password):
+def format_db_results(query_results, results_as_dict={}, count=0):
+
+    
+    all_formatted_results = []
+    for result in query_results:
+        formatted_results = {}
+        formatted_result = str(result).rstrip().split(":", 1)[1:]
+        split_on_line = formatted_result[0].split(",")
+
+        for item in split_on_line:
+            key = item.split("=")[0].lstrip()
+            value = item.split("=")[1].lstrip()
+            formatted_results[key] = value
+        all_formatted_results.append(formatted_results)
+
+    return all_formatted_results
+
+
+def user_sign_in(submitted_username, submitted_password):
+    
+
+    user = UserClass(submitted_username)
+    user_record = user.find_by_username()
+
+    if user_record and (user_record.password == submitted_password):
         
+        return "Successfully logged in."
 
-        user = UserClass(submitted_username)
-        user_record = user.find_by_username()
+    elif user_record:
 
-        if user_record and (user_record.password == submitted_password):
-            
-            return "Successfully logged in."
+        return "Username and password do not match."
 
-        elif user_record:
+    else:
 
-            return "Username and password do not match."
+        return "Username does not exist. Please register or continue as guest."
 
-        else:
+def user_sign_out():
+    # TO DO
+    return "Successfully signed out"
 
-            return "Username does not exist. Please register or continue as guest."
+def user_registration_new(submitted_username, submitted_password,
+                          submitted_email, submitted_first_name,
+                          submitted_last_name):
 
-    def user_sign_out():
-        # TO DO
-        return "Successfully signed out"
+    user = UserClass(submitted_username, submitted_password,
+                     submitted_email, submitted_first_name, submitted_last_name)
 
-    def user_registration_new(submitted_username, submitted_password,
-                              submitted_email, submitted_first_name,
-                              submitted_last_name):
+    if not user.find_by_username():
 
-        user = UserClass(submitted_username, submitted_password,
-                         submitted_email, submitted_first_name, submitted_last_name)
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
 
-        if not user.find_by_username():
+        user_record = User(username=submitted_username, 
+                            password=submitted_password,
+                            email=submitted_email,
+                            fname=submitted_first_name, 
+                            lname=submitted_last_name,
+                            sign_up_datetime=current_datetime)
 
-            current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+        db.session.add(user_record)
+        db.session.commit()
 
-            user_record = User(username=submitted_username, 
-                                password=submitted_password,
-                                email=submitted_email,
-                                fname=submitted_first_name, 
-                                lname=submitted_last_name,
-                                sign_up_datetime=current_datetime)
+        return "Successfully registered. Please sign in."
+    
+    else:
 
-            db.session.add(user_record)
-            db.session.commit()
-
-            return "Successfully registered. Please sign in."
-        
-        else:
-
-            return "Already a user. Please pick a unique username or sign in."
+        return "Already a user. Please pick a unique username or sign in."
 
 
-    def current_user():
+def current_user():
 
-        user_record = User.query.filter(User.username == session['username']).one()
-        user_id = user_record.user_id
+    user_record = User.query.filter(User.username == session['username']).one()
+    user_id = user_record.user_id
 
-        return session['username'], user_id
+    return session['username'], user_id
 
 
 # ---------------------------------------------------------------------------- #

@@ -15,7 +15,7 @@ def load_users():
     print("Users")
 
     # empty user table if any records exist
-    User.query.delete()
+    # User.query.delete()
 
     for row in open("test-fixtures/users.txt"):
         row = row.rstrip()
@@ -30,7 +30,6 @@ def load_users():
                     sign_up_datetime=CURRENT_DATETIME)
 
         db.session.add(user)
-
     db.session.commit()
 
 def load_projects():
@@ -38,7 +37,7 @@ def load_projects():
     print("Projects")
 
     # clean out any existing records from table
-    Project.query.delete()
+    # Project.query.delete()
 
     for row in open("test-fixtures/projects.txt"):
         row = row.rstrip()
@@ -50,30 +49,34 @@ def load_projects():
                           active=active)
 
         db.session.add(project)
-
     db.session.commit()
 
 
 def load_chapter_boards():
 
     print("Chapter boards")
-
-    ChapterBoard.query.delete()
+    # ChapterBoard.query.delete()
 
     for row in open("test-fixtures/chapter_boards.txt"):
+        
         row = row.rstrip()
         user_id, project_id, active = row.split("|")
-
+        
         chapter_board = ChapterBoard(user_id=user_id, 
                                      project_id=project_id,
                                      active=active)
+
+        db.session.add(chapter_board)
+    db.session.commit()
+
+
 
 def load_image_assets():
     """Load fake input img data from test-fixtures/input-imgs.txt"""
     print("Image assets")
 
     # clean out any existing records from table
-    ImageAsset.query.delete()
+    # ImageAsset.query.delete()
 
     for row in open("test-fixtures/image_assets.txt"):
         row = row.rstrip()
@@ -90,7 +93,6 @@ def load_image_assets():
                                image_uuid=img_uuid)
 
         db.session.add(input_img)
-
     db.session.commit()
 
 def load_diff_images():
@@ -98,7 +100,7 @@ def load_diff_images():
     print("Diff images")
 
     # clean out any existing records from table
-    DiffImage.query.delete()
+    # DiffImage.query.delete()
 
     for row in open("test-fixtures/diff-images.txt"):
         row = row.rstrip()
@@ -117,7 +119,6 @@ def load_diff_images():
                              diff_uuid=img_uuid)
 
         db.session.add(diff_img)
-
     db.session.commit()
 
 if __name__ == "__main__":
@@ -127,9 +128,10 @@ if __name__ == "__main__":
     os.system("createdb storybored")
     connect_to_db(app)
     db.create_all()
+    db.session.commit()
 
     load_users()
     load_image_assets()
     load_projects()
     load_chapter_boards()
-    # load_diff_images()
+    # # load_diff_images()

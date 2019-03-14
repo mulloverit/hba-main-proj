@@ -7,8 +7,8 @@
 2 | 1 | yes
 2 | 1 | yes
 2 | 3 | yes
-3 | 6 | yes
-3 | 6 | yes
-3 | 6 | yes
-4 | 5 | yes
+3 | 2 | yes
+3 | 2 | yes
+3 | 2 | yes
+4 | 4 | yes
 4 | 3 | yes

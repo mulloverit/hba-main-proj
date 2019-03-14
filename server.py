@@ -130,6 +130,7 @@ def main():
     username, user_id = current_user()
     user = UserClass(username)
     images = user.all_image_urls()
+    all_user_items = user.all_user_items()
     chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
     chapters = json.dumps(chapters)
     chapters = json.loads(chapters)
