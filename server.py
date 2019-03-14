@@ -60,8 +60,6 @@ def register_user():
 
     message = user_registration_new(request.form['username'], request.form['password'],
                      request.form['email'], request.form['fname'], request.form['lname'])
-    
-    flash (message)
 
     return redirect('/main')
 
@@ -77,24 +75,18 @@ def upload_inputs():
     try:
     
         for file in request.files:
-            
             user_submitted_image = request.files.get(file)
-            
+
             user_submitted_image_temporary_path = ('static/images/{}_{}'.format(
                                                 username,
                                                 user_submitted_image.filename))
-
             user_submitted_image.save(user_submitted_image_temporary_path)
-        
             user_submitted_image_object = ImageClass(user_submitted_image,
                                             user_submitted_image_temporary_path,
                                             username,
                                             )
-            
             print(user_submitted_image_object.upload_to_s3(S3_BUCKET))
-
             user_submitted_image_object.add_to_database(user_id)
-            
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
                                             )    
@@ -115,12 +107,23 @@ def upload_inputs():
 
 @app.route("/save-as", methods=['POST'])
 def save_as():
+    
+    username, user_id = current_user()
+    chapter_boards_json = json.loads(request.form.get('userChapterBoards'))
+    print("Starting info:", chapter_boards_json)
 
-    jayson = json.loads(request.form.get('userChapterBoards'))
+    for board in chapter_boards_json:
+        for asset in board['boardAssets']:
+            asset_s3_url = asset['asset']
+            asset_object = ImageAsset.query.filter(ImageAsset.image_s3_url == asset_s3_url).one()
+            asset_id = asset_object.image_id
+            print("Found asset by id:", asset_object.image_id)
 
-    for item in jayson:
-        # print("JSON ITEM", item)
-        print(item.get('boardAssets'))
+        # AssetsToBoardsRelationship(user_id=user_id,
+        #                            board_id=,
+        #                            asset_id=asset_id,
+        #                            active="yes")
+        chapter_board = ChapterBoard()
     
     return "hello"
 

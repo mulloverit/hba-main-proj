@@ -296,7 +296,7 @@ class AssetUpload extends React.Component {
                           this.fileInput.current.files[0].name
                           );
     this.props.onSubmit(file);
-    document.getElementById('file-input').value = "";
+    document.getElementById('file-input-field').value = "";
   }
 
   render() {
@@ -355,7 +355,7 @@ class SaveAs extends React.Component {
   handleClick(event) {
     event.preventDefault();
 
-    let userChapterBoards = this.props.userchapterboardlist;
+    let userChapterBoards = this.props.userChapterBoardList;
     this.props.handleSaveAs(userChapterBoards);
   }
 
@@ -390,10 +390,12 @@ class MainPageArea extends React.Component {
     console.log("userAssets", userAssetList);
 
     let userChapters = Object.values(window.chapters);
-    // console.log(Object.values(userChapters));
+    console.log(Object.values(userChapters));
     
     userChapters.map(chapter => {
       chapter.key = Math.random().toString(36).substr(2, 9)
+      chapter.dbBoardId = chapter.boardName
+      chapter.boardName = "board_" + Math.random().toString(36).substr(2, 9)
       chapter.draggableId = Math.random().toString(36).substr(2, 9)
       chapter.chapterId = Math.random().toString(36).substr(2, 9)
       chapter.boardAssets = chapter.boardAssets.map(asset => {
@@ -433,7 +435,7 @@ class MainPageArea extends React.Component {
 
     else if (validDropped.source.droppableId === "assetTray" && 
       validDropped.destination.droppableId.includes("board")) {
-
+  
         let targetBoard = this.state.userChapterBoardList.find(function(board) {
           if (board.boardName === validDropped.destination.droppableId) {
             return board  
@@ -543,7 +545,7 @@ class MainPageArea extends React.Component {
     const postUrl = "/save-as"
     const xmlPackage = new XMLHttpRequest();
     let userChapterBoardsJSON = JSON.stringify(userChapterBoards);
-
+    console.log("JSON chpbds", userChapterBoardsJSON)
     formData.append("userChapterBoards", userChapterBoardsJSON);
     xmlPackage.open("POST", postUrl);
     xmlPackage.responseType = 'text';
