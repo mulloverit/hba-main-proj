@@ -114,16 +114,22 @@ def save_as():
 
     for board in chapter_boards_json:
         for asset in board['boardAssets']:
-            asset_s3_url = asset['asset']
-            asset_object = ImageAsset.query.filter(ImageAsset.image_s3_url == asset_s3_url).one()
-            asset_id = asset_object.image_id
-            print("Found asset by id:", asset_object.image_id)
+            asset_url = asset['asset']
+            
+            if "static/images/" in asset_url:
+                asset_id = 0 # this hsould be an s3 url anyway for default image
+            else: 
+                asset_object = ImageAsset.query.filter(ImageAsset.image_s3_url == asset_url).one()
+                asset_id = asset_object.image_id
+                print("Found asset by id:", asset_object.image_id)
 
-        # AssetsToBoardsRelationship(user_id=user_id,
-        #                            board_id=,
-        #                            asset_id=asset_id,
-        #                            active="yes")
-        chapter_board = ChapterBoard()
+    print("this many cpbs", len(chapter_boards_json))
+
+    AssetsToBoardsRelationship(user_id=user_id,
+                               board_id=0,
+                               asset_id=asset_id,
+                               active="yes")
+    chapter_board = ChapterBoard()
     
     return "hello"
 
