@@ -87,25 +87,29 @@ class DynamicGreeting extends React.Component {
 
     return (
       <div className="container">
+      <br />
         <div className="row">
-            <div className="col-6">
-              <br
-              <h3 id="bungee-shade" class="main-page-title">StoryBored</h3>
-            </div>
-            <div className="col-6">
-            <form action="/sign-out" method="POST">
-              <button type="submit" name="sign-out" id="sign-out-button">sign-out</button>
+          <div className="col-6">
+            <h3 id="bungee-shade" className="main-page-title">StoryBored</h3>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-3">
+            <h3 id="welcome-user">Welcome, {UserName}</h3>
+          </div>
+          <div className="col-3">
+            <button id="project-mgmt">Project Management</button>
+          </div>
+          <div className="col-3">
+            <button id="project-mgmt">Asset Management  </button>
+          </div>
+          <div className="col-3">
+              <form action="/sign-out" method="POST">
+                <button type="submit" name="sign-out" id="sign-out-button">sign-out</button>
             </form>
           </div>
         </div>
         <hr />
-        <div className="row">
-          <div className="col-6">
-            <br />
-            <h3 id="welcome-user">Welcome, {UserName}</h3>
-            <br />
-          </div>
-        </div>
       </div>
     );
   }
@@ -155,8 +159,7 @@ class ChapterBoard extends React.Component {
   constructor(props) {
     super(props);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
-    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
-
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);x
   }
 
   onRemoveAssetClick(event) {
@@ -367,8 +370,6 @@ class SaveAs extends React.Component {
   }
 }
 
-
-
 class MainPageArea extends React.Component {
   constructor(props) {
     super(props);
@@ -576,7 +577,6 @@ class MainPageArea extends React.Component {
     this.setState({
       userChapterBoardList: this.state.userChapterBoardList,
     });
-
   }
 
   onRemoveAssetClick(event) {

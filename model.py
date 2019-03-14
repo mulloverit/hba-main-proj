@@ -26,6 +26,46 @@ class User(db.Model):
                         username={self.username},
                         sign_up_datetime={self.sign_up_datetime}""")
 
+class Project(db.Model):
+
+    __tablename__ = "projects"
+
+
+class ChapterBoard(db.Model):
+    """User saved asset groups"""
+
+    __tablename__ = "chapter_boards"
+
+    board_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    board_uuid = db.Column(db.String(500), nullable=False)
+    board_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    board_asset_list = db.Column(db.String,nullable=False)
+    saved_datetime = db.Column(db.String(50), nullable=False)
+
+    def __repr__(self):
+        """Formatted output when chapter board is returned"""
+
+        return (f"""<ChapterBoard:
+                    board_id={self.board_id},
+                    board_uuid={self.board_uuid},
+                    board_user_id={self.board_user_id},
+                    board_asset_list={self.board_asset_list},
+                    saved_datetime={self.saved_datetime}""")
+
+class ProjectToBoardRelationship(db.Model):
+
+    __tablename__ = "project_to_boards"
+
+class BoardToAssetRelationship(db.Model):
+
+    __tablename__ = "boards_to_assets"
+
+    relationship_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    board_id = db.Column(db.Integer, db.ForeignKey('chapter_boards.board_id'))
+    asset_id = db.Column(db.Integer, db.ForeignKey('input_images.image_id'))
+    active = db.Column(db.String(5), nullable=False) # yes / no
+
+
 
 class InputImage(db.Model):
     """Input image model."""
@@ -58,28 +98,6 @@ class InputImage(db.Model):
                     image_mode={self.image_mode},
                     image_s3_url={self.image_s3_url},
                     image_uuid={self.image_uuid}""")
-
-
-class ChapterBoard(db.Model):
-    """User saved asset groups"""
-
-    __tablename__ = "chapter_boards"
-
-    board_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    board_uuid = db.Column(db.String(500), nullable=False)
-    board_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    board_asset_list = db.Column(db.String,nullable=False)
-    saved_datetime = db.Column(db.String(50), nullable=False)
-
-    def __repr__(self):
-        """Formatted output when chapter board is returned"""
-
-        return (f"""<ChapterBoard:
-                    board_id={self.board_id},
-                    board_uuid={self.board_uuid},
-                    board_user_id={self.board_user_id},
-                    board_asset_list={self.board_asset_list},
-                    saved_datetime={self.saved_datetime}""")
 
 
 class DiffImage(db.Model):
