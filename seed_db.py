@@ -123,12 +123,13 @@ def load_diff_images():
 if __name__ == "__main__":
 
     # creates tables, in case they haven't been created yet
-    os.system("dropdb imgdiffs")
-    os.system("createdb imgdiffs")
+    os.system("dropdb storybored")
+    os.system("createdb storybored")
     connect_to_db(app)
     db.create_all()
 
     load_users()
     load_image_assets()
     load_projects()
+    load_chapter_boards()
     # load_diff_images()

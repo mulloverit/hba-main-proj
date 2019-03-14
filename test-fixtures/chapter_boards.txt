@@ -1,14 +1,14 @@
-1|4567|4567|JPEG|RGB|s3://fake-data/cmahon/0000001/test.jpg|4e270095-f3b3-4a34-baf9-522782077c75
-1|4567|4567|JPEG|RGB|s3://fake-data/cmahon/0000002/test.jpg|1e1f3960-1756-4f54-b9d6-abe024d62f87
-1|9876|4566|JPEG|RGB|s3://fake-data/cmahon/0000003/test.jpg|fb498ac9-b2a5-44e2-9464-702093e82d50
-1|9876|4566|JPEG|RGB|s3://fake-data/cmahon/0000004/test.jpg|a77683e0-f7a6-47ac-9611-a17b8c361533
-1|3902|4000|JPEG|RGB|s3://fake-data/cmahon/0000005/test.jpg|98a3a832-6c40-48b7-b531-23692c6afb87
-2|3902|4000|JPEG|RGB|s3://fake-data/amahon/0000001/test.jpg|52abb98c-d40d-40f0-9a98-adc140dc3db1
-2|3902|4000|JPEG|RGB|s3://fake-data/amahon/0000002/test.jpg|2750917c-689c-41ed-8fb4-e79d39456edd
-2|3902|4000|JPEG|RGB|s3://fake-data/amahon/0000003/test.jpg|70ada9a4-99ea-4d25-88f1-13774240eaff
-2|3902|4000|JPEG|RGB|s3://fake-data/amahon/0000004/test.jpg|f9ec0d51-65cf-4ab1-b0a1-d93107c50d31
-3|3902|4000|JPEG|RGB|s3://fake-data/mcbrush/0000001/test.jpg|8c5d02f7-3c0e-476a-89ad-2d7a3c6f68d4
-3|3902|4000|JPEG|RGB|s3://fake-data/mcbrush/0000002/test.jpg|6ad29f9c-84d9-40e5-8ae2-c322f9870d7b
-3|3902|4000|JPEG|RGB|s3://fake-data/mcbrush/0000003/test.jpg|e22012e8-142b-4391-9f8d-f968a41bf920
-4|3902|4000|JPEG|RGB|s3://fake-data/breinhart/0000001/test.jpg|813fdd1f-1dcb-4000-abd7-08fda24275e0
-4|3902|4000|JPEG|RGB|s3://fake-data/breinhart/0000002/test.jpg|512f01ef-85fa-4c2d-a017-dfd522493a86
+1 | 1 | yes
+1 | 3 | yes
+1 | 1 | no
+1 | 1 | yes
+1 | 1 | yes
+2 | 1 | yes
+2 | 1 | yes
+2 | 1 | yes
+2 | 3 | yes
+3 | 6 | yes
+3 | 6 | yes
+3 | 6 | yes
+4 | 5 | yes
+4 | 3 | yes
