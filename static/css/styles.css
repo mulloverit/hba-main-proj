@@ -15,7 +15,7 @@ h2, h5 {
     float: left;
 }
 
-#guest-button #user-signin-button #new-reg-button {
+#guest-button #user-signin-button #register-button #ill-register {
     background-color: #E2E7FF;
     position: relative;
     text-align: center;
@@ -123,8 +123,8 @@ h3#bungee-shade.get-started-page-title {
     text-align: center;
 }
 
-#get-started-button, #new-registration-button,
-#user-sign-in-button, #guest-sign-in-button  {
+#get-started-button, #register-button,
+#user-sign-in-button, #guest-sign-in-button, #ill-register  {
     background-color: #025ae8;
     color: white;
     font-family: 'Bungee Hairline', cursive;
@@ -136,9 +136,11 @@ h3#bungee-shade.get-started-page-title {
     font-family: 'Bungee Hairline', cursive;
     height: 75px;
     width: 75px;
-
 }
 
+#scroll-to-me {
+    background-image: url("/static/images/adventure-time-landscape.JPG");
+}
 
 /*#B4FFEC - pastel turquoise
 #66FFD9 - brighter turq

@@ -21,24 +21,26 @@
     </div>
 </div>
 <hr>
-<div class="row row-centered">
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/character-drawing.JPG"></img>
-    </div>
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/lizard-face.JPG"></img>
-    </div>
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/mtn-sketch.png"></img>
-    </div>
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/wtf-lady.png"></img>
-    </div>
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/night-sky-paint-sample.png"></img>
-    </div>
-    <div class="col-2">
-        <img id="index-page-character-drawing" src="static/images/drawing-desk.png"></img>
+<div class="container">
+    <div class="row text-centered">
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/character-drawing.JPG"></img>
+        </div>
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/lizard-face.JPG"></img>
+        </div>
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/mtn-sketch.png"></img>
+        </div>
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/wtf-lady.png"></img>
+        </div>
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/night-sky-paint-sample.png"></img>
+        </div>
+        <div class="col-2">
+            <img id="index-page-character-drawing" src="static/images/drawing-desk.png"></img>
+        </div>
     </div>
 </div>
 <hr>
@@ -55,10 +57,60 @@
 <div class="row">
     <div class="col-12">
         <div class="get-started">
-            <form action="/get-started" method="POST" class="get-started-form">
-                <input type="submit" name="get-started" id="get-started-button" value="Let's go!">
-            </form>
+            <!-- <form action="/get-started" method="POST" class="get-started-form"> -->
+                <!-- <input type="submit" name="get-started" id="get-started-button" value="Let's go!"> -->
+            <!-- </form> -->
+            <button type="button" id="get-started-button">Let's go!</button>
         </div>
     </div>
-    
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<hr>
+<div class="container" id="scroll-to-me">
+<br>
+<br><br><br>
+    <div class="row">
+    <br><br><br>
+    <div class="col-4">
+        <form action="/sign-in" method="POST" class="registration-inputs">
+            <input type="text" name="username" placeholder="Username">
+            <input type="password" name="password" placeholder="Password">
+            <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
+        </form>
+    </div>
+    <div class="col-4">
+        <form action="/guest-continue" method="POST" class="guest-continue">
+            <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Nah I'm a guest">
+        </form>
+    </div>
+    <div class="col-4">
+        <button type="button" name="ill-register" id="ill-register" value="I'll register">I'll register</button>
+    </div>
+    </div>
+    <br><br><br>
+    <div class="row" id="register-here">
+          <form action="/register-new" method="POST" class="registration-inputs">
+            <input type="text" name="fname" placeholder="First name">
+            <input type="text" name="lname" placeholder="Last name">
+            <input type="text" name="email" placeholder="Email">
+            <input type="text" name="username" placeholder="Username">
+            <input type="text" name="password" placeholder="Password">
+            <input type="submit" name="register-button" id="register-button" value="Register">
+        </form>
+    </div>
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</div>
+<script>
+    $("#get-started-button").click(function() {
+        $('html,body').animate({
+            scrollTop: $("#scroll-to-me").offset().top},
+            'slow');
+    });
+    $("#ill-register").click(function() {
+        $('html,body').animate({
+            scrollTop: $("#register-here").offset().top},
+            'slow');
+    });
+</script>
 {% endblock %}
