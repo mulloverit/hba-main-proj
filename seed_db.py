@@ -4,7 +4,7 @@ import os
 from sqlalchemy import func
 
 from config import connect_to_db
-from model import User, InputImage, DiffImage, db
+from model import User, ImageAsset, AssetsToBoardsRelationship, DiffImage, Project, ChapterBoard, db
 from server import app
 
 CURRENT_DATETIME = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
@@ -15,7 +15,7 @@ def load_users():
     print("Users")
 
     # empty user table if any records exist
-    User.query.delete()
+    # User.query.delete()
 
     for row in open("test-fixtures/users.txt"):
         row = row.rstrip()
@@ -30,21 +30,59 @@ def load_users():
                     sign_up_datetime=CURRENT_DATETIME)
 
         db.session.add(user)
-
     db.session.commit()
 
-def load_input_imgs():
+def load_projects():
     """Load fake input img data from test-fixtures/input-imgs.txt"""
-    print("Input images")
+    print("Projects")
 
     # clean out any existing records from table
-    InputImage.query.delete()
+    # Project.query.delete()
 
-    for row in open("test-fixtures/input-images.txt"):
+    for row in open("test-fixtures/projects.txt"):
+        row = row.rstrip()
+        user_id, project_name, project_description, active = row.split("|")
+
+        project = Project(user_id=user_id,
+                          project_name=project_name,
+                          project_description=project_description,
+                          active=active)
+
+        db.session.add(project)
+    db.session.commit()
+
+
+def load_chapter_boards():
+
+    print("Chapter boards")
+    # ChapterBoard.query.delete()
+
+    for row in open("test-fixtures/chapter_boards.txt"):
+        
+        row = row.rstrip()
+        user_id, project_id, active = row.split("|")
+        
+        chapter_board = ChapterBoard(user_id=user_id, 
+                                     project_id=project_id,
+                                     active=active)
+
+        db.session.add(chapter_board)
+    db.session.commit()
+
+
+
+def load_image_assets():
+    """Load fake input img data from test-fixtures/input-imgs.txt"""
+    print("Image assets")
+
+    # clean out any existing records from table
+    # ImageAsset.query.delete()
+
+    for row in open("test-fixtures/image_assets.txt"):
         row = row.rstrip()
         im_user_id, im_size_x, im_size_y, im_format, im_mode, im_s3_url, img_uuid = row.split("|")
 
-        input_img = InputImage(image_user_id=im_user_id,
+        input_img = ImageAsset(user_id=im_user_id,
                                image_size_x=im_size_x,
                                image_size_y=im_size_y,
                                image_format=im_format,
@@ -55,15 +93,31 @@ def load_input_imgs():
                                image_uuid=img_uuid)
 
         db.session.add(input_img)
-
     db.session.commit()
 
-def load_diff_imgs():
+def load_assets_to_boards_rel():
+
+    print("Assets to boards relationships")
+
+    for row in open("test-fixtures/assets_to_boards.txt"):
+        row = row.rstrip()
+        user_id, board_id, asset_id, active = row.split("|")
+
+        asset_to_board_rel = AssetsToBoardsRelationship(user_id=user_id,
+                                board_id=board_id,
+                                asset_id=asset_id,
+                                active=active)
+
+        db.session.add(asset_to_board_rel)
+    db.session.commit()
+
+
+def load_diff_images():
     """Load fake diff img data from test-fixtures/diff-imgs.txt"""
     print("Diff images")
 
     # clean out any existing records from table
-    DiffImage.query.delete()
+    # DiffImage.query.delete()
 
     for row in open("test-fixtures/diff-images.txt"):
         row = row.rstrip()
@@ -82,17 +136,20 @@ def load_diff_imgs():
                              diff_uuid=img_uuid)
 
         db.session.add(diff_img)
-
     db.session.commit()
 
 if __name__ == "__main__":
 
     # creates tables, in case they haven't been created yet
-    os.system("dropdb imgdiffs")
-    os.system("createdb imgdiffs")
+    os.system("dropdb storybored")
+    os.system("createdb storybored")
     connect_to_db(app)
     db.create_all()
+    db.session.commit()
 
     load_users()
-    # load_input_imgs()
-    # load_diff_imgs()
+    load_image_assets()
+    load_projects()
+    load_chapter_boards()
+    load_assets_to_boards_rel()
+    # # load_diff_images()

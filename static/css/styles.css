@@ -1,26 +1,66 @@
 
 body {
-    background-color: #F3F3F3;
+    background-color: #FFFFFF;
 }
 
-.individual-board {
-    border-style: dashed;
-    margin: 10px;
+h2, form, .index-page-title, .index-page-title-subscript,
+.get-started {
+    text-align: center;
+}
+
+button, input, #get-started-button {
+    border-radius: 10px;
+    outline: none;
+}
+
+#bungee-shade { 
+    font-family: 'Bungee Shade', cursive;
+}
+
+#bungee-hairline { 
+    font-family: 'Bungee Hairline', cursive;
+}
+
+#fredoka-one, #welcome-user { 
+    font-family: 'Fredoka One', cursive;
+}
+
+#index-page-character-drawing {
     padding: 10px;
+    height: 150px;
+    width: 150px;
+    border-radius: 25px;
 }
 
-#file-input-field, #new-chapter-board-button {
-    background-color: #D8E2DC;
+#get-logged-in {
+    background-color: #f7f7f7;
+    border-radius: 15px;
     position: relative;
-    left: 20px;
-    margin: 10px;
-    padding: 10px;
+    text-align: center;
 }
 
-#file-upload-button {
-    background-color: #D8E2DC;
-    position: relative;
-    left: 220px;
-    margin: 11px;
-    padding: 10px;
+#get-started-button, #register-button,
+#user-sign-in-button, #guest-sign-in-button  {
+    background-color: #025ae8;
+    color: white;
+    font-family: 'Bungee Hairline', cursive;
+    width: 200px;
 }
+
+#sign-in-methods {
+    position: relative;
+}
+
+#register-here, #guest-continue-here, #sign-in-here, {
+    position: relative;
+    bottom: 0;
+}
+
+.form-image {
+    text-align: center;
+
+}
+/*#B4FFEC - pastel turquoise
+#66FFD9 - brighter turq
+#F7196F bright pink
+#C6BEFF - pastel purple*/

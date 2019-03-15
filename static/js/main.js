@@ -23,35 +23,135 @@ const assetTrayItemColorStatic = '#FFFFFF';
 const assetTrayItemColorDragging = '#B3EFB2';
 const chapterBoardItemColorStatic = '#FFFFFF';
 const chapterBoardItemColorDragging = '#B3EFB2';
-const boardColorStatic = '#D8E2DC';
+const boardColorStatic = '#f7f7f7';
 
 const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
+  borderRadius: 10, 
   background: isDragging ? assetTrayItemColorDragging : assetTrayItemColorStatic,
   ...draggableStyle,
+});
+
+const getAssetTrayStyle = (isDraggingOver) => ({
+  background: isDraggingOver ? boardColorStatic : boardColorStatic,
+  borderStyle: `ridge`,
+  borderWidth: 2,
+  borderRadius: 15,
+  height: 1525,
+  overflow: `auto`,
+  padding: grid,
+  width: 150,
 });
 
 const getChapterBoardItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
+  borderRadius: 5, 
+  borderWidth: 2,
+  position: `relative`,
   background: isDragging ? chapterBoardItemColorDragging : chapterBoardItemColorStatic,
   ...draggableStyle,
 });
 
-
 const getChapterBoardStyle = (isDraggingOver) => ({
   background: isDraggingOver ? boardColorStatic : boardColorStatic,
   padding: grid,
+  height: 300,
+  overflow: `auto`,
+});
+
+const getChapterBoardContainerStyle = () => ({
+  borderStyle: `ridge`,
+  borderRadius: 5,
+  borderWidth: 2,
+  padding: grid,
+  backgroundColor: boardColorStatic,
+  margin: 10,
+  padding: 10,
   width: 200,
 });
 
-const getAssetTrayStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? boardColorStatic : boardColorStatic,
-  padding: grid,
-  width: 250,
+const getRemoveAssetButtonStyle = () => ({
+  position: `absolute`,
+  top: 0,
+  right: 0,
+  fontFamily: 'Bungee Hairline',
+  borderStyle: `none`,
+  outline: `none`,
+});
+
+const getRemoveBoardButtonStyle = () => ({
+  position: `absolute`,
+  top: 0,
+  right: 0,
+  fontFamily: 'Bungee Hairline',
+  borderStyle: `none`,
+  backgroundColor: boardColorStatic,
+  outline: `none`,
+});
+
+const getNavButtonStyle = () => ({
+    backgroundColor: '#f7f7f7',
+    position: `relative`,
+    margin: 10,
+    outline: `none`,
+    fontFamily: 'Bungee Hairline',
+    width: 200,
+});
+
+const getSignOutButtonStyle = () => ({
+  backgroundColor: '#f7f7f7',
+  position: `relative`,
+  margin: 10,
+  outline: `none`,
+  fontFamily: 'Bungee Hairline',
+  float: `right`,
+});
+
+const getFileInputFieldStyle = () => ({
+  display: `none`,
+});
+
+const getFileInputFieldLabel = () => ({
+  backgroundColor: '#f7f7f7',
+  position: `relative`,
+  margin: 10,
+  outline: `none`,
+  fontFamily: 'Bungee Hairline',
+  height: 30,
+  borderRadius: 10,
+  borderStyle: `solid`,
+  borderColor: '#C0C0C0',
+  borderWidth: 1,
+  width: 200,
+  textAlign: `center`,
+})
+
+// #new-chapter-board-button, #save-as-button
+//     background-color: #f7f7f7;
+//     left: 10px;
+//     padding: 10px;
+
+// #sign-out-button
+//   float: right;
+
+// #file-input-field {
+//     left: 20px;
+//     color:transparent;
+//     width: 150px;
+//     border-radius: 0px;
+
+// #file-upload-button {
+//     left: 20px;
+//     padding: 1px;
+//     width: 50px;
+
+
+const getHairlineFontStyle = () => ({
+  fontFamily: 'Bungee Hairline',
 });
 
 const cloneDropObject = (inputDropObject, userAssetList) => {
@@ -74,16 +174,24 @@ class DynamicGreeting extends React.Component {
       <div className="container">
         <div className="row">
           <div className="col-6">
-            <br />
-            <h1>Welcome, {UserName}</h1>
-            <br />
+            <h3 id="bungee-shade" className="main-page-title">StoryBored</h3>
           </div>
-          <div className="col-6">
-            <br />
-            <form action="/sign-out" method="POST">
-              <button type="submit" name="sign-out">sign-out</button>
+        </div>
+        <div className="row">
+          <div className="col-3">
+            <h3 id="welcome-user">Welcome, {UserName}</h3>
+          </div>
+          <div className="col-9">
+              <form action="/sign-out" method="POST">
+                <button
+                  type="submit"
+                  name="sign-out"
+                  id="sign-out-button"
+                  style={getNavButtonStyle()}
+                  style={getSignOutButtonStyle()} >
+                  sign-out
+                </button>
             </form>
-            <br />
           </div>
         </div>
       </div>
@@ -135,6 +243,7 @@ class ChapterBoard extends React.Component {
   constructor(props) {
     super(props);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
   }
 
   onRemoveAssetClick(event) {
@@ -142,10 +251,25 @@ class ChapterBoard extends React.Component {
     this.props.handleRemoveAssetClick(event);
   }
 
+  onRemoveBoardClick(event) {
+    event.preventDefault();
+    this.props.handleRemoveBoardClick(event);
+  }
+
   render() {
     return (
-      <div className="col-6" id="individual-board">
-      <p> Board </p>
+      <div className="col-2" id="individual-board" style={getChapterBoardContainerStyle()}>
+      <div contentEditable="true"><p id="board-titles" style={getHairlineFontStyle()}>Board</p></div>
+      <form onSubmit={this.onRemoveBoardClick} >
+        <button
+          type="submit"
+          id="remove-chapterboard"
+          className="remove-chapterboard"
+          value={this.props.boardKey}
+          style={getRemoveBoardButtonStyle()} >
+          x
+        </button>
+      </form>
       <Droppable
         droppableId={this.props.board} >
          {(provided, snapshot) => (
@@ -171,10 +295,11 @@ class ChapterBoard extends React.Component {
                     <form onSubmit={this.onRemoveAssetClick} >
                       <button
                         type="submit"
-                        id="remove-chapterboard"
-                        className="remove-chapterboard"
+                        id="remove-chapterboard-asset"
+                        className="remove-chapterboard-asset"
                         value={asset.key}
-                        board={this.props.board}>
+                        board={this.props.board}
+                        style={getRemoveAssetButtonStyle()} >
                         x
                       </button>
                       <img src={asset.asset} height="100" width="100"/>
@@ -197,6 +322,7 @@ class DragDropContextComp extends React.Component {
     super(props);
 
   this.handleRemoveAssetClick = this.handleRemoveAssetClick.bind(this);
+  this.handleRemoveBoardClick = this.handleRemoveBoardClick.bind(this);
   }
 
   handleRemoveAssetClick(event) {
@@ -204,33 +330,42 @@ class DragDropContextComp extends React.Component {
     this.props.onRemoveAssetClick(event);
   }
 
+  handleRemoveBoardClick(event) {
+    event.preventDefault();
+    this.props.onRemoveBoardClick(event);
+  }
+
   render() {
     return (
         <DragDropContext
           onDragEnd={this.props.onDragEnd} >
+          <div className="container">
             <div className="row">
-              <div className="col-6">
+              <div className="col-2">
                 <AssetTray
                   droppableId="assetTray"
                   userAssetList={this.props.userAssetList}
                  />
               </div>
-              <div className="col-6">
+              <div className="col-10">
               <div className="row">
                 {this.props.userChapterBoardList.map((board, index) => (
                   <ChapterBoard
                     droppableId="chapterBoard"
                     board={board.boardName}
+                    boardKey={board.key}
                     key={board.key}
                     draggableId={board.draggableId}
                     index={index}
                     userChapterBoardAssets={board.boardAssets}
-                    handleRemoveAssetClick={this.handleRemoveAssetClick} >
+                    handleRemoveAssetClick={this.handleRemoveAssetClick}
+                    handleRemoveBoardClick={this.handleRemoveBoardClick} >
                   </ChapterBoard>
                 ))}
               </div>
-              </div>
-              </div>
+            </div>
+          </div>
+        </div>
         </DragDropContext>
     );
   }
@@ -249,29 +384,40 @@ class AssetUpload extends React.Component {
                           this.fileInput.current.files[0].name
                           );
     this.props.onSubmit(file);
-    document.getElementById('file-input').value = "";
+    document.getElementById('file-input-field').value = "";
   }
 
   render() {
     return (
-      <div id="upload-assets-form">
+      <div id="asset-upload-form">
         <form
           onSubmit={this.handleSubmit}
           method="POST"
           encType="multipart/form-data">
             <div className="row">
               <div className="col-6">
-                <input
+              <input
                   type="file"
                   ref={this.fileInput}
-                  id="file-input-field" />
+                  id="file-input-field"
+                  style={getFileInputFieldStyle()} />
+                <label
+                  htmlFor="file-input-field"
+                  style={getFileInputFieldLabel()} >
+                    Choose File
+                </label>
               </div>
               <div className="col-6">
-                <button type="submit" id="file-upload-button">Submit</button>
+                  <button
+                    type="submit"
+                    id="file-upload-button"
+                    style={getNavButtonStyle()} >
+                    Upload!
+                  </button>
               </div>
-          </div>
+            </div>
         </form>
-        </div>
+      </div>
     );
   }
 }
@@ -291,7 +437,41 @@ class NewChapterBoard extends React.Component {
     return (
       <form
         onClick={this.handleClick}>
-        <button type="submit" id="new-chapter-board-button">New chapter board</button>
+        <button 
+          type="submit"
+          id="new-chapter-board-button"
+          style={getNavButtonStyle()} >
+          New chapter board
+        </button>
+      </form>
+    );
+  }
+}
+
+class SaveAs extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+
+    let userChapterBoards = this.props.userChapterBoardList;
+    this.props.handleSaveAs(userChapterBoards);
+  }
+
+  render() {
+    return (
+      <form
+        onClick={this.handleClick}
+        userchapterboardlist={this.props.userChapterBoardList}>
+        <button
+          type="submit"
+          id="save-as-button"
+          style={getNavButtonStyle()} >
+            SaveBoards
+          </button>
       </form>
     );
   }
@@ -304,6 +484,7 @@ class MainPageArea extends React.Component {
     this.handleAssetUpload = this.handleAssetUpload.bind(this);
     this.handleNewBoardClick = this.handleNewBoardClick.bind(this);
     this.onRemoveAssetClick = this.onRemoveAssetClick.bind(this);
+    this.onRemoveBoardClick = this.onRemoveBoardClick.bind(this);
 
     let userAssets = window.images;
     let userAssetList = userAssets.substr(6).slice(0, -6).split("&#39;, &#39;");
@@ -313,11 +494,15 @@ class MainPageArea extends React.Component {
                   key: Math.random().toString(36).substr(2, 9)
                 });
     })
-    console.log("userAssets", userAssetList);
+    console.log("userAssetList", userAssetList);
 
-    let userChapters = window.chapters;
+    let userChapters = Object.values(window.chapters);
+    console.log(Object.values(userChapters));
+    
     userChapters.map(chapter => {
       chapter.key = Math.random().toString(36).substr(2, 9)
+      chapter.dbBoardId = chapter.boardName
+      chapter.boardName = "board_" + Math.random().toString(36).substr(2, 9)
       chapter.draggableId = Math.random().toString(36).substr(2, 9)
       chapter.chapterId = Math.random().toString(36).substr(2, 9)
       chapter.boardAssets = chapter.boardAssets.map(asset => {
@@ -357,14 +542,14 @@ class MainPageArea extends React.Component {
 
     else if (validDropped.source.droppableId === "assetTray" && 
       validDropped.destination.droppableId.includes("board")) {
-
+  
         let targetBoard = this.state.userChapterBoardList.find(function(board) {
           if (board.boardName === validDropped.destination.droppableId) {
             return board  
           }
         });
 
-        if ( targetBoard.boardAssets[0].asset === "static/images/smiling-ready.png" ) {
+        if ( targetBoard.boardAssets[0].asset === "static/images/lizard-face.JPG" ) {
           targetBoard.boardAssets.splice(0, 1);
         }
 
@@ -432,7 +617,7 @@ class MainPageArea extends React.Component {
       if (xmlPackage.status === 200) {
         console.log("ASSET LIST:", userAssetList);
 
-        if ( userAssetList[0] === "static/images/smiling-ready.png" ) {
+        if ( userAssetList[0] === "static/images/lizard-face.JPG" ) {
           userAssetList.splice(0, 1);
         }
 
@@ -445,7 +630,7 @@ class MainPageArea extends React.Component {
 
   handleNewBoardClick() {
     this.state.userChapterBoardList.push({
-      boardAssets: [{ asset: "static/images/smiling-ready.png",
+      boardAssets: [{ asset: "static/images/lizard-face.JPG",
                      draggableId: Math.random().toString(36).substr(2, 9),
                      key: Math.random().toString(36).substr(2, 9) }],
       boardName: "board_" + Math.random().toString(36).substr(2, 9),
@@ -460,6 +645,51 @@ class MainPageArea extends React.Component {
 
   }
 
+  handleSaveAs(userChapterBoards) {
+    event.preventDefault();
+    
+    const formData = new FormData();
+    const postUrl = "/save-as"
+    const xmlPackage = new XMLHttpRequest();
+    let userChapterBoardsJSON = JSON.stringify(userChapterBoards);
+    console.log("JSON chpbds", userChapterBoardsJSON)
+    formData.append("userChapterBoards", userChapterBoardsJSON);
+    xmlPackage.open("POST", postUrl);
+    xmlPackage.responseType = 'text';
+    xmlPackage.onload = () => {
+
+      if (xmlPackage.status === 200) {
+        console.log("Successfully saved.");
+      }
+    };
+    xmlPackage.send(formData);
+  }
+
+  onRemoveBoardClick(event) {
+    event.preventDefault();
+
+    const boardId = event.target[0].getAttribute("board");
+    const boardKeyForRemoval = event.target[0].getAttribute("value");
+
+    let chapterBoardList = this.state.userChapterBoardList;
+    // get board object from boardName
+    let board = chapterBoardList.find(function(boarditem) {
+      if (boarditem.boardName === boardId) {
+        return boarditem.chapterId
+        };
+    });
+
+    let index = chapterBoardList.findIndex(board => {
+      return (board.key === boardKeyForRemoval)}
+    );
+
+    chapterBoardList.splice(index, 1);
+    
+    this.setState({
+      userChapterBoardList: this.state.userChapterBoardList,
+    });
+  }
+
   onRemoveAssetClick(event) {
     event.preventDefault();
 
@@ -472,7 +702,6 @@ class MainPageArea extends React.Component {
         return boarditem.chapterId
         };
     });
-
     // get list of assets associated with board
     let chapterBoardAssets = board.boardAssets;
 
@@ -484,7 +713,7 @@ class MainPageArea extends React.Component {
 
     if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
       chapterBoardAssets.splice(0, 1, {
-        asset: "static/images/smiling-ready.png",
+        asset: "static/images/lizard-face.JPG",
         draggableId: Math.random().toString(36).substr(2, 9),
         key: Math.random().toString(36).substr(2, 9),
       });
@@ -498,19 +727,30 @@ class MainPageArea extends React.Component {
   render() {
     return (
       <div>
+      <DynamicGreeting />
+      <hr />
+      <div className="container">
         <div className="row">
-        <div className="col-3">
-        <NewChapterBoard 
-          onClick={this.handleNewBoardClick} />
+          <div className="col-6">
+            <AssetUpload 
+              onSubmit={this.handleAssetUpload} />
+          </div>
+          <div className="col-3">
+            <NewChapterBoard 
+              onClick={this.handleNewBoardClick} />
+          </div>
+          <div className="col-3">
+            <SaveAs 
+              handleSaveAs={this.handleSaveAs}
+              userChapterBoardList={this.state.userChapterBoardList} />
+          </div>
         </div>
-        <div className="col-3">
-        <AssetUpload 
-          onSubmit={this.handleAssetUpload} />
-        </div>
-        </div>
+      </div>
+        <hr />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
           onRemoveAssetClick={this.onRemoveAssetClick}
+          onRemoveBoardClick={this.onRemoveBoardClick}
           userAssetList={this.state.userAssetList}
           userChapterBoardList={this.state.userChapterBoardList}
         />
@@ -519,10 +759,10 @@ class MainPageArea extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <DynamicGreeting />,
-  document.getElementById('dynamic-greeting')
-);
+// ReactDOM.render(
+//   <DynamicGreeting />,
+//   document.getElementById('dynamic-greeting')
+// );
 
 ReactDOM.render(
   <MainPageArea />,

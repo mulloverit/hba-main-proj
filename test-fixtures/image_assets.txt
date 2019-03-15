@@ -1,0 +1,3 @@
+2|4567|4567|JPEG|RGB|https://s3.amazonaws.com/hackbright-image-upload-test/default_images/lizard-face.JPG | 0923c3bd-3e8c-490a-b308-b3319dfc42d8
+2|4567|4567|JPEG|RGB|https://s3.amazonaws.com/hackbright-image-upload-test/default_images/mtn-sketch.png | 9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13
+2|3902|4000|JPEG|RGB|https://s3.amazonaws.com/hackbright-image-upload-test/default_images/wtf-lady.png | c7f56f81-8ebc-4533-8bd3-d0b605db2595

@@ -5,45 +5,151 @@
 {% block content %}
 <br>
 <br>
-<div class="container">
-
-    <div class="row">
-        <div class="col-4">
-            <div class="sign-in">
-                <h2>Guest</h2>
-                <br>
-                <form action="/guest-continue" method="POST" class="guest-continue">
-                    <input type="submit" name="guest-sign-in" value="Continue as guest">
-                </form>
-            </div>
+<div class="container" id="index-page-title">
+    <div class="row row-centered">
+        <div class="col-12 col-centered">
+            <h1 id="bungee-shade" class="index-page-title">StoryBored</h1>
         </div>
-
-        <div class="col-4">
-            <div class="sign-in">
-                <h2>Sign In</h2>
-                <br>
-                <form action="/sign-in" method="POST" class="registration-inputs">
-                    Username:       <input type="text" name="username"><br><br>
-                    Password:       <input type="password" name="password"><br><br> 
-                    <input type="submit" name="sign-in" value="Sign In">
-                </form>
-            </div>
-        </div>
-
-        <div class="col-4">
-            <div class="registration">
-                <h2>Register</h2>
-                <br>
-                <form action="/register-new" method="POST" class="registration-inputs">
-                    First name:     <input type="text" name="fname"><br><br>
-                    Last name:      <input type="text" name="lname"><br><br>
-                    Email:          <input type="text" name="email"><br><br>
-                    Username:       <input type="text" name="username"><br><br>
-                    Password:       <input type="text" name="password"><br><br> 
-                    <input type="submit" name="register" value="Register">
-                </form>
-            </div>
+    </div>
+    <br>
+    <br>
+    <div class="row row-centered">
+        <div class="col-12 col-centered">
+            <h3 id="bungee-hairline" class="index-page-title-subscript">
+                Simple storyboarding for your creative mind
+            </h3>
         </div>
     </div>
 </div>
+<br>
+<hr>
+<br>
+<div class="container">
+    <div class="row text-centered">
+        <div class="col-2">
+            <img
+                id="index-page-character-drawing"
+                src="static/images/character-drawing.JPG" >
+            </img>
+        </div>
+        <div class="col-2">
+            <img 
+                id="index-page-character-drawing"
+                src="static/images/lizard-face.JPG" >
+            </img>
+        </div>
+        <div class="col-2">
+            <img
+                id="index-page-character-drawing"
+                src="static/images/wtf-lady.png" >
+            </img>
+        </div>
+        <div class="col-2">
+            <img 
+                id="index-page-character-drawing"
+                src="static/images/mtn-sketch.png" >
+            </img>
+        </div>
+        <div class="col-2">
+            <img
+                id="index-page-character-drawing"
+                src="static/images/adventure-time-landscape.JPG" >
+            </img>
+        </div>
+        <div class="col-2">
+            <img
+                id="index-page-character-drawing"
+                src="static/images/steph-and-camillas-adventure.JPG" >
+            </img>
+        </div>
+    </div>
+</div>
+<br>
+<hr>
+<br>
+<div class="container" id="index-page-title">
+    <div class="row row-centered">
+        <div class="col-12 col-centered">
+            <h5 id="bungee-hairline" class="index-page-title-subscript">
+                upload assets &#8226 manage chapters &#8226 organize stories
+            </h5>
+        </div>
+    </div>
+</div>
+<br>
+<div class="row">
+    <div class="col-12">
+        <div class="get-started">
+            <button type="button" id="get-started-button">Let's go!</button>
+        </div>
+    </div>
+</div>
+<br>
+<hr>
+<br><br>
+<div><span id="scroll-to-me" /></div>
+<br><br>
+<div class="container" id="get-logged-in">
+    <br><br>
+    <span id="fredoka-one"><h3>Get logged in</h3></span>
+    <br><br>
+    <div class="row" id="sign-in-methods">
+        <div class="col-4" id="register-here">
+          <form action="/register-new" method="POST" class="registration-inputs">
+            <br>
+            <input type="text" name="fname" placeholder="First name">
+            <br><br>
+            <input type="text" name="lname" placeholder="Last name">
+            <br><br>
+            <input type="text" name="email" placeholder="Email">
+            <br><br>
+            <input type="text" name="username" placeholder="Username">
+            <br><br>
+            <input type="password" name="password" placeholder="Password">
+            <br><br>
+            <input type="submit" name="register-button" id="register-button" value="Register">
+            </form>
+        </div>
+        <div class="col-4" id="sign-in-here">
+            <img 
+                id="index-page-character-drawing"
+                class="form-image"
+                src="static/images/lizard-face.JPG" >
+            </img>
+            <br><br>
+            <form action="/sign-in" method="POST" class="registration-inputs">
+                <input type="text" name="username" placeholder="Username">
+                <br><br>
+                <input type="password" name="password" placeholder="Password">
+                <br><br>
+                <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
+            </form>
+        </div>
+        <div class="col-4" id="guest-continue-here">
+            <form action="/guest-continue" method="POST" class="guest-continue">
+            <img 
+                id="index-page-character-drawing"
+                class="form-image"
+                src="static/images/blinker.gif" >
+            </img>
+            <br><br><br><br><br><br>
+            <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Nah I'm a guest">
+            </form>
+        </div>
+    </div>
+    <br><br>
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<script>
+    $("#get-started-button").click(function() {
+        $('html,body').animate({
+            scrollTop: $("#scroll-to-me").offset().top},
+            'slow');
+    });
+    $("#ill-register").click(function() {
+        $('html,body').animate({
+            scrollTop: $("#register-here").offset().top},
+            'slow');
+    });
+</script>
 {% endblock %}

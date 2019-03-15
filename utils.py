@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import session
 
 from config import connect_to_db, db, app
-from model import User, InputImage, DiffImage
+from model import User, Project, ChapterBoard, ImageAsset, AssetsToBoardsRelationship, DiffImage
 
 #------------------------------------------------------------------------------#
 ## CLASS DEFINITIONS ##
@@ -15,12 +15,12 @@ from model import User, InputImage, DiffImage
 
 class ImageClass:
 
-    def __init__(self, image_object, tmp_path, owner):
+    def __init__(self, image_object, tmp_path, user_id):
         """Instantiate an image object"""
 
         import uuid
         
-        self.owner = owner # username
+        self.user_id = user_id # username
         self.tmp_path = tmp_path
         self.image_object = image_object
         self.uuid = str(uuid.uuid4())
@@ -38,7 +38,6 @@ class ImageClass:
         """ Uploads an image file to s3, creating instance attributes:
             upload_begin_datetime, s3_key, upload_complete_datetime, s3_location
         """
-
         import boto3, botocore
         from config import s3, s3_dl
 
@@ -46,9 +45,9 @@ class ImageClass:
             return("No S3_BUCKET var set. Check your environment variables!")
 
         try:
-
+    
             self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            self.s3_key = self.owner + "/" + self.uuid + "_" + self.tmp_path
+            self.s3_key = self.user_id + "/" + self.uuid + "." + self.format
 
             # Halleluja, get past "ValueError: Fileobj must implement read"
             # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker
@@ -76,7 +75,7 @@ class ImageClass:
 
         if input_image_uuids == None:
             
-            image_record = InputImage(image_user_id=user_id, 
+            image_record = ImageAsset(user_id=user_id, 
                     image_size_x=self.size[0],
                     image_size_y=self.size[1],
                     image_format=self.format,
@@ -91,8 +90,8 @@ class ImageClass:
             input_uuid_1 = input_image_uuids[0]
             input_uuid_2 = input_image_uuids[1]
 
-            input_1_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_1).first()
-            input_2_record = InputImage.query.filter(InputImage.image_uuid == input_uuid_2).first()
+            input_1_record = ImageAsset.query.filter(ImageAsset.image_uuid == input_uuid_1).first()
+            input_2_record = ImageAsset.query.filter(ImageAsset.image_uuid == input_uuid_2).first()
 
             image_record = DiffImage(diff_user_id=user_id,
                                  im_1_id=input_1_record.image_id,
@@ -107,6 +106,47 @@ class ImageClass:
                                  diff_uuid=self.uuid)
         
         db.session.add(image_record)
+        db.session.commit()
+
+class ProjectClass:
+
+    def __init__(self, project_object, user_id):
+        """Instantiate an image object"""
+        
+        self.user_id = user_id # username
+        self.project_object = project_object
+
+    def add_to_database(self, user_id):
+        """Create database record for an image. Handles input images & diffs."""
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        project_record = Project(user_id=user_id, 
+                project_id=self.project_id,
+                saved_datetime=current_datetime,
+                active="yes")
+        
+        db.session.add(project_record)
+        db.session.commit()
+
+class ChapterBoardClass:
+
+    def __init__(self, chapter_object, user_id):
+        """Instantiate an image object"""
+        
+        self.user_id = user_id # username
+        self.chapter_object = chapter_object
+
+    def add_to_database(self, user_id, project_id):
+        """Create database record for an image. Handles input images & diffs."""
+        
+        current_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+
+        chapter_board_record = ChapterBoard(user_id=user_id, 
+                project_id=self.project_id,
+                saved_datetime=current_datetime,
+                active="yes")
+        
+        db.session.add(chapter_board_record)
         db.session.commit()
 
 class UserClass:
@@ -133,11 +173,30 @@ class UserClass:
 
             return None
 
+    def all_user_items(self):
+
+        all_user_items_list = []
+        user = User.query.filter(User.username == self.username).first()
+        projects = Project.query.filter(Project.user_id == user.user_id).all()
+        chapter_boards = ChapterBoard.query.filter(ChapterBoard.user_id == user.user_id).all()
+        image_assets = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
+        assets_to_boards = AssetsToBoardsRelationship.query.filter(AssetsToBoardsRelationship.user_id == user.user_id).all()
+        
+        user_formatted = format_db_results([user])
+        projects_formatted = format_db_results(projects)
+        chapters_formatted = format_db_results(chapter_boards)
+        image_assets_formatted = format_db_results(image_assets)
+        assets_to_boards_formatted = format_db_results(assets_to_boards)
+
+        all_user_items_list.extend([user_formatted, projects_formatted, chapters_formatted, image_assets_formatted, assets_to_boards_formatted])
+
+        return all_user_items_list
+
     def all_image_urls(self):
 
         all_image_urls = []
         user = User.query.filter(User.username == self.username).first()
-        images = InputImage.query.filter(InputImage.image_user_id == user.user_id).all()
+        images = ImageAsset.query.filter(ImageAsset.user_id == user.user_id).all()
 
         for image in images:
             all_image_urls.append(image.image_s3_url)
@@ -145,6 +204,30 @@ class UserClass:
         return(all_image_urls)
 
 # ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+###############NON CLASS SPECIFIC HELPER FUNCTIONS BELOW HERE###################
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+
+def format_db_results(query_results, results_as_dict={}, count=0):
+
+    
+    all_formatted_results = []
+    for result in query_results:
+        formatted_results = {}
+        formatted_result = str(result).strip('\n').split(":", 1)[1:]
+        split_on_line = formatted_result[0].split(",")
+
+        for item in split_on_line:
+            key = item.split("=")[0].lstrip().rstrip().strip('\n')
+            value = item.split("=")[1].lstrip().rstrip().strip('\n')
+            formatted_results[key] = value
+        all_formatted_results.append(formatted_results)
+
+    return all_formatted_results
+
 
 def user_sign_in(submitted_username, submitted_password):
     
