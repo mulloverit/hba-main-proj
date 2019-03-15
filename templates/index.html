@@ -12,6 +12,7 @@
         </div>
     </div>
     <br>
+    <br>
     <div class="row row-centered">
         <div class="col-12 col-centered">
             <h3 id="bungee-hairline" class="index-page-title-subscript">
@@ -20,30 +21,52 @@
         </div>
     </div>
 </div>
+<br>
 <hr>
+<br>
 <div class="container">
     <div class="row text-centered">
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/character-drawing.JPG"></img>
+            <img
+                id="index-page-character-drawing"
+                src="static/images/character-drawing.JPG" >
+            </img>
         </div>
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/lizard-face.JPG"></img>
+            <img 
+                id="index-page-character-drawing"
+                src="static/images/lizard-face.JPG" >
+            </img>
         </div>
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/mtn-sketch.png"></img>
+            <img
+                id="index-page-character-drawing"
+                src="static/images/wtf-lady.png" >
+            </img>
         </div>
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/wtf-lady.png"></img>
+            <img 
+                id="index-page-character-drawing"
+                src="static/images/mtn-sketch.png" >
+            </img>
         </div>
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/night-sky-paint-sample.png"></img>
+            <img
+                id="index-page-character-drawing"
+                src="static/images/adventure-time-landscape.JPG" >
+            </img>
         </div>
         <div class="col-2">
-            <img id="index-page-character-drawing" src="static/images/drawing-desk.png"></img>
+            <img
+                id="index-page-character-drawing"
+                src="static/images/steph-and-camillas-adventure.JPG" >
+            </img>
         </div>
     </div>
 </div>
+<br>
 <hr>
+<br>
 <div class="container" id="index-page-title">
     <div class="row row-centered">
         <div class="col-12 col-centered">
@@ -53,54 +76,67 @@
         </div>
     </div>
 </div>
-<hr>
+<br>
 <div class="row">
     <div class="col-12">
         <div class="get-started">
-            <!-- <form action="/get-started" method="POST" class="get-started-form"> -->
-                <!-- <input type="submit" name="get-started" id="get-started-button" value="Let's go!"> -->
-            <!-- </form> -->
             <button type="button" id="get-started-button">Let's go!</button>
         </div>
     </div>
 </div>
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br>
+<hr>
+<br><br><br><br><br><br><br>
 <hr>
 <div class="container" id="scroll-to-me">
-<br>
-<br><br><br>
-    <div class="row">
-    <br><br><br>
-    <div class="col-4">
-        <form action="/sign-in" method="POST" class="registration-inputs">
-            <input type="text" name="username" placeholder="Username">
-            <input type="password" name="password" placeholder="Password">
-            <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
-        </form>
-    </div>
-    <div class="col-4">
-        <form action="/guest-continue" method="POST" class="guest-continue">
-            <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Nah I'm a guest">
-        </form>
-    </div>
-    <div class="col-4">
-        <button type="button" name="ill-register" id="ill-register" value="I'll register">I'll register</button>
-    </div>
-    </div>
-    <br><br><br>
-    <div class="row" id="register-here">
+    <br><br>
+    <div class="row" id="sign-in-methods">
+        <div class="col-4" id="register-here">
           <form action="/register-new" method="POST" class="registration-inputs">
+            <br>
             <input type="text" name="fname" placeholder="First name">
+            <br><br>
             <input type="text" name="lname" placeholder="Last name">
+            <br><br>
             <input type="text" name="email" placeholder="Email">
+            <br><br>
             <input type="text" name="username" placeholder="Username">
+            <br><br>
             <input type="password" name="password" placeholder="Password">
+            <br><br>
             <input type="submit" name="register-button" id="register-button" value="Register">
-        </form>
+            </form>
+        </div>
+        <div class="col-4" id="sign-in-here">
+            <img 
+                id="index-page-character-drawing"
+                class="form-image"
+                src="static/images/lizard-face.JPG" >
+            </img>
+            <br><br>
+            <form action="/sign-in" method="POST" class="registration-inputs">
+                <input type="text" name="username" placeholder="Username">
+                <br><br>
+                <input type="password" name="password" placeholder="Password">
+                <br><br>
+                <input type="submit" name="sign-in" value="Sign In" id="user-sign-in-button">
+            </form>
+        </div>
+        <div class="col-4" id="guest-continue-here">
+            <form action="/guest-continue" method="POST" class="guest-continue">
+            <img 
+                id="index-page-character-drawing"
+                class="form-image"
+                src="static/images/blinker.gif" >
+            </img>
+            <br><br><br><br><br><br>
+            <input type="submit" name="guest-sign-in" id="guest-sign-in-button" value="Nah I'm a guest">
+            </form>
+        </div>
     </div>
+    <br><br>
 </div>
 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-</div>
 <script>
     $("#get-started-button").click(function() {
         $('html,body').animate({

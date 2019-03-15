@@ -42,7 +42,7 @@ const getAssetTrayStyle = (isDraggingOver) => ({
   height: 1525,
   overflow: `auto`,
   padding: grid,
-  width: 250,
+  width: 150,
 });
 
 const getChapterBoardItemStyle = (isDragging, draggableStyle) => ({
@@ -71,6 +71,7 @@ const getChapterBoardContainerStyle = () => ({
   backgroundColor: boardColorStatic,
   margin: 10,
   padding: 10,
+  width: 200,
 });
 
 const getRemoveAssetButtonStyle = () => ({
@@ -79,6 +80,7 @@ const getRemoveAssetButtonStyle = () => ({
   right: 0,
   fontFamily: 'Bungee Hairline',
   borderStyle: `none`,
+  outline: `none`,
 });
 
 const getRemoveBoardButtonStyle = () => ({
@@ -88,6 +90,68 @@ const getRemoveBoardButtonStyle = () => ({
   fontFamily: 'Bungee Hairline',
   borderStyle: `none`,
   backgroundColor: boardColorStatic,
+  outline: `none`,
+});
+
+const getNavButtonStyle = () => ({
+    backgroundColor: '#f7f7f7',
+    position: `relative`,
+    margin: 10,
+    outline: `none`,
+    fontFamily: 'Bungee Hairline',
+    width: 200,
+});
+
+const getSignOutButtonStyle = () => ({
+  backgroundColor: '#f7f7f7',
+  position: `relative`,
+  margin: 10,
+  outline: `none`,
+  fontFamily: 'Bungee Hairline',
+  float: `right`,
+});
+
+const getFileInputFieldStyle = () => ({
+  display: `none`,
+});
+
+const getFileInputFieldLabel = () => ({
+  backgroundColor: '#f7f7f7',
+  position: `relative`,
+  margin: 10,
+  outline: `none`,
+  fontFamily: 'Bungee Hairline',
+  height: 30,
+  borderRadius: 10,
+  borderStyle: `solid`,
+  borderColor: '#C0C0C0',
+  borderWidth: 1,
+  width: 200,
+  textAlign: `center`,
+})
+
+// #new-chapter-board-button, #save-as-button
+//     background-color: #f7f7f7;
+//     left: 10px;
+//     padding: 10px;
+
+// #sign-out-button
+//   float: right;
+
+// #file-input-field {
+//     left: 20px;
+//     color:transparent;
+//     width: 150px;
+//     border-radius: 0px;
+
+// #file-upload-button {
+//     left: 20px;
+//     padding: 1px;
+//     width: 50px;
+
+
+const getHairlineFontStyle = () => ({
+  fontFamily: 'Bungee Hairline',
 });
 
 const cloneDropObject = (inputDropObject, userAssetList) => {
@@ -119,7 +183,14 @@ class DynamicGreeting extends React.Component {
           </div>
           <div className="col-9">
               <form action="/sign-out" method="POST">
-                <button type="submit" name="sign-out" id="sign-out-button">sign-out</button>
+                <button
+                  type="submit"
+                  name="sign-out"
+                  id="sign-out-button"
+                  style={getNavButtonStyle()}
+                  style={getSignOutButtonStyle()} >
+                  sign-out
+                </button>
             </form>
           </div>
         </div>
@@ -187,8 +258,8 @@ class ChapterBoard extends React.Component {
 
   render() {
     return (
-      <div className="col-3" id="individual-board" style={getChapterBoardContainerStyle()}>
-      <div contentEditable="true"><p id="board-titles">Board</p></div>
+      <div className="col-2" id="individual-board" style={getChapterBoardContainerStyle()}>
+      <div contentEditable="true"><p id="board-titles" style={getHairlineFontStyle()}>Board</p></div>
       <form onSubmit={this.onRemoveBoardClick} >
         <button
           type="submit"
@@ -270,13 +341,13 @@ class DragDropContextComp extends React.Component {
           onDragEnd={this.props.onDragEnd} >
           <div className="container">
             <div className="row">
-              <div className="col-3">
+              <div className="col-2">
                 <AssetTray
                   droppableId="assetTray"
                   userAssetList={this.props.userAssetList}
                  />
               </div>
-              <div className="col-9">
+              <div className="col-10">
               <div className="row">
                 {this.props.userChapterBoardList.map((board, index) => (
                   <ChapterBoard
@@ -325,13 +396,24 @@ class AssetUpload extends React.Component {
           encType="multipart/form-data">
             <div className="row">
               <div className="col-6">
-                <input
+              <input
                   type="file"
                   ref={this.fileInput}
-                  id="file-input-field" />
+                  id="file-input-field"
+                  style={getFileInputFieldStyle()} />
+                <label
+                  htmlFor="file-input-field"
+                  style={getFileInputFieldLabel()} >
+                    Choose File
+                </label>
               </div>
               <div className="col-6">
-                  <button type="submit" id="file-upload-button">go!</button>
+                  <button
+                    type="submit"
+                    id="file-upload-button"
+                    style={getNavButtonStyle()} >
+                    Upload!
+                  </button>
               </div>
             </div>
         </form>
@@ -355,7 +437,12 @@ class NewChapterBoard extends React.Component {
     return (
       <form
         onClick={this.handleClick}>
-        <button type="submit" id="new-chapter-board-button">New chapter board</button>
+        <button 
+          type="submit"
+          id="new-chapter-board-button"
+          style={getNavButtonStyle()} >
+          New chapter board
+        </button>
       </form>
     );
   }
@@ -379,7 +466,12 @@ class SaveAs extends React.Component {
       <form
         onClick={this.handleClick}
         userchapterboardlist={this.props.userChapterBoardList}>
-        <button type="submit" id="save-as-button">SaveBoards</button>
+        <button
+          type="submit"
+          id="save-as-button"
+          style={getNavButtonStyle()} >
+            SaveBoards
+          </button>
       </form>
     );
   }
@@ -402,7 +494,7 @@ class MainPageArea extends React.Component {
                   key: Math.random().toString(36).substr(2, 9)
                 });
     })
-    console.log("userAssets", userAssetList);
+    console.log("userAssetList", userAssetList);
 
     let userChapters = Object.values(window.chapters);
     console.log(Object.values(userChapters));
@@ -457,7 +549,7 @@ class MainPageArea extends React.Component {
           }
         });
 
-        if ( targetBoard.boardAssets[0].asset === "static/images/smiling-ready.png" ) {
+        if ( targetBoard.boardAssets[0].asset === "static/images/lizard-face.JPG" ) {
           targetBoard.boardAssets.splice(0, 1);
         }
 
@@ -525,7 +617,7 @@ class MainPageArea extends React.Component {
       if (xmlPackage.status === 200) {
         console.log("ASSET LIST:", userAssetList);
 
-        if ( userAssetList[0] === "static/images/smiling-ready.png" ) {
+        if ( userAssetList[0] === "static/images/lizard-face.JPG" ) {
           userAssetList.splice(0, 1);
         }
 
@@ -538,7 +630,7 @@ class MainPageArea extends React.Component {
 
   handleNewBoardClick() {
     this.state.userChapterBoardList.push({
-      boardAssets: [{ asset: "static/images/smiling-ready.png",
+      boardAssets: [{ asset: "static/images/lizard-face.JPG",
                      draggableId: Math.random().toString(36).substr(2, 9),
                      key: Math.random().toString(36).substr(2, 9) }],
       boardName: "board_" + Math.random().toString(36).substr(2, 9),
@@ -621,7 +713,7 @@ class MainPageArea extends React.Component {
 
     if ( chapterBoardAssets[0] === "" || chapterBoardAssets[0] === undefined ) {
       chapterBoardAssets.splice(0, 1, {
-        asset: "static/images/smiling-ready.png",
+        asset: "static/images/lizard-face.JPG",
         draggableId: Math.random().toString(36).substr(2, 9),
         key: Math.random().toString(36).substr(2, 9),
       });
@@ -639,15 +731,15 @@ class MainPageArea extends React.Component {
       <hr />
       <div className="container">
         <div className="row">
-          <div className="col-4">
+          <div className="col-6">
             <AssetUpload 
               onSubmit={this.handleAssetUpload} />
           </div>
-          <div className="col-4">
+          <div className="col-3">
             <NewChapterBoard 
               onClick={this.handleNewBoardClick} />
           </div>
-          <div className="col-4">
+          <div className="col-3">
             <SaveAs 
               handleSaveAs={this.handleSaveAs}
               userChapterBoardList={this.state.userChapterBoardList} />

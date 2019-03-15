@@ -47,7 +47,7 @@ class ImageClass:
         try:
     
             self.upload_begin_datetime = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-            self.s3_key = self.user_id + "/" + self.uuid + "." + self.mimetype
+            self.s3_key = self.user_id + "/" + self.uuid + "." + self.format
 
             # Halleluja, get past "ValueError: Fileobj must implement read"
             # https://www.programcreek.com/python/example/106649/boto3.s3.transfer.ProgressCallbackInvoker

@@ -48,9 +48,9 @@ def sign_in():
 @app.route("/sign-out", methods=['POST'])
 def sign_out():
     """Log in an existing user"""
-
+    session['images'] = []
     session['username'] = "guest"
-    message = user_sign_out()
+    
     return redirect('/')
 
 
@@ -86,19 +86,33 @@ def upload_inputs():
                                             username,
                                             )
             print(user_submitted_image_object.upload_to_s3(S3_BUCKET))
-            user_submitted_image_object.add_to_database(user_id)
+
+            if username != "guest":
+                user_submitted_image_object.add_to_database(user_id)
+
             user_submitted_image_s3_locations.append(
                                             user_submitted_image_object.s3_location,
                                             )    
-            
-        images = user.all_image_urls()
+        if username != "guest":    
+            images = user.all_image_urls()
+
+        new_images = user_submitted_image_s3_locations
+
+        if session.get('images', None) == None and username == "guest":
+            session['images'] = new_images
+        elif session.get('images', None) != None and username == "guest":
+            session['images'] = session['images'] + new_images
+            session_images = session['images']
 
         print("UPLOAD SUCCESS!")
         print("NEW ASSET LOCATIONS:", user_submitted_image_s3_locations)
-        print("ALL USER IMAGES:", images)
         
         #normalize data to a dictionary and Json.dumps similar to boards below
-        return str(images)
+        if username != "guest":
+            print("ALL USER IMAGES:", images)
+            return str(images)
+        print("ALL SESSION IMAGES:", session_images)
+        return str(session_images)
 
     except:
 
@@ -139,6 +153,8 @@ def main():
     username, user_id = current_user()
     user = UserClass(username)
     images = user.all_image_urls()
+    if len(images) == 0:
+        images.append("static/images/lizard-face.JPG")
     all_user_items = user.all_user_items()
 
     user_record = all_user_items[0]
@@ -184,7 +200,7 @@ def main():
         chapter_boards_with_asset_urls[count] = {"boardName": board,
                                                  "boardAssets": asset_urls}
         count += 1
-    print("formatted", chapter_boards_with_asset_urls)
+    #print("formatted", chapter_boards_with_asset_urls)
 
     chapters = chapter_boards_with_asset_urls
     # chapters = {"boardName": "board_00001", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/c55db769-59a9-470e-9678-0768c7b0d73e_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG']}, {"boardName": "board_00002", "boardAssets": ['http://hackbright-image-upload-test.s3.amazonaws.com/guest/346b5e60-9dcc-43ec-9657-001cd0dbb49c_static/images/guest_IMG_5417.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/c7f56f81-8ebc-4533-8bd3-d0b605db2595_static/images/guest_IMG_5477.JPG', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/9d85f98c-f07b-4d6a-9b3c-cb7b697f4a13_static/images/guest_DODtrQ5W0AA-2S4.jpg', 'http://hackbright-image-upload-test.s3.amazonaws.com/guest/40b0e5bb-4bbc-4dae-85e6-436b8a6f64ee_static/images/guest_IMG_5417.JPG']}
