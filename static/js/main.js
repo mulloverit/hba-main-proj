@@ -87,7 +87,6 @@ class DynamicGreeting extends React.Component {
 
     return (
       <div className="container">
-      <br />
         <div className="row">
           <div className="col-6">
             <h3 id="bungee-shade" className="main-page-title">StoryBored</h3>
@@ -97,19 +96,12 @@ class DynamicGreeting extends React.Component {
           <div className="col-3">
             <h3 id="welcome-user">Welcome, {UserName}</h3>
           </div>
-          <div className="col-3">
-            <button id="project-mgmt">Project Management</button>
-          </div>
-          <div className="col-3">
-            <button id="project-mgmt">Asset Management  </button>
-          </div>
-          <div className="col-3">
+          <div className="col-9">
               <form action="/sign-out" method="POST">
                 <button type="submit" name="sign-out" id="sign-out-button">sign-out</button>
             </form>
           </div>
         </div>
-        <hr />
       </div>
     );
   }
@@ -307,20 +299,18 @@ class AssetUpload extends React.Component {
           method="POST"
           encType="multipart/form-data">
             <div className="row">
-              <div className="col">
+              <div className="col-6">
                 <input
                   type="file"
                   ref={this.fileInput}
                   id="file-input-field" />
               </div>
+              <div className="col-6">
+                  <button type="submit" id="file-upload-button">go!</button>
               </div>
-              <div className="row">
-                <div className="col">
-                <button type="submit" id="file-upload-button">upload</button>
-                </div>
-              </div>
+            </div>
         </form>
-        </div>
+      </div>
     );
   }
 }
@@ -620,21 +610,24 @@ class MainPageArea extends React.Component {
   render() {
     return (
       <div>
+      <DynamicGreeting />
+      <hr />
         <div className="row">
-        <div className="col-3">
-        <AssetUpload 
-          onSubmit={this.handleAssetUpload} />
+          <div className="col-4">
+            <AssetUpload 
+              onSubmit={this.handleAssetUpload} />
+          </div>
+          <div className="col-4">
+            <NewChapterBoard 
+              onClick={this.handleNewBoardClick} />
+          </div>
+          <div className="col-4">
+            <SaveAs 
+              handleSaveAs={this.handleSaveAs}
+              userChapterBoardList={this.state.userChapterBoardList} />
+          </div>
         </div>
-        <div className="col-3">
-        <NewChapterBoard 
-          onClick={this.handleNewBoardClick} />
-        </div>
-        <div className="col-3">
-        <SaveAs 
-          handleSaveAs={this.handleSaveAs}
-          userChapterBoardList={this.state.userChapterBoardList} />
-        </div>
-        </div>
+        <hr />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
           onRemoveAssetClick={this.onRemoveAssetClick}
@@ -647,10 +640,10 @@ class MainPageArea extends React.Component {
   }
 }
 
-ReactDOM.render(
-  <DynamicGreeting />,
-  document.getElementById('dynamic-greeting')
-);
+// ReactDOM.render(
+//   <DynamicGreeting />,
+//   document.getElementById('dynamic-greeting')
+// );
 
 ReactDOM.render(
   <MainPageArea />,
