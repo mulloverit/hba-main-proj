@@ -2,7 +2,6 @@
 package-lock.json
 node_modules/
 hba-proj-env/
-static/images/
 __pycache__
 *.pyc
 secrets.sh
