@@ -15,13 +15,13 @@ Wish me luck! 🤘
 Aside from using [Issues](https://github.com/mulloverit/hba-main-proj/issues) and [PRs](https://github.com/mulloverit/hba-main-proj/pulls), I'm keeping track of messier daily notes on my progress, found resources, and to-dos in [this gist](https://gist.github.com/mulloverit/231e26ec0402b472d7a988e0a911d51c).
 
 ### Walkthrough
-Landing page:
+_Landing page_
 <img width="1270" alt="Screen Shot 2019-03-15 at 2 34 33 PM" src="https://user-images.githubusercontent.com/42949710/54464357-94fca400-4733-11e9-9dc1-c39b3bc7e3c2.png">
 
-Below-the-fold sign-in:
+_Below-the-fold sign-in_
 <img width="1280" alt="Screen Shot 2019-03-15 at 3 05 46 PM" src="https://user-images.githubusercontent.com/42949710/54464438-e2791100-4733-11e9-84cb-4fb89d913f07.png">
 
-Storyboard view with default images:
+_Logged-in view with default images_
 <img width="1280" alt="Screen Shot 2019-03-15 at 3 06 09 PM" src="https://user-images.githubusercontent.com/42949710/54464441-e60c9800-4733-11e9-83e7-bbcfa9e870a1.png">
 
 ### Current status (wip ^_^)
