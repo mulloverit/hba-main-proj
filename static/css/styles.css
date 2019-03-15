@@ -83,11 +83,16 @@ h2 {
     padding: 1px;
     width: 50px;
     outline: none;
+    font-family: 'Bungee Hairline', cursive;
+}
+
+#board-titles {
+    font-family: 'Bungee Hairline', cursive;
 }
 
 #file-input-field {
     color:transparent;
-    width: 125px;
+    width: 150px;
     border-radius: 0px;
 }
 
@@ -100,16 +105,16 @@ h3#bungee-shade.get-started-page-title {
     text-align: center;
 }
 
-#dummy-board {
-    border-radius: 25px;
-    border-style: ridge;
-}
+/*#dummy-board {
+    border-radius: 5px;
+}*/
 
 #sign-out-button {
     position: relative;
     float: right;
     margin: 10px;
     outline: none;
+    font-family: 'Bungee Hairline', cursive;
 }
 
 #new-chapter-board-button, #save-as-button  {
@@ -119,6 +124,7 @@ h3#bungee-shade.get-started-page-title {
     left: 10px;
     padding: 10px;
     outline: none;
+    font-family: 'Bungee Hairline', cursive;
 }
 
 .get-started {

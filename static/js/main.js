@@ -37,7 +37,8 @@ const getAssetTrayItemStyle = (isDragging, draggableStyle) => ({
 const getAssetTrayStyle = (isDraggingOver) => ({
   background: isDraggingOver ? boardColorStatic : boardColorStatic,
   borderStyle: `ridge`,
-  borderRadius: 25,
+  borderWidth: 2,
+  borderRadius: 15,
   height: 1525,
   overflow: `auto`,
   padding: grid,
@@ -48,7 +49,9 @@ const getChapterBoardItemStyle = (isDragging, draggableStyle) => ({
   userSelect: 'none',
   padding: grid * 2,
   margin: `0 0 ${grid}px 0`,
-  borderRadius: 10, 
+  borderRadius: 5, 
+  borderWidth: 2,
+  position: `relative`,
   background: isDragging ? chapterBoardItemColorDragging : chapterBoardItemColorStatic,
   ...draggableStyle,
 });
@@ -62,11 +65,29 @@ const getChapterBoardStyle = (isDraggingOver) => ({
 
 const getChapterBoardContainerStyle = () => ({
   borderStyle: `ridge`,
-  borderRadius: 25,
+  borderRadius: 5,
+  borderWidth: 2,
   padding: grid,
   backgroundColor: boardColorStatic,
   margin: 10,
   padding: 10,
+});
+
+const getRemoveAssetButtonStyle = () => ({
+  position: `absolute`,
+  top: 0,
+  right: 0,
+  fontFamily: 'Bungee Hairline',
+  borderStyle: `none`,
+});
+
+const getRemoveBoardButtonStyle = () => ({
+  position: `absolute`,
+  top: 0,
+  right: 0,
+  fontFamily: 'Bungee Hairline',
+  borderStyle: `none`,
+  backgroundColor: boardColorStatic,
 });
 
 const cloneDropObject = (inputDropObject, userAssetList) => {
@@ -167,13 +188,14 @@ class ChapterBoard extends React.Component {
   render() {
     return (
       <div className="col-3" id="individual-board" style={getChapterBoardContainerStyle()}>
-      <div contentEditable="true"><p>Board</p></div>
+      <div contentEditable="true"><p id="board-titles">Board</p></div>
       <form onSubmit={this.onRemoveBoardClick} >
         <button
           type="submit"
           id="remove-chapterboard"
           className="remove-chapterboard"
-          value={this.props.boardKey} >
+          value={this.props.boardKey}
+          style={getRemoveBoardButtonStyle()} >
           x
         </button>
       </form>
@@ -205,7 +227,8 @@ class ChapterBoard extends React.Component {
                         id="remove-chapterboard-asset"
                         className="remove-chapterboard-asset"
                         value={asset.key}
-                        board={this.props.board}>
+                        board={this.props.board}
+                        style={getRemoveAssetButtonStyle()} >
                         x
                       </button>
                       <img src={asset.asset} height="100" width="100"/>
@@ -245,6 +268,7 @@ class DragDropContextComp extends React.Component {
     return (
         <DragDropContext
           onDragEnd={this.props.onDragEnd} >
+          <div className="container">
             <div className="row">
               <div className="col-3">
                 <AssetTray
@@ -268,8 +292,9 @@ class DragDropContextComp extends React.Component {
                   </ChapterBoard>
                 ))}
               </div>
-              </div>
-              </div>
+            </div>
+          </div>
+        </div>
         </DragDropContext>
     );
   }
@@ -612,6 +637,7 @@ class MainPageArea extends React.Component {
       <div>
       <DynamicGreeting />
       <hr />
+      <div className="container">
         <div className="row">
           <div className="col-4">
             <AssetUpload 
@@ -627,6 +653,7 @@ class MainPageArea extends React.Component {
               userChapterBoardList={this.state.userChapterBoardList} />
           </div>
         </div>
+      </div>
         <hr />
         <DragDropContextComp 
           onDragEnd={this.onDragEnd}
