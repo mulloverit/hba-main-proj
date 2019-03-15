@@ -4,14 +4,14 @@ Storybored is a simple storyboarding application, where a user can upload creati
 
 This app is built with a Flask/Python/Postgres backend, and a React front-end. 
 
-## about me
+## About me
 I'm Camilla. I'm a full-time software engineering student at Hackbright Academy. This is my main project for the course.
 
 I'm coming to Hackbright from 5 years as a developer, team lead and product manager at Mapbox. I'm heading back towards engineering because I love building things. I have some experience on the backend (Python, Bash, AWS), and am using this time to stretch my muslces and brain on a data-driven front-end.
 
 Wish me luck! 🤘 
 
-## daily notes
+## Daily notes
 Aside from using [Issues](https://github.com/mulloverit/hba-main-proj/issues) and [PRs](https://github.com/mulloverit/hba-main-proj/pulls), I'm keeping track of messier daily notes on my progress, found resources, and to-dos in [this gist](https://gist.github.com/mulloverit/231e26ec0402b472d7a988e0a911d51c).
 
 ## Walkthrough
