@@ -24,6 +24,6 @@ _Below-the-fold sign-in_
 _Logged-in view with default images_
 <img width="1280" alt="Screen Shot 2019-03-15 at 3 06 09 PM" src="https://user-images.githubusercontent.com/42949710/54464441-e60c9800-4733-11e9-83e7-bbcfa9e870a1.png">
 
-### Current status (wip ^_^)
+### Current status
 
 ![wip10](https://user-images.githubusercontent.com/42949710/54464280-3cc5a200-4733-11e9-9897-0ff9736fe87d.gif)
