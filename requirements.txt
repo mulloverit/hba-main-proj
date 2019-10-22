@@ -8,7 +8,7 @@ itsdangerous==1.1.0
 Jinja2==2.10
 jmespath==0.9.3
 MarkupSafe==1.1.0
-Pillow==5.4.1
+Pillow==6.2.0
 psycopg2==2.7.7
 python-dateutil==2.8.0
 s3transfer==0.2.0
